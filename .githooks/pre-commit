@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+XDG_CACHE_HOME=/tmp COREPACK_HOME=/tmp/corepack corepack pnpm lint
+XDG_CACHE_HOME=/tmp COREPACK_HOME=/tmp/corepack corepack pnpm test

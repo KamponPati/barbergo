@@ -1,0 +1,35 @@
+version: 1
+last_updated: 2026-02-13
+mode: pilot_limited
+
+zones:
+  - zone_id: central-a
+    city: bangkok
+    status: enabled
+    geofence:
+      center_lat: 13.7563
+      center_lng: 100.5018
+      radius_km: 5
+    booking_controls:
+      delivery_mode: false
+      max_daily_bookings: 120
+      partner_whitelist:
+        - partner_1
+        - partner_2
+  - zone_id: west-b
+    city: bangkok
+    status: enabled
+    geofence:
+      center_lat: 13.7400
+      center_lng: 100.4800
+      radius_km: 4
+    booking_controls:
+      delivery_mode: false
+      max_daily_bookings: 80
+      partner_whitelist:
+        - partner_1
+
+rollout_guardrails:
+  reject_outside_geofence: true
+  reject_non_whitelisted_partner: true
+  reject_over_daily_cap: true

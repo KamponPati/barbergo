@@ -1,0 +1,4 @@
+booking_id,amount,status
+book_101,350,captured
+book_102,250,captured
+book_103,550,refunded

@@ -1,0 +1,94 @@
+name: release-prod
+
+on:
+  workflow_dispatch:
+    inputs:
+      api_base_url:
+        description: "Production API base URL (example: https://api.example.com/api/v1)"
+        required: true
+      web_base_url:
+        description: "Production Web URL (example: https://app.example.com)"
+        required: true
+      release_id:
+        description: "Release identifier"
+        required: true
+
+concurrency:
+  group: release-prod
+  cancel-in-progress: false
+
+jobs:
+  predeploy:
+    runs-on: ubuntu-latest
+    environment: production
+    timeout-minutes: 20
+    outputs:
+      release_id: ${{ github.event.inputs.release_id }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile=false
+
+      - name: Predeploy gate
+        run: bash scripts/release/predeploy-gate.sh
+
+  deploy-and-verify:
+    runs-on: ubuntu-latest
+    environment: production
+    needs: predeploy
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install ripgrep
+        run: sudo apt-get update && sudo apt-get install -y ripgrep
+
+      - name: Deploy canary (hook)
+        run: |
+          if [ -n "${{ secrets.PROD_DEPLOY_CANARY_CMD }}" ]; then
+            bash -lc "${{ secrets.PROD_DEPLOY_CANARY_CMD }}"
+          else
+            echo "[WARN] PROD_DEPLOY_CANARY_CMD is not configured"
+          fi
+
+      - name: Production smoke verification
+        env:
+          API_BASE_URL: ${{ github.event.inputs.api_base_url }}
+          WEB_BASE_URL: ${{ github.event.inputs.web_base_url }}
+        run: bash scripts/staging/smoke-critical-journeys.sh
+
+      - name: Promote full rollout (hook)
+        run: |
+          if [ -n "${{ secrets.PROD_DEPLOY_FULL_CMD }}" ]; then
+            bash -lc "${{ secrets.PROD_DEPLOY_FULL_CMD }}"
+          else
+            echo "[WARN] PROD_DEPLOY_FULL_CMD is not configured"
+          fi
+
+      - name: Rollback on failure (hook)
+        if: failure()
+        run: |
+          if [ -n "${{ secrets.PROD_ROLLBACK_CMD }}" ]; then
+            bash -lc "${{ secrets.PROD_ROLLBACK_CMD }}"
+          else
+            echo "[WARN] PROD_ROLLBACK_CMD is not configured"
+          fi

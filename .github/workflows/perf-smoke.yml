@@ -1,0 +1,33 @@
+name: perf-smoke
+
+on:
+  workflow_dispatch:
+    inputs:
+      api_base_url:
+        description: "API base URL (example: https://api-staging.example.com/api/v1)"
+        required: true
+      vus:
+        description: "Virtual users"
+        required: false
+        default: "30"
+      duration:
+        description: "Test duration"
+        required: false
+        default: "1m"
+
+jobs:
+  k6-smoke:
+    runs-on: ubuntu-latest
+    environment: staging
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Run k6 smoke
+        uses: grafana/k6-action@v0.3.1
+        with:
+          filename: scripts/perf/k6-smoke.js
+          flags: >-
+            -e API_BASE_URL=${{ github.event.inputs.api_base_url }}
+            -e VUS=${{ github.event.inputs.vus }}
+            -e DURATION=${{ github.event.inputs.duration }}

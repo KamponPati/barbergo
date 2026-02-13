@@ -1,0 +1,20 @@
+version: 1
+updated_at: 2026-02-13
+
+global_gates:
+  min_completion_rate: 0.92
+  max_complaint_rate: 0.03
+  max_refund_rate: 0.02
+  max_confirm_time_avg_min: 10
+  min_repeat_rate: 0.25
+
+zones:
+  - zone_id: central-a
+    status: approved_for_expansion
+    current_coverage_level: L1
+    target_coverage_level: L2
+  - zone_id: west-b
+    status: hold
+    current_coverage_level: L1
+    target_coverage_level: L2
+    hold_reason: on_time_start_rate_below_threshold

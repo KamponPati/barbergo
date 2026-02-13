@@ -1,0 +1,18 @@
+version: 1
+updated_at: 2026-02-13
+
+auto_triage_rules:
+  - rule_id: low_value_no_show
+    if:
+      dispute_type: no_show
+      amount_lte: 300
+      evidence_score_gte: 0.8
+    action: auto_refund
+  - rule_id: missing_evidence
+    if:
+      evidence_count_eq: 0
+    action: request_more_evidence
+
+policy_enforcement:
+  abuse_threshold_per_30d: 3
+  actions: [warning, temporary_suspension, delisting_review]

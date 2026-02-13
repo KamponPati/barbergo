@@ -1,0 +1,6 @@
+booking_id,confirm_time_min,on_time_start,completed,complaint,refund,repeat
+book_101,7,1,1,0,0,1
+book_102,12,0,1,1,0,0
+book_103,9,1,0,0,1,0
+book_104,6,1,1,0,0,1
+book_105,8,1,1,0,0,0

@@ -1,0 +1,17 @@
+version: 1
+updated_at: 2026-02-13
+
+modules:
+  loyalty:
+    status: planned
+    pilot_zones: [central-a]
+  referral:
+    status: planned
+    pilot_zones: [central-a]
+  promo_expansion:
+    status: planned
+    pilot_zones: [central-a, west-b]
+
+release_policy:
+  requires_ab_readout: true
+  requires_kpi_guardrail_pass: true

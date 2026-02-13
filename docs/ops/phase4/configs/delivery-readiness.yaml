@@ -1,0 +1,19 @@
+version: 1
+updated_at: 2026-02-13
+
+requirements:
+  - partner_delivery_training_completed
+  - delivery_sla_simulation_passed
+  - dispute_resolution_capacity_ready
+  - zone_completion_rate_meets_gate
+  - zone_refund_rate_meets_gate
+
+zones:
+  - zone_id: central-a
+    delivery_mode: disabled
+    readiness_score: 0.84
+    decision: pending
+  - zone_id: west-b
+    delivery_mode: disabled
+    readiness_score: 0.62
+    decision: blocked

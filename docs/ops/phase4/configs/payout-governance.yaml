@@ -1,0 +1,19 @@
+version: 1
+updated_at: 2026-02-13
+
+risk_profiles:
+  low:
+    holdback_rate: 0.02
+    payout_cycle_days: 3
+  medium:
+    holdback_rate: 0.05
+    payout_cycle_days: 7
+  high:
+    holdback_rate: 0.10
+    payout_cycle_days: 14
+
+classification_inputs:
+  - dispute_rate
+  - refund_rate
+  - cancellation_rate
+  - chargeback_rate

@@ -1,0 +1,4 @@
+partner_id,partner_name,zone_id,kyc_status,training_status,onboarded_at,ops_contact
+partner_1,Downtown Grooming Co.,central-a,approved,completed,2026-02-13,ops-central@barbergo.local
+partner_2,Riverside Barber Lab,central-a,approved,completed,2026-02-13,ops-central@barbergo.local
+partner_3,Westside Men Studio,west-b,approved,in_progress,2026-02-13,ops-west@barbergo.local

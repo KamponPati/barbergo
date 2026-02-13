@@ -1,0 +1,21 @@
+version: 1
+updated_at: 2026-02-13
+
+default_multiplier: 1.00
+caps:
+  max_multiplier: 1.35
+  min_multiplier: 0.85
+
+rules:
+  - rule_id: peak-hours-central
+    zone_id: central-a
+    condition:
+      hour_range: "18:00-21:00"
+      demand_supply_ratio_gte: 1.2
+    multiplier: 1.15
+  - rule_id: offpeak-west
+    zone_id: west-b
+    condition:
+      hour_range: "10:00-13:00"
+      demand_supply_ratio_lte: 0.8
+    multiplier: 0.92

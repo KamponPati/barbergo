@@ -1,0 +1,447 @@
+openapi: 3.1.0
+info:
+  title: BarberGo API
+  version: 1.0.0-rc2
+  description: Contract-first API skeleton for Phase 1 freeze candidate.
+servers:
+  - url: /api/v1
+security:
+  - bearerAuth: []
+paths:
+  /customer/shops/nearby:
+    get:
+      summary: Get nearby shops
+      tags: [Customer]
+      parameters:
+        - name: lat
+          in: query
+          required: true
+          schema:
+            type: number
+        - name: lng
+          in: query
+          required: true
+          schema:
+            type: number
+        - name: radius_km
+          in: query
+          required: false
+          schema:
+            type: number
+            default: 5
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NearbyShopsResponse'
+
+  /customer/shops/{shopId}:
+    get:
+      summary: Get shop detail
+      tags: [Customer]
+      parameters:
+        - $ref: '#/components/parameters/ShopId'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ShopDetailResponse'
+
+  /customer/availability:
+    get:
+      summary: Get availability slots
+      tags: [Customer]
+      parameters:
+        - $ref: '#/components/parameters/ShopId'
+        - name: branch_id
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: service_id
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: date
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AvailabilityResponse'
+
+  /customer/bookings/quote:
+    post:
+      summary: Create booking quote
+      tags: [Customer]
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateQuoteRequest'
+      responses:
+        '200':
+          description: Quote generated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QuoteResponse'
+
+  /customer/bookings:
+    post:
+      summary: Create booking
+      tags: [Customer]
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateBookingRequest'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BookingResponse'
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /customer/bookings/{id}:
+    get:
+      summary: Get booking detail
+      tags: [Customer]
+      parameters:
+        - $ref: '#/components/parameters/BookingId'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BookingResponse'
+
+  /customer/bookings/{id}/cancel:
+    post:
+      summary: Cancel booking
+      tags: [Customer]
+      parameters:
+        - $ref: '#/components/parameters/BookingId'
+        - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '200':
+          description: Cancelled
+
+  /partner/onboarding/submit:
+    post:
+      summary: Submit partner onboarding
+      tags: [Partner]
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '202':
+          description: Accepted
+
+  /partner/shop/profile:
+    get:
+      summary: Get partner profile
+      tags: [Partner]
+      responses:
+        '200':
+          description: Success
+    put:
+      summary: Update partner profile
+      tags: [Partner]
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '200':
+          description: Updated
+
+  /partner/branches:
+    post:
+      summary: Create partner branch
+      tags: [Partner]
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '201':
+          description: Created
+
+  /partner/services:
+    post:
+      summary: Create or update service
+      tags: [Partner]
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '201':
+          description: Created
+
+  /partner/staff:
+    post:
+      summary: Create or update staff
+      tags: [Partner]
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '201':
+          description: Created
+
+  /partner/bookings/{id}/confirm:
+    post:
+      summary: Confirm booking
+      tags: [Partner]
+      parameters:
+        - $ref: '#/components/parameters/BookingId'
+        - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '200':
+          description: Confirmed
+
+  /partner/bookings/{id}/start:
+    post:
+      summary: Start booking service
+      tags: [Partner]
+      parameters:
+        - $ref: '#/components/parameters/BookingId'
+        - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '200':
+          description: Started
+
+  /partner/bookings/{id}/complete:
+    post:
+      summary: Complete booking service
+      tags: [Partner]
+      parameters:
+        - $ref: '#/components/parameters/BookingId'
+        - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '200':
+          description: Completed
+
+  /partner/wallet/summary:
+    get:
+      summary: Get wallet summary
+      tags: [Partner]
+      responses:
+        '200':
+          description: Success
+
+  /admin/partners/pending:
+    get:
+      summary: Get pending partners
+      tags: [Admin]
+      responses:
+        '200':
+          description: Success
+
+  /admin/partners/{id}/approve:
+    post:
+      summary: Approve partner
+      tags: [Admin]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+        - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '200':
+          description: Approved
+
+  /admin/disputes:
+    get:
+      summary: Get disputes
+      tags: [Admin]
+      responses:
+        '200':
+          description: Success
+
+  /admin/disputes/{id}/resolve:
+    post:
+      summary: Resolve dispute
+      tags: [Admin]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+        - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '200':
+          description: Resolved
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  parameters:
+    IdempotencyKey:
+      name: Idempotency-Key
+      in: header
+      required: true
+      schema:
+        type: string
+    ShopId:
+      name: shopId
+      in: path
+      required: true
+      schema:
+        type: string
+    BookingId:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: string
+
+  schemas:
+    NearbyShopsResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/ShopSummary'
+
+    ShopSummary:
+      type: object
+      properties:
+        shop_id:
+          type: string
+        display_name:
+          type: string
+        distance_km:
+          type: number
+        rating:
+          type: number
+        next_available_at:
+          type: string
+          format: date-time
+
+    ShopDetailResponse:
+      type: object
+      properties:
+        shop_id:
+          type: string
+        display_name:
+          type: string
+        branches:
+          type: array
+          items:
+            type: object
+        services:
+          type: array
+          items:
+            type: object
+
+    AvailabilityResponse:
+      type: object
+      properties:
+        slots:
+          type: array
+          items:
+            type: object
+            properties:
+              start_at:
+                type: string
+                format: date-time
+              end_at:
+                type: string
+                format: date-time
+              available:
+                type: boolean
+
+    CreateQuoteRequest:
+      type: object
+      required: [shop_id, branch_id, service_id, scheduled_start_at]
+      properties:
+        shop_id:
+          type: string
+        branch_id:
+          type: string
+        staff_id:
+          type: string
+        service_id:
+          type: string
+        scheduled_start_at:
+          type: string
+          format: date-time
+
+    QuoteResponse:
+      type: object
+      properties:
+        quote_id:
+          type: string
+        total_price:
+          type: number
+        currency:
+          type: string
+        expires_at:
+          type: string
+          format: date-time
+
+    CreateBookingRequest:
+      type: object
+      required: [shop_id, branch_id, service_id, scheduled_start_at]
+      properties:
+        shop_id:
+          type: string
+        branch_id:
+          type: string
+        staff_id:
+          type: string
+        service_id:
+          type: string
+        scheduled_start_at:
+          type: string
+          format: date-time
+
+    BookingResponse:
+      type: object
+      properties:
+        booking_id:
+          type: string
+        booking_no:
+          type: string
+        state:
+          type: string
+        total_price:
+          type: number
+
+    ErrorResponse:
+      type: object
+      properties:
+        code:
+          type: string
+        message:
+          type: string
+        request_id:
+          type: string
