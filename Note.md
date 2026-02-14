@@ -72,3 +72,6 @@ Updated: 2026-02-14
 - `POST /api/v1/partner/bookings/:bookingId/(confirm|start|complete)`
 - Notes: write endpoints require `Idempotency-Key` header by design.
 - Release scripts updated to run `prisma generate` + `prisma migrate deploy` before restarting services (seed is optional via `BARBERGO_RUN_SEED=true`).
+- Persisted idempotency store to Redis (in-memory fallback).
+- Persisted auth refresh sessions to DB table `AuthSession` (rotation/revoke survives restart).
+- Persisted audit logs to DB table `AuditLog` (best-effort write; admin can read historical logs).
