@@ -48,7 +48,7 @@ Updated: 2026-02-14
 - `sudo /bin/systemctl restart barbergo-api`
 - `sudo /bin/systemctl restart barbergo-web`
 - without password prompt (verified).
-- Recommended production secrets for self-hosted local deploy (no SSH):
-- `PROD_DEPLOY_CANARY_CMD`: `cd /home/yee/app && git fetch origin && git reset --hard origin/main && corepack pnpm install --frozen-lockfile=false && corepack pnpm --filter @barbergo/api build && corepack pnpm --filter @barbergo/web build && sudo systemctl restart barbergo-api barbergo-web`
-- `PROD_DEPLOY_FULL_CMD`: `sudo systemctl restart barbergo-api barbergo-web`
-- `PROD_ROLLBACK_CMD`: `cd /home/yee/app && git reset --hard HEAD~1 && corepack pnpm install --frozen-lockfile=false && corepack pnpm --filter @barbergo/api build && corepack pnpm --filter @barbergo/web build && sudo systemctl restart barbergo-api barbergo-web`
+- Deploy hooks now run local scripts (no command parsing from GitHub secrets):
+- `scripts/release/deploy-canary-local.sh`
+- `scripts/release/promote-full-local.sh`
+- `scripts/release/rollback-local.sh`

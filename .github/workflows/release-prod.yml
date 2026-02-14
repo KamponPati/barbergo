@@ -65,14 +65,7 @@ jobs:
           node-version: 22
 
       - name: Deploy canary (hook)
-        env:
-          PROD_DEPLOY_CANARY_CMD: ${{ secrets.PROD_DEPLOY_CANARY_CMD }}
-        run: |
-          if [ -n "${PROD_DEPLOY_CANARY_CMD:-}" ]; then
-            bash -lc "$PROD_DEPLOY_CANARY_CMD"
-          else
-            echo "[WARN] PROD_DEPLOY_CANARY_CMD is not configured"
-          fi
+        run: bash scripts/release/deploy-canary-local.sh
 
       - name: Production smoke verification
         env:
@@ -81,22 +74,8 @@ jobs:
         run: bash scripts/staging/smoke-critical-journeys.sh
 
       - name: Promote full rollout (hook)
-        env:
-          PROD_DEPLOY_FULL_CMD: ${{ secrets.PROD_DEPLOY_FULL_CMD }}
-        run: |
-          if [ -n "${PROD_DEPLOY_FULL_CMD:-}" ]; then
-            bash -lc "$PROD_DEPLOY_FULL_CMD"
-          else
-            echo "[WARN] PROD_DEPLOY_FULL_CMD is not configured"
-          fi
+        run: bash scripts/release/promote-full-local.sh
 
       - name: Rollback on failure (hook)
         if: failure()
-        env:
-          PROD_ROLLBACK_CMD: ${{ secrets.PROD_ROLLBACK_CMD }}
-        run: |
-          if [ -n "${PROD_ROLLBACK_CMD:-}" ]; then
-            bash -lc "$PROD_ROLLBACK_CMD"
-          else
-            echo "[WARN] PROD_ROLLBACK_CMD is not configured"
-          fi
+        run: bash scripts/release/rollback-local.sh
