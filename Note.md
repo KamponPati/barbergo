@@ -43,6 +43,11 @@ Updated: 2026-02-14
 ## Release Pipeline Update (2026-02-14)
 - `release-prod` job `deploy-and-verify` changed to `self-hosted` runner to avoid SSH timeout from GitHub-hosted runners to private IPs.
 - Workflow file updated: `.github/workflows/release-prod.yml`
+- Runner sudo policy configured:
+- `/etc/sudoers.d/barbergo-gha` allows `yee` to run
+- `sudo /bin/systemctl restart barbergo-api`
+- `sudo /bin/systemctl restart barbergo-web`
+- without password prompt (verified).
 - Recommended production secrets for self-hosted local deploy (no SSH):
 - `PROD_DEPLOY_CANARY_CMD`: `cd /home/yee/app && git fetch origin && git reset --hard origin/main && corepack pnpm install --frozen-lockfile=false && corepack pnpm --filter @barbergo/api build && corepack pnpm --filter @barbergo/web build && sudo systemctl restart barbergo-api barbergo-web`
 - `PROD_DEPLOY_FULL_CMD`: `sudo systemctl restart barbergo-api barbergo-web`
