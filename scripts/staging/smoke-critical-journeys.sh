@@ -60,6 +60,17 @@ get_json() {
   fi
 }
 
+api_origin_from_base() {
+  local base="$1"
+  if echo "$base" | grep -Eq '/api/v1/?$'; then
+    echo "$base" | sed -E 's#/api/v1/?$##'
+  else
+    echo "$base"
+  fi
+}
+
+API_ORIGIN="$(api_origin_from_base "$API_BASE_URL")"
+
 echo "[1/8] checking web shell"
 echo "[INFO] waiting for web to become ready: $WEB_BASE_URL"
 web_ok=false
@@ -78,6 +89,20 @@ fi
 WEB_HTML="$(curl "${CURL_OK_FLAGS[@]}" "$WEB_BASE_URL")"
 if ! echo "$WEB_HTML" | grep -Eq "BarberGo Web App|<div id=\"root\">"; then
   echo "[FAIL] web shell content not detected"
+  exit 1
+fi
+
+echo "[INFO] waiting for API to become ready: $API_ORIGIN"
+api_ok=false
+for i in $(seq 1 30); do
+  if curl "${CURL_OK_FLAGS[@]}" "$API_ORIGIN/health/live" >/dev/null 2>&1; then
+    api_ok=true
+    break
+  fi
+  sleep 1
+done
+if [ "$api_ok" != "true" ]; then
+  echo "[FAIL] API not reachable after 30s: $API_ORIGIN"
   exit 1
 fi
 
