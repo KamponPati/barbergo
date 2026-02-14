@@ -27,6 +27,9 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile=false
 
+      - name: Generate Prisma client
+        run: pnpm --filter @barbergo/api exec prisma generate
+
       - name: Lint
         run: pnpm lint
 
