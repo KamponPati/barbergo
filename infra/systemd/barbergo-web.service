@@ -1,0 +1,17 @@
+[Unit]
+Description=BarberGo Web (Nginx Static)
+After=network.target
+
+[Service]
+Type=simple
+User=yee
+Group=yee
+WorkingDirectory=/home/yee/app
+ExecStartPre=/usr/bin/env bash -lc 'mkdir -p /tmp/barbergo-nginx/{client_body,proxy,fastcgi,uwsgi,scgi}'
+ExecStart=/usr/sbin/nginx -c /home/yee/app/infra/nginx/barbergo-web.conf -g 'daemon off;'
+ExecReload=/usr/sbin/nginx -c /home/yee/app/infra/nginx/barbergo-web.conf -s reload
+Restart=always
+RestartSec=3
+
+[Install]
+WantedBy=multi-user.target

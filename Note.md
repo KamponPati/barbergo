@@ -52,3 +52,10 @@ Updated: 2026-02-14
 - `scripts/release/deploy-canary-local.sh`
 - `scripts/release/promote-full-local.sh`
 - `scripts/release/rollback-local.sh`
+
+## Release History
+- 2026-02-14: `release-prod` pipeline passed (staging domain verification + self-hosted deploy-and-verify).
+
+## Web Serving
+- 2026-02-14: migrated `barbergo-web.service` from `vite preview` to `nginx` static serving on port `5173`.
+- Nginx config: `infra/nginx/barbergo-web.conf`
