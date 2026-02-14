@@ -1,5 +1,6 @@
 import { Body, Controller, Get, Param, Post, Put, UseGuards } from "@nestjs/common";
 import { AuditLogService } from "../../common/services/audit-log.service";
+import { DbCoreService } from "../../common/services/db-core.service";
 import { MvpCoreService } from "../../common/services/mvp-core.service";
 import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
 import { RolesGuard } from "../auth/guards/roles.guard";
@@ -11,6 +12,7 @@ import { Roles } from "../auth/roles.decorator";
 export class AdminController {
   constructor(
     private readonly auditLogService: AuditLogService,
+    private readonly dbCoreService: DbCoreService,
     private readonly mvpCoreService: MvpCoreService
   ) {}
 
@@ -26,7 +28,7 @@ export class AdminController {
     @Param("partnerId") partnerId: string,
     @Body() body: { action: "approve" | "reject" }
   ) {
-    return this.mvpCoreService.adminSetPartnerVerification({
+    return this.dbCoreService.adminSetPartnerVerification({
       partner_id: partnerId,
       action: body.action
     });
@@ -34,7 +36,7 @@ export class AdminController {
 
   @Get("disputes")
   listDisputes() {
-    return this.mvpCoreService.listDisputes();
+    return this.dbCoreService.listDisputes();
   }
 
   @Post("disputes/:disputeId/resolve")
@@ -42,7 +44,7 @@ export class AdminController {
     @Param("disputeId") disputeId: string,
     @Body() body: { action: string; note: string }
   ) {
-    return this.mvpCoreService.resolveDispute({
+    return this.dbCoreService.resolveDispute({
       dispute_id: disputeId,
       action: body.action,
       note: body.note
@@ -212,6 +214,6 @@ export class AdminController {
 
   @Get("alerts")
   alerts() {
-    return this.mvpCoreService.getNotificationFeed("admin");
+    return this.dbCoreService.getNotificationFeed("admin");
   }
 }

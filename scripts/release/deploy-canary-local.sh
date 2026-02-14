@@ -7,6 +7,15 @@ cd "$ROOT_DIR"
 git fetch origin
 git reset --hard origin/main
 corepack pnpm install --frozen-lockfile=false
+set -a
+# shellcheck disable=SC1090
+source "$ROOT_DIR/.env"
+set +a
+corepack pnpm --filter @barbergo/api exec prisma generate
+corepack pnpm --filter @barbergo/api exec prisma migrate deploy
+if [ "${BARBERGO_RUN_SEED:-}" = "true" ]; then
+  corepack pnpm --filter @barbergo/api exec prisma db seed
+fi
 corepack pnpm --filter @barbergo/api build
 corepack pnpm --filter @barbergo/web build
 sudo -n /bin/systemctl restart barbergo-api

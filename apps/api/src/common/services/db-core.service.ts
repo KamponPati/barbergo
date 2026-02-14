@@ -1,5 +1,15 @@
 import { BadRequestException, Injectable, NotFoundException } from "@nestjs/common";
-import { BookingStatus, DisputeStatus, PaymentStatus, Prisma, ServiceMode } from "@prisma/client";
+import {
+  BookingStatus,
+  DisputeStatus,
+  PartnerVerificationStatus,
+  PaymentStatus,
+  Prisma,
+  ServiceMode,
+  UserRole,
+  UserStatus,
+  WithdrawalStatus
+} from "@prisma/client";
 import { randomUUID } from "node:crypto";
 import { PrismaService } from "./prisma.service";
 
@@ -70,6 +80,32 @@ type ApiPayment = {
   status: PaymentStatus;
   amount: number;
   provider_ref?: string | null;
+};
+
+type PartnerProfile = {
+  id: string;
+  name: string;
+  verification_status: "pending" | "approved" | "rejected";
+  documents: { id: string; type: string; url: string; uploaded_at: string }[];
+};
+
+type DisputeRecord = {
+  id: string;
+  booking_id: string;
+  created_by: string;
+  status: "open" | "resolved";
+  reason: string;
+  evidence_timeline: { at: string; note: string }[];
+  resolution_action?: string;
+};
+
+type NotificationEvent = {
+  id: string;
+  event_name: string;
+  booking_id?: string;
+  audience: "customer" | "partner" | "admin";
+  message: string;
+  created_at: string;
 };
 
 const TRANSITIONS: Record<BookingStatus, BookingStatus[]> = {
@@ -191,6 +227,12 @@ export class DbCoreService {
     }
   }
 
+  private toVerificationStatus(status: PartnerVerificationStatus): PartnerProfile["verification_status"] {
+    if (status === PartnerVerificationStatus.approved) return "approved";
+    if (status === PartnerVerificationStatus.rejected) return "rejected";
+    return "pending";
+  }
+
   private async transitionBooking(bookingId: string, to: BookingStatus, type: string): Promise<void> {
     const current = await this.prisma.booking.findUnique({ where: { id: bookingId }, select: { status: true } });
     if (!current) {
@@ -211,6 +253,336 @@ export class DbCoreService {
       })
     ]);
   }
+
+  private async mustPartnerOwnShop(partnerId: string, shopId: string): Promise<void> {
+    const shop = await this.prisma.shop.findUnique({ where: { id: shopId }, select: { partnerId: true } });
+    if (!shop) {
+      throw new NotFoundException({ code: "SHOP_NOT_FOUND", message: "shop not found" });
+    }
+    if (shop.partnerId !== partnerId) {
+      throw new BadRequestException({ code: "PARTNER_FORBIDDEN", message: "cannot edit another partner shop" });
+    }
+  }
+
+  async submitPartnerOnboarding(params: { partner_name: string }): Promise<PartnerProfile> {
+    const id = this.nextId("partner");
+    await this.prisma.$transaction(async (tx) => {
+      await tx.user.create({
+        data: {
+          id,
+          role: UserRole.partner,
+          status: UserStatus.active
+        }
+      });
+      await tx.partner.create({
+        data: {
+          id,
+          userId: id,
+          name: params.partner_name,
+          verificationStatus: PartnerVerificationStatus.pending
+        }
+      });
+    });
+
+    return {
+      id,
+      name: params.partner_name,
+      verification_status: "pending",
+      documents: []
+    };
+  }
+
+  async uploadPartnerDocument(params: { partner_id: string; type: string; url: string }): Promise<PartnerProfile> {
+    const partner = await this.prisma.partner.findUnique({
+      where: { id: params.partner_id },
+      include: { documents: { orderBy: { createdAt: "desc" } } }
+    });
+    if (!partner) {
+      throw new NotFoundException({ code: "PARTNER_NOT_FOUND", message: "partner not found" });
+    }
+
+    await this.prisma.partnerDocument.create({
+      data: {
+        id: this.nextId("doc"),
+        partnerId: partner.id,
+        type: params.type,
+        // For now we store the provided URL as objectKey. Later: parse / store full S3 metadata.
+        objectKey: params.url
+      }
+    });
+
+    const refreshed = await this.prisma.partner.findUnique({
+      where: { id: partner.id },
+      include: { documents: { orderBy: { createdAt: "desc" } } }
+    });
+    if (!refreshed) {
+      throw new NotFoundException({ code: "PARTNER_NOT_FOUND", message: "partner not found" });
+    }
+
+    return {
+      id: refreshed.id,
+      name: refreshed.name,
+      verification_status: this.toVerificationStatus(refreshed.verificationStatus),
+      documents: refreshed.documents.map((d) => ({
+        id: d.id,
+        type: d.type,
+        url: d.objectKey,
+        uploaded_at: d.createdAt.toISOString()
+      }))
+    };
+  }
+
+  async getPartnerVerificationStatus(partnerId: string): Promise<{ partner_id: string; status: string; documents: number }> {
+    const partner = await this.prisma.partner.findUnique({
+      where: { id: partnerId },
+      include: { _count: { select: { documents: true } } }
+    });
+    if (!partner) {
+      throw new NotFoundException({ code: "PARTNER_NOT_FOUND", message: "partner not found" });
+    }
+    return {
+      partner_id: partner.id,
+      status: this.toVerificationStatus(partner.verificationStatus),
+      documents: partner._count.documents
+    };
+  }
+
+  async upsertBranch(params: {
+    partner_id: string;
+    branch_id?: string;
+    shop_id: string;
+    name: string;
+    zone: string;
+    open_hours: string;
+    capacity: number;
+    lat: number;
+    lng: number;
+  }): Promise<ApiBranch> {
+    await this.mustPartnerOwnShop(params.partner_id, params.shop_id);
+
+    const branchId = params.branch_id ?? this.nextId("branch");
+    const row = await this.prisma.branch.upsert({
+      where: { id: branchId },
+      update: {
+        shopId: params.shop_id,
+        name: params.name,
+        zone: params.zone,
+        openHours: params.open_hours,
+        capacity: params.capacity,
+        lat: params.lat,
+        lng: params.lng
+      },
+      create: {
+        id: branchId,
+        shopId: params.shop_id,
+        name: params.name,
+        zone: params.zone,
+        openHours: params.open_hours,
+        capacity: params.capacity,
+        lat: params.lat,
+        lng: params.lng
+      }
+    });
+
+    return this.toApiBranch(row);
+  }
+
+  async upsertService(params: {
+    partner_id: string;
+    shop_id: string;
+    service_id?: string;
+    name: string;
+    price: number;
+    duration_minutes: number;
+    mode: "in_shop" | "delivery";
+  }): Promise<ApiService> {
+    await this.mustPartnerOwnShop(params.partner_id, params.shop_id);
+
+    const serviceId = params.service_id ?? this.nextId("svc");
+    const row = await this.prisma.service.upsert({
+      where: { id: serviceId },
+      update: {
+        shopId: params.shop_id,
+        name: params.name,
+        price: params.price,
+        durationMinutes: params.duration_minutes,
+        mode: params.mode === "delivery" ? ServiceMode.delivery : ServiceMode.in_shop
+      },
+      create: {
+        id: serviceId,
+        shopId: params.shop_id,
+        name: params.name,
+        price: params.price,
+        durationMinutes: params.duration_minutes,
+        mode: params.mode === "delivery" ? ServiceMode.delivery : ServiceMode.in_shop
+      }
+    });
+
+    return this.toApiService(row);
+  }
+
+  async upsertStaff(params: {
+    partner_id: string;
+    shop_id: string;
+    staff_id?: string;
+    name: string;
+    skills: string[];
+    shift_slots: string[];
+  }): Promise<ApiStaff> {
+    await this.mustPartnerOwnShop(params.partner_id, params.shop_id);
+
+    const staffId = params.staff_id ?? this.nextId("staff");
+    const row = await this.prisma.$transaction(async (tx) => {
+      const staff = await tx.staff.upsert({
+        where: { id: staffId },
+        update: { shopId: params.shop_id, name: params.name },
+        create: { id: staffId, shopId: params.shop_id, name: params.name }
+      });
+
+      await tx.staffSkill.deleteMany({ where: { staffId: staff.id } });
+      if (params.skills.length > 0) {
+        await tx.staffSkill.createMany({
+          data: params.skills.map((skill) => ({ id: randomUUID(), staffId: staff.id, skill }))
+        });
+      }
+
+      return tx.staff.findUnique({ where: { id: staff.id }, include: { skills: true } });
+    });
+
+    if (!row) {
+      throw new NotFoundException({ code: "STAFF_NOT_FOUND", message: "staff not found" });
+    }
+    return this.toApiStaff(row);
+  }
+
+  async createDispute(params: {
+    booking_id: string;
+    created_by: string;
+    reason: string;
+    evidence_note: string;
+  }): Promise<DisputeRecord> {
+    const booking = await this.prisma.booking.findUnique({ where: { id: params.booking_id } });
+    if (!booking) {
+      throw new NotFoundException({ code: "BOOKING_NOT_FOUND", message: "booking not found" });
+    }
+
+    this.assertTransition(booking.status, BookingStatus.disputed);
+
+    const disputeId = this.nextId("disp");
+    const dispute = await this.prisma.$transaction(async (tx) => {
+      const created = await tx.dispute.create({
+        data: {
+          id: disputeId,
+          bookingId: booking.id,
+          openedBy: params.created_by,
+          reason: params.reason,
+          status: DisputeStatus.opened,
+          evidence: { timeline: [{ at: new Date().toISOString(), note: params.evidence_note }] }
+        }
+      });
+      await tx.booking.update({ where: { id: booking.id }, data: { status: BookingStatus.disputed } });
+      await tx.bookingEvent.create({
+        data: {
+          bookingId: booking.id,
+          type: "booking.disputed",
+          statusFrom: booking.status,
+          statusTo: BookingStatus.disputed,
+          message: params.reason
+        }
+      });
+      return created;
+    });
+
+    return {
+      id: dispute.id,
+      booking_id: dispute.bookingId,
+      created_by: dispute.openedBy,
+      status: "open",
+      reason: dispute.reason,
+      evidence_timeline: [{ at: new Date().toISOString(), note: params.evidence_note }]
+    };
+  }
+
+  async adminSetPartnerVerification(params: { partner_id: string; action: "approve" | "reject" }): Promise<PartnerProfile> {
+    const partner = await this.prisma.partner.update({
+      where: { id: params.partner_id },
+      data: {
+        verificationStatus:
+          params.action === "approve" ? PartnerVerificationStatus.approved : PartnerVerificationStatus.rejected
+      },
+      include: { documents: { orderBy: { createdAt: "desc" } } }
+    });
+
+    return {
+      id: partner.id,
+      name: partner.name,
+      verification_status: this.toVerificationStatus(partner.verificationStatus),
+      documents: partner.documents.map((d) => ({
+        id: d.id,
+        type: d.type,
+        url: d.objectKey,
+        uploaded_at: d.createdAt.toISOString()
+      }))
+    };
+  }
+
+  async listDisputes(): Promise<{ data: DisputeRecord[] }> {
+    const rows = await this.prisma.dispute.findMany({ orderBy: { createdAt: "desc" } });
+    return {
+      data: rows.map((row) => {
+        const evidence = row.evidence as unknown;
+        const timeline =
+          typeof evidence === "object" && evidence !== null && Array.isArray((evidence as any).timeline)
+            ? ((evidence as any).timeline as Array<{ at: string; note: string }>)
+            : [];
+        return {
+          id: row.id,
+          booking_id: row.bookingId,
+          created_by: row.openedBy,
+          status: row.status === DisputeStatus.resolved ? "resolved" : "open",
+          reason: row.reason,
+          evidence_timeline: timeline
+        };
+      })
+    };
+  }
+
+  async resolveDispute(params: { dispute_id: string; action: string; note: string }): Promise<DisputeRecord> {
+    const dispute = await this.prisma.dispute.findUnique({ where: { id: params.dispute_id } });
+    if (!dispute) {
+      throw new NotFoundException({ code: "DISPUTE_NOT_FOUND", message: "dispute not found" });
+    }
+
+    const existingEvidence = dispute.evidence as unknown;
+    const existingTimeline =
+      typeof existingEvidence === "object" && existingEvidence !== null && Array.isArray((existingEvidence as any).timeline)
+        ? ((existingEvidence as any).timeline as Array<{ at: string; note: string }>)
+        : [];
+
+    const updatedTimeline = [...existingTimeline, { at: new Date().toISOString(), note: params.note }];
+
+    const updated = await this.prisma.dispute.update({
+      where: { id: dispute.id },
+      data: {
+        status: DisputeStatus.resolved,
+        evidence: {
+          timeline: updatedTimeline,
+          resolution_action: params.action
+        } as any
+      }
+    });
+
+    return {
+      id: updated.id,
+      booking_id: updated.bookingId,
+      created_by: updated.openedBy,
+      status: "resolved",
+      reason: updated.reason,
+      evidence_timeline: updatedTimeline,
+      resolution_action: params.action
+    };
+  }
+
 
   async listShops(filters: SearchFilters): Promise<{ data: Array<ApiShop & { branches: ApiBranch[] }> }> {
     const where: Prisma.ShopWhereInput = {};
@@ -551,6 +923,89 @@ export class DbCoreService {
     return this.toApiBooking(row);
   }
 
+  async rejectBooking(params: { booking_id: string; reason: string }): Promise<ApiBooking> {
+    const booking = await this.prisma.booking.findUnique({
+      where: { id: params.booking_id },
+      include: { payment: true, reservation: true }
+    });
+    if (!booking) {
+      throw new NotFoundException({ code: "BOOKING_NOT_FOUND", message: "booking not found" });
+    }
+
+    this.assertTransition(booking.status, BookingStatus.cancelled);
+
+    await this.prisma.$transaction(async (tx) => {
+      await tx.booking.update({
+        where: { id: booking.id },
+        data: { status: BookingStatus.cancelled, cancelReason: `partner_reject:${params.reason}` }
+      });
+      await tx.bookingEvent.create({
+        data: {
+          bookingId: booking.id,
+          type: "booking.rejected",
+          statusFrom: booking.status,
+          statusTo: BookingStatus.cancelled,
+          message: params.reason
+        }
+      });
+      if (booking.reservation) {
+        await tx.slotReservation.delete({ where: { bookingId: booking.id } });
+      }
+      if (booking.payment && booking.payment.status !== PaymentStatus.refunded) {
+        await tx.payment.update({ where: { id: booking.payment.id }, data: { status: PaymentStatus.refunded } });
+      }
+    });
+
+    const latest = await this.prisma.booking.findUnique({ where: { id: booking.id }, include: { payment: { select: { id: true } } } });
+    if (!latest) throw new NotFoundException({ code: "BOOKING_NOT_FOUND", message: "booking not found" });
+    return this.toApiBooking(latest);
+  }
+
+  async rescheduleBooking(params: { booking_id: string; new_slot_at: string }): Promise<ApiBooking> {
+    const newSlotAt = new Date(params.new_slot_at);
+    if (Number.isNaN(newSlotAt.getTime())) {
+      throw new BadRequestException({ code: "INVALID_SLOT_AT", message: "new_slot_at must be ISO date" });
+    }
+
+    const booking = await this.prisma.booking.findUnique({
+      where: { id: params.booking_id },
+      include: { reservation: true }
+    });
+    if (!booking) {
+      throw new NotFoundException({ code: "BOOKING_NOT_FOUND", message: "booking not found" });
+    }
+    if (!booking.reservation) {
+      throw new BadRequestException({ code: "RESERVATION_NOT_FOUND", message: "no reservation to reschedule" });
+    }
+
+    try {
+      await this.prisma.$transaction(async (tx) => {
+        // Update booking slot + reservation slot atomically.
+        await tx.booking.update({ where: { id: booking.id }, data: { slotAt: newSlotAt } });
+        await tx.slotReservation.update({
+          where: { bookingId: booking.id },
+          data: { slotAt: newSlotAt }
+        });
+        await tx.bookingEvent.create({
+          data: {
+            bookingId: booking.id,
+            type: "booking.rescheduled",
+            message: params.new_slot_at
+          }
+        });
+      });
+    } catch (err) {
+      if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === "P2002") {
+        throw new BadRequestException({ code: "SLOT_CONFLICT", message: "slot already reserved" });
+      }
+      throw err;
+    }
+
+    const latest = await this.prisma.booking.findUnique({ where: { id: booking.id }, include: { payment: { select: { id: true } } } });
+    if (!latest) throw new NotFoundException({ code: "BOOKING_NOT_FOUND", message: "booking not found" });
+    return this.toApiBooking(latest);
+  }
+
   async startBooking(bookingId: string): Promise<ApiBooking> {
     await this.transitionBooking(bookingId, BookingStatus.started, "booking.started");
     const row = await this.prisma.booking.findUnique({ where: { id: bookingId }, include: { payment: { select: { id: true } } } });
@@ -601,6 +1056,111 @@ export class DbCoreService {
     const latest = await this.prisma.booking.findUnique({ where: { id: booking.id }, include: { payment: { select: { id: true } } } });
     if (!latest) throw new NotFoundException({ code: "BOOKING_NOT_FOUND", message: "booking not found" });
     return { booking: this.toApiBooking(latest), refunded };
+  }
+
+  async getWalletSummary(partnerId: string): Promise<{ balance: number; ledger: Array<{ id: string; partner_id: string; booking_id: string; amount: number; direction: string; reason: string; created_at: string }>; withdrawals: Array<{ id: string; partner_id: string; amount: number; status: string; created_at: string }> }> {
+    const [ledgerRows, withdrawalRows] = await Promise.all([
+      this.prisma.ledgerEntry.findMany({ where: { partnerId }, orderBy: { createdAt: "desc" } }),
+      this.prisma.withdrawal.findMany({ where: { partnerId }, orderBy: { createdAt: "desc" } })
+    ]);
+
+    const balance = ledgerRows.reduce((acc, row) => acc + (row.direction === "credit" ? row.amount : -row.amount), 0);
+
+    return {
+      balance,
+      ledger: ledgerRows.map((row) => ({
+        id: row.id,
+        partner_id: row.partnerId,
+        booking_id: row.bookingId ?? "-",
+        amount: row.amount,
+        direction: row.direction,
+        reason: row.reason,
+        created_at: row.createdAt.toISOString()
+      })),
+      withdrawals: withdrawalRows.map((row) => ({
+        id: row.id,
+        partner_id: row.partnerId,
+        amount: row.amount,
+        status: row.status,
+        created_at: row.createdAt.toISOString()
+      }))
+    };
+  }
+
+  async requestWithdrawal(partnerId: string, amount: number): Promise<{ id: string; partner_id: string; amount: number; status: string; created_at: string }> {
+    if (amount <= 0) {
+      throw new BadRequestException({ code: "WITHDRAWAL_INVALID", message: "invalid withdrawal amount" });
+    }
+
+    const summary = await this.getWalletSummary(partnerId);
+    if (amount > summary.balance) {
+      throw new BadRequestException({ code: "WITHDRAWAL_INVALID", message: "invalid withdrawal amount" });
+    }
+
+    const withdrawalId = this.nextId("wd");
+    await this.prisma.$transaction(async (tx) => {
+      await tx.withdrawal.create({
+        data: {
+          id: withdrawalId,
+          partnerId,
+          amount,
+          status: WithdrawalStatus.requested
+        }
+      });
+      await tx.ledgerEntry.create({
+        data: {
+          id: this.nextId("ledger"),
+          partnerId,
+          bookingId: null,
+          direction: "debit",
+          amount,
+          reason: "withdrawal"
+        }
+      });
+    });
+
+    return {
+      id: withdrawalId,
+      partner_id: partnerId,
+      amount,
+      status: WithdrawalStatus.requested,
+      created_at: new Date().toISOString()
+    };
+  }
+
+  async getNotificationFeed(audience: "customer" | "partner" | "admin"): Promise<{ data: NotificationEvent[] }> {
+    // Minimal DB-backed feed: surface latest booking events as "notifications".
+    const rows = await this.prisma.bookingEvent.findMany({
+      orderBy: { createdAt: "desc" },
+      take: 100
+    });
+    return {
+      data: rows.map((row) => ({
+        id: row.id,
+        event_name: row.type,
+        booking_id: row.bookingId,
+        audience,
+        message: row.message ?? row.type,
+        created_at: row.createdAt.toISOString()
+      }))
+    };
+  }
+
+  async getBookingTimeline(bookingId: string): Promise<{ data: NotificationEvent[] }> {
+    const rows = await this.prisma.bookingEvent.findMany({
+      where: { bookingId },
+      orderBy: { createdAt: "asc" }
+    });
+    return {
+      data: rows.map((row) => ({
+        id: row.id,
+        event_name: row.type,
+        booking_id: row.bookingId,
+        audience: "customer",
+        message: row.message ?? row.type,
+        created_at: row.createdAt.toISOString()
+      }))
+    };
   }
 
   async postServiceAction(params: {
@@ -712,7 +1272,7 @@ export class DbCoreService {
         bookingId: params.booking_id,
         status: PaymentStatus.authorized,
         amount: params.amount,
-        providerRef: params.provider_ref
+        providerRef: params.provider_ref ?? `${params.payment_method}_${Date.now()}`
       }
     });
 

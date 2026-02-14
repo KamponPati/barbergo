@@ -1,17 +1,17 @@
 import { BadRequestException, Body, Controller, Get, Param, Post } from "@nestjs/common";
 import { MinioService } from "../../common/services/minio.service";
-import { MvpCoreService } from "../../common/services/mvp-core.service";
+import { DbCoreService } from "../../common/services/db-core.service";
 
 @Controller()
 export class TrustController {
   constructor(
-    private readonly mvpCoreService: MvpCoreService,
+    private readonly dbCoreService: DbCoreService,
     private readonly minioService: MinioService
   ) {}
 
   @Post("partner/onboarding")
   onboarding(@Body() body: { partner_name: string }) {
-    return this.mvpCoreService.submitPartnerOnboarding(body);
+    return this.dbCoreService.submitPartnerOnboarding(body);
   }
 
   @Post("partner/onboarding/:partnerId/documents")
@@ -19,7 +19,7 @@ export class TrustController {
     @Param("partnerId") partnerId: string,
     @Body() body: { type: string; url: string }
   ) {
-    return this.mvpCoreService.uploadPartnerDocument({
+    return this.dbCoreService.uploadPartnerDocument({
       partner_id: partnerId,
       type: body.type,
       url: body.url
@@ -56,7 +56,7 @@ export class TrustController {
 
   @Get("partner/onboarding/:partnerId/status")
   onboardingStatus(@Param("partnerId") partnerId: string) {
-    return this.mvpCoreService.getPartnerVerificationStatus(partnerId);
+    return this.dbCoreService.getPartnerVerificationStatus(partnerId);
   }
 
   @Post("partner/branches")
@@ -74,7 +74,7 @@ export class TrustController {
       lng: number;
     }
   ) {
-    return this.mvpCoreService.upsertBranch(body);
+    return this.dbCoreService.upsertBranch(body);
   }
 
   @Post("partner/services")
@@ -90,7 +90,7 @@ export class TrustController {
       mode: "in_shop" | "delivery";
     }
   ) {
-    return this.mvpCoreService.upsertService(body);
+    return this.dbCoreService.upsertService(body);
   }
 
   @Post("partner/staff")
@@ -105,7 +105,7 @@ export class TrustController {
       shift_slots: string[];
     }
   ) {
-    return this.mvpCoreService.upsertStaff(body);
+    return this.dbCoreService.upsertStaff(body);
   }
 
   @Post("disputes")
@@ -118,6 +118,6 @@ export class TrustController {
       evidence_note: string;
     }
   ) {
-    return this.mvpCoreService.createDispute(body);
+    return this.dbCoreService.createDispute(body);
   }
 }

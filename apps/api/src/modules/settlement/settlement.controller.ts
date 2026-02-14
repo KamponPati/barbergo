@@ -1,17 +1,17 @@
 import { Body, Controller, Get, Param, Post } from "@nestjs/common";
-import { MvpCoreService } from "../../common/services/mvp-core.service";
+import { DbCoreService } from "../../common/services/db-core.service";
 
 @Controller("partner/wallet")
 export class SettlementController {
-  constructor(private readonly mvpCoreService: MvpCoreService) {}
+  constructor(private readonly dbCoreService: DbCoreService) {}
 
   @Get(":partnerId")
   summary(@Param("partnerId") partnerId: string) {
-    return this.mvpCoreService.getWalletSummary(partnerId);
+    return this.dbCoreService.getWalletSummary(partnerId);
   }
 
   @Post(":partnerId/withdraw")
   withdraw(@Param("partnerId") partnerId: string, @Body() body: { amount: number }) {
-    return this.mvpCoreService.requestWithdrawal(partnerId, body.amount);
+    return this.dbCoreService.requestWithdrawal(partnerId, body.amount);
   }
 }

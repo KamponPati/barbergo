@@ -1,4 +1,4 @@
-import { Body, Controller, Get, NotImplementedException, Param, Post } from "@nestjs/common";
+import { Body, Controller, Get, Param, Post } from "@nestjs/common";
 import { DbCoreService } from "../../common/services/db-core.service";
 
 @Controller("partner/bookings")
@@ -17,18 +17,12 @@ export class PartnerBookingController {
 
   @Post(":bookingId/reject")
   reject(@Param("bookingId") bookingId: string, @Body() body: { reason: string }) {
-    // TODO(Phase 5): implement reject with refund and slot release.
-    return this.dbCoreService.cancelBooking({ booking_id: bookingId, reason: `partner_reject:${body.reason}` });
+    return this.dbCoreService.rejectBooking({ booking_id: bookingId, reason: body.reason });
   }
 
   @Post(":bookingId/reschedule")
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   reschedule(@Param("bookingId") bookingId: string, @Body() body: { new_slot_at: string }) {
-    // TODO(Phase 5): implement reschedule with reservation swap.
-    throw new NotImplementedException({
-      code: "RESCHEDULE_NOT_IMPLEMENTED",
-      message: "reschedule is not implemented yet"
-    });
+    return this.dbCoreService.rescheduleBooking({ booking_id: bookingId, new_slot_at: body.new_slot_at });
   }
 
   @Post(":bookingId/start")
