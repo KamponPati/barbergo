@@ -1,11 +1,13 @@
 import { useMemo, useState } from "react";
 import { checkoutBooking, getAvailability, getCustomerHistory, getNearbyShops, quoteBooking } from "../../lib/api";
 import type { Booking, Shop } from "../../lib/types";
+import { useAuth } from "../auth/AuthContext";
 import { JsonView } from "../shared/JsonView";
 import { PageSection } from "../shared/PageSection";
 import { EmptyHint, ErrorBanner, LoadingBadge } from "../shared/UiState";
 
 export function CustomerPage(): JSX.Element {
+  const { token } = useAuth();
   const [shops, setShops] = useState<Shop[]>([]);
   const [selectedShop, setSelectedShop] = useState<Shop | null>(null);
   const [slots, setSlots] = useState<string[]>([]);
@@ -65,16 +67,16 @@ export function CustomerPage(): JSX.Element {
         <button
           disabled={!selectedShop}
           onClick={async () => {
-            setLoading(true);
-            setError(null);
-            try {
-              if (!selectedShop) return;
-              const data = await quoteBooking(selectedShop.id, serviceId);
-              setQuote(data);
-              setStatus("Quote calculated");
-            } catch (e) {
-              const message = e instanceof Error ? e.message : "unknown error";
-              setError(message);
+              setLoading(true);
+              setError(null);
+              try {
+                if (!selectedShop) return;
+                const data = await quoteBooking(token, selectedShop.id, serviceId);
+                setQuote(data);
+                setStatus("Quote calculated");
+              } catch (e) {
+                const message = e instanceof Error ? e.message : "unknown error";
+                setError(message);
               setStatus("Quote failed");
             } finally {
               setLoading(false);
@@ -86,15 +88,15 @@ export function CustomerPage(): JSX.Element {
         <button
           disabled={!selectedShop}
           onClick={async () => {
-            setLoading(true);
-            setError(null);
-            try {
-              if (!selectedShop) return;
-              const data = await checkoutBooking({ shopId: selectedShop.id, serviceId, slot });
-              setStatus(`Booked ${data.booking.id}`);
-            } catch (e) {
-              const message = e instanceof Error ? e.message : "unknown error";
-              setError(message);
+              setLoading(true);
+              setError(null);
+              try {
+                if (!selectedShop) return;
+                const data = await checkoutBooking({ token, shopId: selectedShop.id, serviceId, slot });
+                setStatus(`Booked ${data.booking.id}`);
+              } catch (e) {
+                const message = e instanceof Error ? e.message : "unknown error";
+                setError(message);
               setStatus("Checkout failed");
             } finally {
               setLoading(false);
@@ -105,15 +107,15 @@ export function CustomerPage(): JSX.Element {
         </button>
         <button
           onClick={async () => {
-            setLoading(true);
-            setError(null);
-            try {
-              const data = await getCustomerHistory();
-              setHistory(data.data);
-              setStatus(`Loaded ${data.data.length} bookings`);
-            } catch (e) {
-              const message = e instanceof Error ? e.message : "unknown error";
-              setError(message);
+              setLoading(true);
+              setError(null);
+              try {
+                const data = await getCustomerHistory(token);
+                setHistory(data.data);
+                setStatus(`Loaded ${data.data.length} bookings`);
+              } catch (e) {
+                const message = e instanceof Error ? e.message : "unknown error";
+                setError(message);
               setStatus("Load history failed");
             } finally {
               setLoading(false);

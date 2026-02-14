@@ -18,7 +18,9 @@ type SearchFilters = {
   min_rating?: number;
   service_mode?: "in_shop" | "delivery";
   q?: string;
-  sort?: "rating_desc" | "rating_asc" | "price_asc" | "price_desc";
+  lat?: number;
+  lng?: number;
+  sort?: "rating_desc" | "rating_asc" | "price_asc" | "price_desc" | "nearest";
 };
 
 type ApiBranch = {
@@ -217,6 +219,21 @@ export class DbCoreService {
     return Math.min(...services.map((s) => s.price));
   }
 
+  private distanceMeters(a: { lat: number; lng: number }, b: { lat: number; lng: number }): number {
+    // Haversine (good enough for small datasets; Phase 6 can move to PostGIS for scale).
+    const R = 6371000;
+    const toRad = (deg: number) => (deg * Math.PI) / 180;
+    const dLat = toRad(b.lat - a.lat);
+    const dLng = toRad(b.lng - a.lng);
+    const lat1 = toRad(a.lat);
+    const lat2 = toRad(b.lat);
+    const x =
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos(lat1) * Math.cos(lat2) * Math.sin(dLng / 2) * Math.sin(dLng / 2);
+    const c = 2 * Math.atan2(Math.sqrt(x), Math.sqrt(1 - x));
+    return R * c;
+  }
+
   private assertTransition(from: BookingStatus, to: BookingStatus): void {
     const allowed = TRANSITIONS[from] ?? [];
     if (!allowed.includes(to)) {
@@ -262,6 +279,34 @@ export class DbCoreService {
     if (shop.partnerId !== partnerId) {
       throw new BadRequestException({ code: "PARTNER_FORBIDDEN", message: "cannot edit another partner shop" });
     }
+  }
+
+  private async mustGetBookingForPartner(bookingId: string, partnerId: string) {
+    const booking = await this.prisma.booking.findUnique({
+      where: { id: bookingId },
+      include: { payment: true, reservation: true }
+    });
+    if (!booking) {
+      throw new NotFoundException({ code: "BOOKING_NOT_FOUND", message: "booking not found" });
+    }
+    if (booking.partnerId !== partnerId) {
+      throw new BadRequestException({ code: "PARTNER_FORBIDDEN", message: "cannot access another partner booking" });
+    }
+    return booking;
+  }
+
+  private async mustGetBookingForCustomer(bookingId: string, customerId: string) {
+    const booking = await this.prisma.booking.findUnique({
+      where: { id: bookingId },
+      include: { payment: true, reservation: true }
+    });
+    if (!booking) {
+      throw new NotFoundException({ code: "BOOKING_NOT_FOUND", message: "booking not found" });
+    }
+    if (booking.customerId !== customerId) {
+      throw new BadRequestException({ code: "CUSTOMER_FORBIDDEN", message: "cannot access another customer booking" });
+    }
+    return booking;
   }
 
   async submitPartnerOnboarding(params: { partner_name: string }): Promise<PartnerProfile> {
@@ -461,10 +506,7 @@ export class DbCoreService {
     reason: string;
     evidence_note: string;
   }): Promise<DisputeRecord> {
-    const booking = await this.prisma.booking.findUnique({ where: { id: params.booking_id } });
-    if (!booking) {
-      throw new NotFoundException({ code: "BOOKING_NOT_FOUND", message: "booking not found" });
-    }
+    const booking = await this.mustGetBookingForCustomer(params.booking_id, params.created_by);
 
     this.assertTransition(booking.status, BookingStatus.disputed);
 
@@ -638,6 +680,11 @@ export class DbCoreService {
       sorted.sort((a, b) => this.minPrice(a.services) - this.minPrice(b.services));
     } else if (filters.sort === "price_desc") {
       sorted.sort((a, b) => this.minPrice(b.services) - this.minPrice(a.services));
+    } else if (filters.sort === "nearest" && typeof filters.lat === "number" && typeof filters.lng === "number") {
+      const origin = { lat: filters.lat, lng: filters.lng };
+      const minDist = (shop: (ApiShop & { branches: ApiBranch[] }) & { services: ApiService[] }) =>
+        Math.min(...shop.branches.map((br) => this.distanceMeters(origin, { lat: br.lat, lng: br.lng })));
+      sorted.sort((a, b) => minDist(a) - minDist(b));
     }
 
     return { data: sorted };
@@ -885,10 +932,12 @@ export class DbCoreService {
     return { data: rows.map((b) => this.toApiBooking(b)) };
   }
 
-  async getBookingDetail(bookingId: string): Promise<{ booking: ApiBooking; payment?: ApiPayment }> {
+  async getBookingDetail(
+    bookingId: string
+  ): Promise<{ booking: ApiBooking; payment?: ApiPayment; dispute?: DisputeRecord; review?: { rating: number; review?: string } }> {
     const booking = await this.prisma.booking.findUnique({
       where: { id: bookingId },
-      include: { payment: true }
+      include: { payment: true, dispute: true, review: true }
     });
     if (!booking) {
       throw new NotFoundException({ code: "BOOKING_NOT_FOUND", message: "booking not found" });
@@ -904,7 +953,32 @@ export class DbCoreService {
             provider_ref: booking.payment.providerRef
           }
         : undefined
+      ,
+      dispute: booking.dispute
+        ? {
+            id: booking.dispute.id,
+            booking_id: booking.dispute.bookingId,
+            created_by: booking.dispute.openedBy,
+            status: booking.dispute.status === DisputeStatus.resolved ? "resolved" : "open",
+            reason: booking.dispute.reason,
+            evidence_timeline: []
+          }
+        : undefined,
+      review: booking.review
+        ? {
+            rating: booking.review.rating,
+            review: booking.review.comment ?? undefined
+          }
+        : undefined
     };
+  }
+
+  async getBookingDetailForCustomer(
+    bookingId: string,
+    customerId: string
+  ): Promise<{ booking: ApiBooking; payment?: ApiPayment; dispute?: DisputeRecord; review?: { rating: number; review?: string } }> {
+    await this.mustGetBookingForCustomer(bookingId, customerId);
+    return await this.getBookingDetail(bookingId);
   }
 
   async listIncomingQueue(partnerId: string): Promise<{ data: ApiBooking[] }> {
@@ -916,21 +990,16 @@ export class DbCoreService {
     return { data: rows.map((b) => this.toApiBooking(b)) };
   }
 
-  async confirmBooking(bookingId: string): Promise<ApiBooking> {
+  async confirmBooking(bookingId: string, partnerId: string): Promise<ApiBooking> {
+    await this.mustGetBookingForPartner(bookingId, partnerId);
     await this.transitionBooking(bookingId, BookingStatus.confirmed, "booking.confirmed");
     const row = await this.prisma.booking.findUnique({ where: { id: bookingId }, include: { payment: { select: { id: true } } } });
     if (!row) throw new NotFoundException({ code: "BOOKING_NOT_FOUND", message: "booking not found" });
     return this.toApiBooking(row);
   }
 
-  async rejectBooking(params: { booking_id: string; reason: string }): Promise<ApiBooking> {
-    const booking = await this.prisma.booking.findUnique({
-      where: { id: params.booking_id },
-      include: { payment: true, reservation: true }
-    });
-    if (!booking) {
-      throw new NotFoundException({ code: "BOOKING_NOT_FOUND", message: "booking not found" });
-    }
+  async rejectBooking(params: { booking_id: string; partner_id: string; reason: string }): Promise<ApiBooking> {
+    const booking = await this.mustGetBookingForPartner(params.booking_id, params.partner_id);
 
     this.assertTransition(booking.status, BookingStatus.cancelled);
 
@@ -961,19 +1030,13 @@ export class DbCoreService {
     return this.toApiBooking(latest);
   }
 
-  async rescheduleBooking(params: { booking_id: string; new_slot_at: string }): Promise<ApiBooking> {
+  async rescheduleBooking(params: { booking_id: string; partner_id: string; new_slot_at: string }): Promise<ApiBooking> {
     const newSlotAt = new Date(params.new_slot_at);
     if (Number.isNaN(newSlotAt.getTime())) {
       throw new BadRequestException({ code: "INVALID_SLOT_AT", message: "new_slot_at must be ISO date" });
     }
 
-    const booking = await this.prisma.booking.findUnique({
-      where: { id: params.booking_id },
-      include: { reservation: true }
-    });
-    if (!booking) {
-      throw new NotFoundException({ code: "BOOKING_NOT_FOUND", message: "booking not found" });
-    }
+    const booking = await this.mustGetBookingForPartner(params.booking_id, params.partner_id);
     if (!booking.reservation) {
       throw new BadRequestException({ code: "RESERVATION_NOT_FOUND", message: "no reservation to reschedule" });
     }
@@ -1006,14 +1069,16 @@ export class DbCoreService {
     return this.toApiBooking(latest);
   }
 
-  async startBooking(bookingId: string): Promise<ApiBooking> {
+  async startBooking(bookingId: string, partnerId: string): Promise<ApiBooking> {
+    await this.mustGetBookingForPartner(bookingId, partnerId);
     await this.transitionBooking(bookingId, BookingStatus.started, "booking.started");
     const row = await this.prisma.booking.findUnique({ where: { id: bookingId }, include: { payment: { select: { id: true } } } });
     if (!row) throw new NotFoundException({ code: "BOOKING_NOT_FOUND", message: "booking not found" });
     return this.toApiBooking(row);
   }
 
-  async completeBooking(bookingId: string): Promise<ApiBooking> {
+  async completeBooking(bookingId: string, partnerId: string): Promise<ApiBooking> {
+    await this.mustGetBookingForPartner(bookingId, partnerId);
     await this.transitionBooking(bookingId, BookingStatus.completed, "booking.completed");
 
     // capture payment + settle ledger
@@ -1025,14 +1090,12 @@ export class DbCoreService {
     return this.toApiBooking(row);
   }
 
-  async cancelBooking(params: { booking_id: string; reason: string }): Promise<{ booking: ApiBooking; refunded: boolean }> {
-    const booking = await this.prisma.booking.findUnique({
-      where: { id: params.booking_id },
-      include: { payment: true, reservation: true }
-    });
-    if (!booking) {
-      throw new NotFoundException({ code: "BOOKING_NOT_FOUND", message: "booking not found" });
-    }
+  async cancelBooking(params: {
+    booking_id: string;
+    customer_id: string;
+    reason: string;
+  }): Promise<{ booking: ApiBooking; refunded: boolean }> {
+    const booking = await this.mustGetBookingForCustomer(params.booking_id, params.customer_id);
 
     this.assertTransition(booking.status, BookingStatus.cancelled);
 
@@ -1164,6 +1227,7 @@ export class DbCoreService {
   }
 
   async postServiceAction(params: {
+    customer_id: string;
     booking_id: string;
     rating?: number;
     review?: string;
@@ -1171,13 +1235,7 @@ export class DbCoreService {
     rebook_slot_at?: string;
     dispute_reason?: string;
   }): Promise<{ accepted: boolean; created_dispute_id?: string; rebook_booking_id?: string }> {
-    const booking = await this.prisma.booking.findUnique({
-      where: { id: params.booking_id },
-      include: { review: true, dispute: true }
-    });
-    if (!booking) {
-      throw new NotFoundException({ code: "BOOKING_NOT_FOUND", message: "booking not found" });
-    }
+    const booking = await this.mustGetBookingForCustomer(params.booking_id, params.customer_id);
 
     if (params.dispute_reason) {
       // Create dispute and move booking into disputed.
@@ -1335,25 +1393,17 @@ export class DbCoreService {
     if (!booking) return;
 
     const partnerPayout = Math.round(booking.amount * (1 - this.commissionRate));
-    await this.prisma.ledgerEntry.createMany({
-      data: [
-        {
-          id: this.nextId("ledger"),
-          partnerId: booking.partnerId,
-          bookingId: booking.id,
-          direction: "credit",
-          amount: partnerPayout,
-          reason: "booking_settlement"
-        },
-        {
-          id: this.nextId("ledger"),
-          partnerId: booking.partnerId,
-          bookingId: booking.id,
-          direction: "debit",
-          amount: booking.amount - partnerPayout,
-          reason: "commission"
-        }
-      ]
+    // Partner wallet should reflect partner payout only.
+    // Platform commission should be tracked separately (Phase 6: economics ledger).
+    await this.prisma.ledgerEntry.create({
+      data: {
+        id: this.nextId("ledger"),
+        partnerId: booking.partnerId,
+        bookingId: booking.id,
+        direction: "credit",
+        amount: partnerPayout,
+        reason: "booking_settlement"
+      }
     });
   }
 }

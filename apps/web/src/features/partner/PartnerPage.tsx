@@ -1,11 +1,13 @@
 import { useState } from "react";
 import { completePartnerBooking, confirmPartnerBooking, getPartnerQueue, startPartnerBooking } from "../../lib/api";
 import type { Booking } from "../../lib/types";
+import { useAuth } from "../auth/AuthContext";
 import { JsonView } from "../shared/JsonView";
 import { PageSection } from "../shared/PageSection";
 import { EmptyHint, ErrorBanner, LoadingBadge } from "../shared/UiState";
 
 export function PartnerPage(): JSX.Element {
+  const { token } = useAuth();
   const [queue, setQueue] = useState<Booking[]>([]);
   const [status, setStatus] = useState("Idle");
   const [activeBookingId, setActiveBookingId] = useState<string | null>(null);
@@ -18,7 +20,7 @@ export function PartnerPage(): JSX.Element {
     setLoading(true);
     setError(null);
     try {
-      const data = await getPartnerQueue();
+      const data = await getPartnerQueue(token);
       setQueue(data.data);
       setStatus(`Loaded ${data.data.length} incoming bookings`);
     } catch (e) {
@@ -39,7 +41,7 @@ export function PartnerPage(): JSX.Element {
           onClick={async () => {
             try {
               if (!first) return;
-              await confirmPartnerBooking(first.id);
+              await confirmPartnerBooking(token, first.id);
               setActiveBookingId(first.id);
               setStatus(`Confirmed ${first.id}. Next: Start`);
               await refreshQueue();
@@ -57,7 +59,7 @@ export function PartnerPage(): JSX.Element {
           onClick={async () => {
             try {
               if (!activeBookingId) return;
-              await startPartnerBooking(activeBookingId);
+              await startPartnerBooking(token, activeBookingId);
               setStatus(`Started ${activeBookingId}. Next: Complete`);
               await refreshQueue();
             } catch (error) {
@@ -74,7 +76,7 @@ export function PartnerPage(): JSX.Element {
           onClick={async () => {
             try {
               if (!activeBookingId) return;
-              await completePartnerBooking(activeBookingId);
+              await completePartnerBooking(token, activeBookingId);
               setStatus(`Completed ${activeBookingId}`);
               setActiveBookingId(null);
               await refreshQueue();

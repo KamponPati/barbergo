@@ -59,9 +59,14 @@ export async function getAvailability(shopId: string, serviceId: string): Promis
   );
 }
 
-export async function quoteBooking(shopId: string, serviceId: string): Promise<{ subtotal: number; discount: number; total: number }> {
+export async function quoteBooking(
+  token: string,
+  shopId: string,
+  serviceId: string
+): Promise<{ subtotal: number; discount: number; total: number }> {
   return request("/customer/bookings/quote", {
     method: "POST",
+    token,
     body: {
       customer_id: "cust_1",
       shop_id: shopId,
@@ -72,12 +77,14 @@ export async function quoteBooking(shopId: string, serviceId: string): Promise<{
 }
 
 export async function checkoutBooking(params: {
+  token: string;
   shopId: string;
   serviceId: string;
   slot: string;
 }): Promise<{ booking: Booking }> {
   return request("/customer/bookings/checkout", {
     method: "POST",
+    token: params.token,
     body: {
       customer_id: "cust_1",
       shop_id: params.shopId,
@@ -89,24 +96,24 @@ export async function checkoutBooking(params: {
   });
 }
 
-export async function getCustomerHistory(): Promise<{ data: Booking[] }> {
-  return request("/customer/bookings/cust_1");
+export async function getCustomerHistory(token: string): Promise<{ data: Booking[] }> {
+  return request("/customer/bookings/cust_1", { token });
 }
 
-export async function getPartnerQueue(): Promise<{ data: Booking[] }> {
-  return request("/partner/bookings/incoming/partner_1");
+export async function getPartnerQueue(token: string): Promise<{ data: Booking[] }> {
+  return request("/partner/bookings/incoming/partner_1", { token });
 }
 
-export async function confirmPartnerBooking(bookingId: string): Promise<unknown> {
-  return request(`/partner/bookings/${bookingId}/confirm`, { method: "POST" });
+export async function confirmPartnerBooking(token: string, bookingId: string): Promise<unknown> {
+  return request(`/partner/bookings/${bookingId}/confirm`, { method: "POST", token });
 }
 
-export async function startPartnerBooking(bookingId: string): Promise<unknown> {
-  return request(`/partner/bookings/${bookingId}/start`, { method: "POST" });
+export async function startPartnerBooking(token: string, bookingId: string): Promise<unknown> {
+  return request(`/partner/bookings/${bookingId}/start`, { method: "POST", token });
 }
 
-export async function completePartnerBooking(bookingId: string): Promise<unknown> {
-  return request(`/partner/bookings/${bookingId}/complete`, { method: "POST" });
+export async function completePartnerBooking(token: string, bookingId: string): Promise<unknown> {
+  return request(`/partner/bookings/${bookingId}/complete`, { method: "POST", token });
 }
 
 export async function getScaleGateEval(token: string): Promise<unknown> {

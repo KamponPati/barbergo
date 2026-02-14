@@ -11,13 +11,17 @@ export class DiscoveryController {
     @Query("min_rating") minRating?: string,
     @Query("service_mode") serviceMode?: "in_shop" | "delivery",
     @Query("q") q?: string,
-    @Query("sort") sort?: "rating_desc" | "rating_asc" | "price_asc" | "price_desc"
+    @Query("lat") lat?: string,
+    @Query("lng") lng?: string,
+    @Query("sort") sort?: "rating_desc" | "rating_asc" | "price_asc" | "price_desc" | "nearest"
   ) {
     return this.dbCoreService.listShops({
       zone,
       min_rating: minRating ? Number(minRating) : undefined,
       service_mode: serviceMode,
       q,
+      lat: lat ? Number(lat) : undefined,
+      lng: lng ? Number(lng) : undefined,
       sort
     });
   }

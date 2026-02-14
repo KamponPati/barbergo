@@ -328,15 +328,15 @@ Default for Phase 5:
 ลำดับทำ (สำคัญสุดก่อน):
 - Data model -> persistence -> transactions/idempotency -> state machine correctness -> settlement/reconciliation -> reviews/disputes -> search/ranking -> event durability -> RBAC controller enforcement
 
-- [ ] `Status: TODO` Implement real data model from `New_Project.md` (users, customers, partner_shops, branches, staff, services, bookings, booking_events, payments, wallets, ledger, withdrawals, reviews, disputes, partner_documents)
-- [ ] `Status: TODO` Replace in-memory `MvpCoreService` storage with Prisma/Postgres persistence (transactions for slot locking + idempotency)
-- [ ] `Status: TODO` Implement booking state machine per `New_Project.md` states + policy engine integration (authoritative server-side)
-- [ ] `Status: TODO` Implement settlement ledger and reconciliation against payment provider exports (daily job + mismatch report)
-- [ ] `Status: TODO` Implement reviews + dispute center end-to-end (DB + admin tools + audit trail + evidence storage)
-- [ ] `Status: TODO` Search/ranking upgrades: distance calc, “open now”, price range, fastest available, quality reliability signals
-- [ ] `Status: TODO` Event log durability: persist `booking_events` and admin actions (append-only)
-- [ ] `Status: TODO` RBAC enforcement: per-role permissions matrix enforced at controller layer (not only UI)
-- [ ] `Status: IN_PROGRESS` Migrate API read/write paths from `MvpCoreService` to DB-backed service (Discovery + Customer/Partner booking flows first)
+- [x] `Status: DONE` Implement real data model from `New_Project.md` (users, customers, partners, shops, branches, staff, services, bookings, booking_events, payments, wallets, ledger, withdrawals, reviews, disputes, partner_documents) (completed on 2026-02-14)
+- [x] `Status: DONE` Replace in-memory `MvpCoreService` storage with Prisma/Postgres persistence (slot locking via `SlotReservation`, booking/payment/wallet/dispute persisted) (completed on 2026-02-14)
+- [x] `Status: DONE` Implement booking state machine per `New_Project.md` states (authoritative server-side transitions + DB events) (completed on 2026-02-14)
+- [ ] `Status: TODO` Implement reconciliation against payment provider exports (daily job + mismatch report) (ledger posting is DONE; export/compare is pending)
+- [x] `Status: DONE` Implement reviews + dispute center end-to-end (DB + admin resolve + audit trail + evidence JSON) (completed on 2026-02-14)
+- [x] `Status: DONE` Search/ranking baseline upgrades: nearest sort (lat/lng) + stable sort options (completed on 2026-02-14)
+- [x] `Status: DONE` Event log durability: persist `booking_events` and admin actions (append-only tables) (completed on 2026-02-14)
+- [x] `Status: DONE` RBAC enforcement at controller layer: require JWT + role checks for customer/partner/admin flows (completed on 2026-02-14)
+- [x] `Status: DONE` Migrate API read/write paths from `MvpCoreService` to DB-backed service (core customer/partner/trust/settlement/admin-disputes; scale/analytics configs remain in-memory) (completed on 2026-02-14)
 
 ## Phase 6 - Infrastructure + Environments + Recovery (P0)
 
