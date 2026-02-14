@@ -1,31 +1,14 @@
-import { HttpException, HttpStatus, Injectable, UnauthorizedException } from "@nestjs/common";
+import { HttpException, HttpStatus, Inject, Injectable, Optional, UnauthorizedException } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
 import { randomUUID } from "node:crypto";
 import { AuditLogService } from "../../common/services/audit-log.service";
-
-type SessionRecord = {
-  session_id: string;
-  user_id: string;
-  role: string;
-  refresh_token: string;
-  created_at: number;
-  expires_at: number;
-  rotated_at?: number;
-  revoked_at?: number;
-  ip?: string;
-  user_agent?: string;
-};
+import { AuthRepo, InMemoryAuthRepo, IssueContext, SessionRecord } from "./auth.repo";
 
 type LoginAttempt = {
   failed_count: number;
   lock_until?: number;
   first_attempt_at: number;
   last_attempt_at: number;
-};
-
-type IssueContext = {
-  ip?: string;
-  user_agent?: string;
 };
 
 type IssueResult = {
@@ -35,34 +18,36 @@ type IssueResult = {
   refresh_expires_in_seconds: number;
 };
 
+export const AUTH_REPO_TOKEN = "AUTH_REPO_TOKEN";
+
 @Injectable()
 export class AuthService {
-  private readonly refreshSessions = new Map<string, SessionRecord>();
   private readonly attempts = new Map<string, LoginAttempt>();
   private readonly ipWindow = new Map<string, { count: number; started_at: number }>();
-  private readonly acceptedUsers = new Map<string, string>([
-    ["admin_1", "admin"],
-    ["partner_1", "partner"],
-    ["cust_1", "customer"]
-  ]);
   private readonly accessTtlSeconds = 60 * 60;
   private readonly refreshTtlSeconds = 7 * 24 * 60 * 60;
   private readonly lockoutThreshold = 5;
   private readonly lockoutDurationMs = 15 * 60 * 1000;
   private readonly rateWindowMs = 60 * 1000;
   private readonly rateLimitPerMinute = 25;
+  private readonly repo: AuthRepo;
 
   constructor(
     private readonly jwtService: JwtService,
-    private readonly auditLogService: AuditLogService
-  ) {}
+    private readonly auditLogService: AuditLogService,
+    @Optional()
+    @Inject(AUTH_REPO_TOKEN)
+    repo?: AuthRepo
+  ) {
+    this.repo = repo ?? new InMemoryAuthRepo();
+  }
 
-  issueToken(userId: string, role: string, context: IssueContext): IssueResult {
+  async issueToken(userId: string, role: string, context: IssueContext): Promise<IssueResult> {
     this.enforceIpRateLimit(context.ip);
     this.enforceLockout(userId);
 
-    const expectedRole = this.acceptedUsers.get(userId);
-    if (!expectedRole || expectedRole !== role) {
+    const validUser = await this.repo.validateUserRole(userId, role);
+    if (!validUser) {
       this.recordLoginFailure(userId, context);
       throw new UnauthorizedException({
         code: "AUTH_INVALID_CREDENTIALS",
@@ -74,7 +59,7 @@ export class AuthService {
     const sessionId = `sess_${randomUUID()}`;
     const refreshToken = `rt_${randomUUID()}`;
     const now = Date.now();
-    this.refreshSessions.set(sessionId, {
+    const session: SessionRecord = {
       session_id: sessionId,
       user_id: userId,
       role,
@@ -83,7 +68,9 @@ export class AuthService {
       expires_at: now + this.refreshTtlSeconds * 1000,
       ip: context.ip,
       user_agent: context.user_agent
-    });
+    };
+
+    await this.repo.createSession(session);
 
     const payload = {
       sub: userId,
@@ -91,7 +78,7 @@ export class AuthService {
       sid: sessionId
     };
 
-    this.auditLogService.record({
+    void this.auditLogService.record({
       action: "auth.login.success",
       actor_user_id: userId,
       request_id: undefined,
@@ -112,10 +99,10 @@ export class AuthService {
     };
   }
 
-  rotateRefreshToken(refreshToken: string, context: IssueContext): IssueResult {
-    const existing = this.findSessionByRefreshToken(refreshToken);
+  async rotateRefreshToken(refreshToken: string, context: IssueContext): Promise<IssueResult> {
+    const existing = await this.repo.findSessionByRefreshToken(refreshToken);
     if (!existing) {
-      this.auditLogService.record({
+      void this.auditLogService.record({
         action: "auth.refresh.invalid_token",
         actor_user_id: undefined,
         request_id: undefined,
@@ -137,12 +124,9 @@ export class AuthService {
       });
     }
 
-    existing.rotated_at = now;
-    existing.revoked_at = now;
-
     const nextSessionId = `sess_${randomUUID()}`;
     const nextRefreshToken = `rt_${randomUUID()}`;
-    this.refreshSessions.set(nextSessionId, {
+    const next: SessionRecord = {
       session_id: nextSessionId,
       user_id: existing.user_id,
       role: existing.role,
@@ -151,7 +135,15 @@ export class AuthService {
       expires_at: now + this.refreshTtlSeconds * 1000,
       ip: context.ip,
       user_agent: context.user_agent
-    });
+    };
+
+    const rotated = await this.repo.rotateSession(refreshToken, next, now);
+    if (!rotated) {
+      throw new UnauthorizedException({
+        code: "AUTH_REFRESH_INVALID",
+        message: "invalid refresh token"
+      });
+    }
 
     const accessToken = this.jwtService.sign(
       {
@@ -162,7 +154,7 @@ export class AuthService {
       { expiresIn: `${this.accessTtlSeconds}s` }
     );
 
-    this.auditLogService.record({
+    void this.auditLogService.record({
       action: "auth.refresh.success",
       actor_user_id: existing.user_id,
       request_id: undefined,
@@ -183,37 +175,31 @@ export class AuthService {
     };
   }
 
-  revokeByRefreshToken(refreshToken: string, actorUserId?: string): { revoked: boolean } {
-    const session = this.findSessionByRefreshToken(refreshToken);
-    if (!session) {
+  async revokeByRefreshToken(refreshToken: string, actorUserId?: string): Promise<{ revoked: boolean }> {
+    const now = Date.now();
+    const result = await this.repo.revokeByRefreshToken(refreshToken, now);
+    if (!result.revoked || !result.session) {
       return { revoked: false };
     }
 
-    session.revoked_at = Date.now();
-    this.auditLogService.record({
+    void this.auditLogService.record({
       action: "auth.logout",
-      actor_user_id: actorUserId ?? session.user_id,
+      actor_user_id: actorUserId ?? result.session.user_id,
       request_id: undefined,
       path: "/api/v1/auth/logout",
       method: "POST",
       metadata: {
-        session_id: session.session_id
+        session_id: result.session.session_id
       }
     });
     return { revoked: true };
   }
 
-  revokeAllByUser(userId: string): { revoked_count: number } {
-    let revokedCount = 0;
+  async revokeAllByUser(userId: string): Promise<{ revoked_count: number }> {
     const now = Date.now();
-    for (const session of this.refreshSessions.values()) {
-      if (session.user_id === userId && !session.revoked_at) {
-        session.revoked_at = now;
-        revokedCount += 1;
-      }
-    }
+    const revokedCount = await this.repo.revokeAllByUser(userId, now);
 
-    this.auditLogService.record({
+    void this.auditLogService.record({
       action: "auth.logout_all",
       actor_user_id: userId,
       request_id: undefined,
@@ -225,15 +211,6 @@ export class AuthService {
     });
 
     return { revoked_count: revokedCount };
-  }
-
-  private findSessionByRefreshToken(refreshToken: string): SessionRecord | null {
-    for (const session of this.refreshSessions.values()) {
-      if (session.refresh_token === refreshToken) {
-        return session;
-      }
-    }
-    return null;
   }
 
   private enforceIpRateLimit(ip?: string): void {

@@ -14,28 +14,30 @@ describe("Security and reliability", () => {
     const authService = new AuthService(jwtService, new AuditLogService());
     const guard = new RolesGuard(new Reflector());
 
-    const token = authService.issueToken("admin_1", "admin", { ip: "127.0.0.1" });
-    expect(token.access_token).toBeDefined();
+    // AuthService is async when backed by DB; in unit tests it uses the in-memory repo.
+    return authService.issueToken("admin_1", "admin", { ip: "127.0.0.1" }).then((token) => {
+      expect(token.access_token).toBeDefined();
 
-    const mockContext = {
-      getHandler: () => "handler",
-      getClass: () => "class",
-      switchToHttp: () => ({
-        getRequest: () => ({
-          user: {
-            role: "customer"
-          }
+      const mockContext = {
+        getHandler: () => "handler",
+        getClass: () => "class",
+        switchToHttp: () => ({
+          getRequest: () => ({
+            user: {
+              role: "customer"
+            }
+          })
         })
-      })
-    };
+      };
 
     const reflectorSpy = jest
       .spyOn(Reflector.prototype, "getAllAndOverride")
       .mockReturnValue(["admin"]);
 
-    expect(() => guard.canActivate(mockContext as any)).toThrow(ForbiddenException);
+      expect(() => guard.canActivate(mockContext as any)).toThrow(ForbiddenException);
 
-    reflectorSpy.mockRestore();
+      reflectorSpy.mockRestore();
+    });
   });
 
   it("supports idempotency and dead-letter on handler failure", async () => {

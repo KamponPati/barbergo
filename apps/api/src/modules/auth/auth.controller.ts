@@ -22,12 +22,12 @@ export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post("login")
-  login(
+  async login(
     @Req() req: Request,
     @Res({ passthrough: true }) res: Response,
     @Body() body: LoginRequest
-  ): { access_token: string; expires_in_seconds: number } {
-    const issued = this.authService.issueToken(body.user_id, body.role, {
+  ): Promise<{ access_token: string; expires_in_seconds: number }> {
+    const issued = await this.authService.issueToken(body.user_id, body.role, {
       ip: req.ip,
       user_agent: req.header("user-agent")
     });
@@ -39,11 +39,11 @@ export class AuthController {
   }
 
   @Post("refresh")
-  refresh(
+  async refresh(
     @Req() req: Request,
     @Res({ passthrough: true }) res: Response,
     @Body() body: RefreshRequest
-  ): { access_token: string; expires_in_seconds: number } {
+  ): Promise<{ access_token: string; expires_in_seconds: number }> {
     const refreshToken = this.getRefreshToken(req, body);
     if (!refreshToken) {
       throw new UnauthorizedException({
@@ -52,7 +52,7 @@ export class AuthController {
       });
     }
 
-    const issued = this.authService.rotateRefreshToken(refreshToken, {
+    const issued = await this.authService.rotateRefreshToken(refreshToken, {
       ip: req.ip,
       user_agent: req.header("user-agent")
     });
@@ -64,24 +64,24 @@ export class AuthController {
   }
 
   @Post("logout")
-  logout(
+  async logout(
     @Req() req: Request,
     @Res({ passthrough: true }) res: Response,
     @Body() body: RefreshRequest
-  ): { revoked: boolean } {
+  ): Promise<{ revoked: boolean }> {
     const refreshToken = this.getRefreshToken(req, body);
     if (!refreshToken) {
       this.clearRefreshCookie(res);
       return { revoked: false };
     }
-    const result = this.authService.revokeByRefreshToken(refreshToken);
+    const result = await this.authService.revokeByRefreshToken(refreshToken);
     this.clearRefreshCookie(res);
     return result;
   }
 
   @UseGuards(JwtAuthGuard)
   @Post("logout-all")
-  logoutAll(@CurrentUser() user: CurrentUserPayload): { revoked_count: number } {
+  logoutAll(@CurrentUser() user: CurrentUserPayload): Promise<{ revoked_count: number }> {
     return this.authService.revokeAllByUser(user.user_id);
   }
 

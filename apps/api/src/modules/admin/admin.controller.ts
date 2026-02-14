@@ -17,9 +17,9 @@ export class AdminController {
   ) {}
 
   @Get("audit/logs")
-  getAuditLogs(): { data: ReturnType<AuditLogService["list"]> } {
+  async getAuditLogs(): Promise<{ data: Awaited<ReturnType<AuditLogService["list"]>> }> {
     return {
-      data: this.auditLogService.list()
+      data: await this.auditLogService.list()
     };
   }
 

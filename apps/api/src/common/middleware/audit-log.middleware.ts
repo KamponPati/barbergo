@@ -17,7 +17,7 @@ export class AuditLogMiddleware implements NestMiddleware {
     const isPrivilegedPath = req.path.startsWith("/api/v1/admin") || req.path.startsWith("/api/v1/auth/admin-only");
 
     if (isPrivilegedPath) {
-      this.auditLogService.record({
+      void this.auditLogService.record({
         action: "privileged_api_access",
         actor_user_id: req.user?.user_id,
         request_id: req.requestId,
