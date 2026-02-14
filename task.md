@@ -1,7 +1,14 @@
 # BarberGo Project Task Board
 
-อัปเดตล่าสุด: 2026-02-13
-สถานะล่าสุด: Phase 0-3 Signed แล้ว (Closed: 2026-02-13) และอยู่ระหว่างเตรียม Production Readiness + Phase 4
+อัปเดตล่าสุด: 2026-02-14
+สถานะล่าสุด: Phase 0-4 Signed แล้ว (Closed: 2026-02-13) และอยู่ระหว่าง Phase 5 (Production Readiness ก่อน GA)
+
+ลำดับงานถัดไป (แนะนำ):
+- Phase 5: Data + Domain (ทำให้ระบบ “ใช้ DB จริง” แทน in-memory)
+- Phase 6: Infrastructure + Environments + Recovery (staging/prod parity, backup/restore, observability, reverse proxy)
+- Phase 7: UI/UX Hi-Fi (Single Theme) (ทำหน้าจอจริงให้พร้อมใช้งาน/เข้าถึงได้)
+- Phase 8: Mobile Apps + Store Release (ถ้าต้องการ iOS/Android)
+- Phase 9: Marketing + Brand + Legal + Support Content
 
 วิธีอัปเดตสถานะ:
 - ใช้ `Status: TODO | IN_PROGRESS | BLOCKED | DONE`
@@ -27,6 +34,7 @@
 - `Phase 2`: S2-W1 ถึง S2-W8 (`2026-03-23` ถึง `2026-05-15`)
 - `Phase 3`: S3-W1 ถึง S3-W4 (`2026-05-18` ถึง `2026-06-12`)
 - `Phase 4`: S4-W1 ถึง S4-W10 (`2026-06-15` ถึง `2026-08-21`)
+- `Phase 5-9`: TBD (หลัง Phase 4; ปรับตามความเร็วทีม/ความพร้อม infra และ requirement จริง)
 
 ### DoD Baseline by Work Type
 
@@ -299,53 +307,91 @@ Default for Phase 4:
 
 ---
 
-## Production Readiness Backlog (Required Before GA)
+## Production Baseline (DONE)
 
-Default for Production Readiness:
-- `Owner: Codex | Priority: P0 | Sprint: S4-W1..S4-W10 | Due: 2026-08-21 | Dependency: DEP-04/DEP-05 | DoD: Implementation + Security + Ops sign-off | Deliverable: production release checklist + evidence | Blocker: None`
+Default for Production Baseline:
+- `Owner: Codex | Priority: P0 | Sprint: S4-W1..S4-W2 | Due: 2026-02-14 | Dependency: DEP-04/DEP-05 | DoD: Implementation + Security + basic release | Deliverable: working staging + passing release workflow | Blocker: None`
 
-### Frontend and UX Delivery
+- [x] `Status: DONE` Web app shell (Customer/Partner/Admin) + RBAC routing + API base switching + critical states (completed on 2026-02-13)
+- [x] `Status: DONE` Auth/session hardening: refresh rotation + secure cookies + throttling/lockout/audit (completed on 2026-02-13)
+- [x] `Status: DONE` External providers baseline: payment/object storage/push + retry/circuit breaker (completed on 2026-02-13)
+- [x] `Status: DONE` CI/CD baseline: ci + security + staging-e2e + perf-smoke + release-prod (completed on 2026-02-14)
+- [x] `Status: DONE` Staging web served by nginx on runner host + Cloudflare tunnel reachable (completed on 2026-02-14)
 
-- [x] `Status: DONE` สร้าง `apps/web` สำหรับ Customer/Partner/Admin พร้อม RBAC route guards (completed on 2026-02-13)
-- [x] `Status: DONE` เชื่อม UI กับ API จริงทุก flow ใน Phase 2 โดยไม่ใช้ mock data (completed on 2026-02-13)
-- [x] `Status: DONE` ทำ responsive + accessibility baseline (`WCAG 2.1 AA` checklist) (completed on 2026-02-13)
-- [x] `Status: DONE` เพิ่ม error/loading/empty states ครบทุก critical screens (completed on 2026-02-13)
+---
 
-### Production Frontend Active Breakdown (Wave 1 - Web Foundation)
+## Phase 5 - Data + Domain (P0)
 
-- [x] `Status: DONE` สร้าง `apps/web` (Vite + React + TypeScript) และผ่าน build/lint (completed on 2026-02-13)
-  `Owner: Codex | Priority: P0 | Sprint: S4-W1 | Due: 2026-06-21 | Dependency: DEP-04 | DoD: Implementation | Deliverable: apps/web/* + passing web build | Blocker: None`
-- [x] `Status: DONE` ทำ consolidated UI หน้า Customer/Partner/Admin และเชื่อม API flow หลัก (completed on 2026-02-13)
-  `Owner: Codex | Priority: P0 | Sprint: S4-W1 | Due: 2026-06-22 | Dependency: DEP-04/DEP-05 | DoD: Implementation | Deliverable: apps/web/src/App.tsx + apps/web/src/lib/api.ts | Blocker: None`
+Default for Phase 5:
+- `Owner: Codex | Priority: P0 | Sprint: S4-W2..S4-W6 | Due: 2026-07-26 | Dependency: DEP-04/DEP-05 | DoD: DB-backed system + migrations + correctness | Deliverable: Prisma schema + migrations + working flows on DB | Blocker: None`
 
-### Authentication and Session Hardening
+ลำดับทำ (สำคัญสุดก่อน):
+- Data model -> persistence -> transactions/idempotency -> state machine correctness -> settlement/reconciliation -> reviews/disputes -> search/ranking -> event durability -> RBAC controller enforcement
 
-- [x] `Status: DONE` ใช้ access token + refresh token rotation พร้อม revoke/session invalidation (completed on 2026-02-13)
-- [x] `Status: DONE` เปิดใช้ secure cookie policy (`HttpOnly`, `Secure`, `SameSite`) สำหรับ web auth (completed on 2026-02-13)
-- [x] `Status: DONE` เพิ่ม account protection: login throttling, lockout, suspicious activity audit (completed on 2026-02-13)
+- [ ] `Status: TODO` Implement real data model from `New_Project.md` (users, customers, partner_shops, branches, staff, services, bookings, booking_events, payments, wallets, ledger, withdrawals, reviews, disputes, partner_documents)
+- [ ] `Status: TODO` Replace in-memory `MvpCoreService` storage with Prisma/Postgres persistence (transactions for slot locking + idempotency)
+- [ ] `Status: TODO` Implement booking state machine per `New_Project.md` states + policy engine integration (authoritative server-side)
+- [ ] `Status: TODO` Implement settlement ledger and reconciliation against payment provider exports (daily job + mismatch report)
+- [ ] `Status: TODO` Implement reviews + dispute center end-to-end (DB + admin tools + audit trail + evidence storage)
+- [ ] `Status: TODO` Search/ranking upgrades: distance calc, “open now”, price range, fastest available, quality reliability signals
+- [ ] `Status: TODO` Event log durability: persist `booking_events` and admin actions (append-only)
+- [ ] `Status: TODO` RBAC enforcement: per-role permissions matrix enforced at controller layer (not only UI)
+- [ ] `Status: IN_PROGRESS` Migrate API read/write paths from `MvpCoreService` to DB-backed service (Discovery + Customer/Partner booking flows first)
 
-### External Provider Integrations (Real)
+## Phase 6 - Infrastructure + Environments + Recovery (P0)
 
-- [x] `Status: DONE` เชื่อม payment gateway production (authorize/capture/refund + webhook verification) (completed on 2026-02-13)
-- [x] `Status: DONE` เชื่อม object storage production สำหรับเอกสาร/KYC พร้อม signed URL policy (completed on 2026-02-13)
-- [x] `Status: DONE` เชื่อม push provider production สำหรับ customer/partner/admin notifications (completed on 2026-02-13)
-- [x] `Status: DONE` เพิ่ม provider failover + retry + circuit breaker + alerting (completed on 2026-02-13)
+Default for Phase 6:
+- `Owner: Codex | Priority: P0 | Sprint: S4-W3..S4-W8 | Due: 2026-08-09 | Dependency: DEP-04 | DoD: reproducible infra + recovery evidence | Deliverable: staging parity + backups + observability | Blocker: accounts/domains`
 
-### Security, Reliability, and Performance
+- [ ] `Status: TODO` Staging parity: separate DB/Redis/MinIO, separate secrets, data reset strategy, seeded test data
+- [ ] `Status: TODO` Service management standard: commit hardened `systemd` unit templates (api/web/workers) + environment files strategy + boot persistence + healthcheck endpoints
+- [ ] `Status: TODO` Observability: structured logs, metrics dashboards, alerts (SLO-based), trace correlation with request_id
+- [ ] `Status: TODO` Backup automation: scheduled DB backups + MinIO backups + restore verification job
+- [ ] `Status: TODO` Backup/restore drill evidence in staging/prod: record RPO/RTO + verify restore steps (ต้องมีหลักฐาน)
+- [ ] `Status: TODO` Production reverse proxy frontdoor for web+api: TLS termination, security headers, gzip/brotli, rate limits
+- [ ] `Status: TODO` Production deploy packaging: containerize API/Web (or hardened systemd) with versioned artifacts
 
-- [x] `Status: DONE` เพิ่ม migration/release safety: backward-compatible schema + rollback runbook (completed on 2026-02-13)
-- [x] `Status: DONE` ทำ e2e test suite ครอบคลุม web + api critical journeys บน staging (completed on 2026-02-13)
-- [x] `Status: DONE` ทำ load/stress test และยืนยัน SLO (latency, error rate, throughput) (completed on 2026-02-13)
-- [x] `Status: DONE` ทำ security test: SAST, dependency scan, secrets scan, basic DAST (completed on 2026-02-13)
-- [ ] `Status: TODO` ยืนยัน data backup/restore drill ใน staging/prod ตาม RPO/RTO target
+## Phase 7 - UI/UX Hi-Fi (Single Theme) (P0)
 
-### Deployment and Operations
+Default for Phase 7:
+- `Owner: Codex | Priority: P0 | Sprint: S4-W4..S4-W10 | Due: 2026-08-21 | Dependency: Phase 5 | DoD: themed UI + usability | Deliverable: component library + role dashboards | Blocker: None`
 
-- [x] `Status: DONE` ตั้ง CI/CD production pipeline พร้อม protected environments + approvals (completed on 2026-02-13)
-- [x] `Status: DONE` แยก secrets/config ตาม environment (`dev/stage/prod`) ด้วย policy ที่ตรวจสอบได้ (completed on 2026-02-13)
-- [x] `Status: DONE` จัดทำ release strategy: canary/blue-green + automated rollback gates (completed on 2026-02-13)
-- [x] `Status: DONE` ตั้ง on-call rotation + incident escalation matrix + communication templates (completed on 2026-02-13)
-- [x] `Status: DONE` ทำ final production go-live checklist และ cross-functional sign-off (completed on 2026-02-13)
+ลำดับทำ (สำคัญสุดก่อน):
+- Design tokens -> components -> app shell -> customer key journeys -> partner ops -> admin ops -> i18n/a11y -> PWA
+
+- [ ] `Status: TODO` Single theme design system: color/typography/spacing/radius/elevation/motion tokens + CSS variables
+- [ ] `Status: TODO` Accessible component library: Button, Input, Select, Tabs, Modal/Drawer, Toast, Table, Badge, Skeleton, EmptyState, ErrorState
+- [ ] `Status: TODO` App shell production: responsive nav/layout, route transitions, admin breadcrumbs, consistent page templates
+- [ ] `Status: TODO` Customer UI hi-fi: discovery (map+list, filters, sort), shop detail (gallery/branches/services/staff/reviews), checkout (multi-step + price breakdown + policy summary), history/status (timeline), post-service (review/tip/rebook/dispute)
+- [ ] `Status: TODO` Partner UI hi-fi: onboarding/KYC, shop ops (branches/services/staff), booking ops (queue + confirm/reject/reschedule/start/complete + exceptions), finance (revenue/commission/withdrawals)
+- [ ] `Status: TODO` Admin UI hi-fi: governance (partner/KYC approvals, roles, audit), controls (commission/cancellation/pricing/promos), quality/support (disputes + penalties + SLA), analytics (overview + zone gates)
+- [ ] `Status: TODO` i18n TH/EN + timezone-safe formatting baseline (dates, money, addresses)
+- [ ] `Status: TODO` PWA baseline: manifest + icons + installability + offline-friendly shell (no sensitive caching)
+- [ ] `Status: TODO` Usability/a11y pass: keyboard nav, contrast, focus states, loading/empty/error consistency, single brand voice copywriting
+
+## Phase 8 - Mobile Apps + Store Release (P1)
+
+Default for Phase 8:
+- `Owner: Codex | Priority: P1 | Sprint: S4-W6..S4-W10 | Due: 2026-08-21 | Dependency: Phase 5/7 | DoD: ship-ready apps | Deliverable: iOS/Android builds + store checklist | Blocker: Apple/Google accounts required`
+
+- [ ] `Status: TODO` Choose mobile stack: React Native (Expo) or Flutter (default: RN/Expo)
+- [ ] `Status: TODO` Create `apps/mobile` + env handling + CI build
+- [ ] `Status: TODO` Mobile design system aligned with web theme
+- [ ] `Status: TODO` Customer Mobile: discovery/map, shop detail, booking checkout, history, post-service
+- [ ] `Status: TODO` Partner Mobile: onboarding/KYC, shop ops, booking ops, finance
+- [ ] `Status: TODO` Push notifications (APNS/FCM) + deep links for customer/partner/admin
+- [ ] `Status: TODO` Store readiness: icons/splash, privacy/permissions copy, review notes, versioning, crash reporting
+
+## Phase 9 - Marketing + Brand + Legal + Support Content (P1)
+
+Default for Phase 9:
+- `Owner: Codex | Priority: P1 | Sprint: S4-W4..S4-W10 | Due: 2026-08-21 | Dependency: brand decisions | DoD: content ready | Deliverable: marketing site + legal + support content | Blocker: brand decisions`
+
+- [ ] `Status: TODO` Brand kit: logo, palette, typography, illustration style, tone of voice
+- [ ] `Status: TODO` Marketing website: landing, partner acquisition, FAQ, pricing/commission, contact
+- [ ] `Status: TODO` Legal pages: Terms, Privacy, Cookie, refund/cancellation policy (align with Phase 0 policy matrix)
+- [ ] `Status: TODO` In-app copywriting pass TH/EN: labels, empty states, errors, notifications
+- [ ] `Status: TODO` Support center content: onboarding guides, dispute guides, troubleshooting
 
 ---
 

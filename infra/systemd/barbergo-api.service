@@ -1,0 +1,18 @@
+[Unit]
+Description=BarberGo API Service
+After=network.target
+
+[Service]
+Type=simple
+User=yee
+Group=yee
+WorkingDirectory=/home/yee/app
+EnvironmentFile=-/home/yee/app/.env
+Environment=NODE_ENV=production
+Environment=PORT=3000
+ExecStart=/usr/bin/env bash -lc 'corepack pnpm --filter @barbergo/api start'
+Restart=always
+RestartSec=3
+
+[Install]
+WantedBy=multi-user.target

@@ -1,12 +1,12 @@
 import { Body, Controller, Get, Param, Post } from "@nestjs/common";
-import { MvpCoreService } from "../../common/services/mvp-core.service";
+import { DbCoreService } from "../../common/services/db-core.service";
 
 @Controller("customer/bookings")
 export class CustomerBookingController {
-  constructor(private readonly mvpCoreService: MvpCoreService) {}
+  constructor(private readonly dbCoreService: DbCoreService) {}
 
   @Post("quote")
-  quote(
+  async quote(
     @Body()
     body: {
       customer_id: string;
@@ -15,11 +15,11 @@ export class CustomerBookingController {
       promo_code?: string;
     }
   ) {
-    return this.mvpCoreService.quoteBooking(body);
+    return await this.dbCoreService.quoteBooking(body);
   }
 
   @Post("checkout")
-  checkout(
+  async checkout(
     @Body()
     body: {
       customer_id: string;
@@ -30,22 +30,22 @@ export class CustomerBookingController {
       payment_method: string;
     }
   ) {
-    return this.mvpCoreService.checkoutBooking(body);
+    return await this.dbCoreService.checkoutBooking(body);
   }
 
   @Get(":customerId")
   history(@Param("customerId") customerId: string) {
-    return this.mvpCoreService.listCustomerBookings(customerId);
+    return this.dbCoreService.listCustomerBookings(customerId);
   }
 
   @Get("detail/:bookingId")
   detail(@Param("bookingId") bookingId: string) {
-    return this.mvpCoreService.getBookingDetail(bookingId);
+    return this.dbCoreService.getBookingDetail(bookingId);
   }
 
   @Post(":bookingId/cancel")
   cancel(@Param("bookingId") bookingId: string, @Body() body: { reason: string }) {
-    return this.mvpCoreService.cancelBooking({ booking_id: bookingId, reason: body.reason });
+    return this.dbCoreService.cancelBooking({ booking_id: bookingId, reason: body.reason });
   }
 
   @Post(":bookingId/post-service")
@@ -60,7 +60,7 @@ export class CustomerBookingController {
       dispute_reason?: string;
     }
   ) {
-    return this.mvpCoreService.postServiceAction({
+    return this.dbCoreService.postServiceAction({
       booking_id: bookingId,
       rating: body.rating,
       review: body.review,

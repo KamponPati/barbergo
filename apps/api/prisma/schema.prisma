@@ -7,10 +7,365 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum UserRole {
+  customer
+  partner
+  admin
+}
+
+enum UserStatus {
+  active
+  disabled
+}
+
+enum PartnerVerificationStatus {
+  pending
+  approved
+  rejected
+}
+
+enum ServiceMode {
+  in_shop
+  delivery
+}
+
+enum BookingStatus {
+  requested
+  quoted
+  authorized
+  confirmed
+  started
+  completed
+  cancelled
+  disputed
+}
+
+enum PaymentStatus {
+  authorized
+  captured
+  refunded
+}
+
+enum WithdrawalStatus {
+  requested
+  approved
+  paid
+  rejected
+}
+
+enum DisputeStatus {
+  opened
+  investigating
+  resolved
+  rejected
+}
+
 model User {
-  id        String   @id @default(uuid())
-  role      String
-  status    String
+  id        String     @id
+  role      UserRole
+  status    UserStatus @default(active)
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+
+  customer Customer?
+  partner  Partner?
+
+  sessions AuthSession[]
+  audit    AuditLog[]
+
+  @@index([role])
+}
+
+model Customer {
+  id        String   @id
+  userId    String   @unique
+  name      String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  bookings Booking[]
+  reviews  Review[]
+}
+
+model Partner {
+  id                 String                    @id
+  userId             String                    @unique
+  name               String
+  verificationStatus PartnerVerificationStatus @default(pending)
+  createdAt          DateTime                  @default(now())
+  updatedAt          DateTime                  @updatedAt
+
+  user        User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  shops       Shop[]
+  documents   PartnerDocument[]
+  bookings    Booking[]
+  wallet      Wallet?
+  ledger      LedgerEntry[]
+  withdrawals Withdrawal[]
+}
+
+model Shop {
+  id        String   @id
+  partnerId String
+  name      String
+  rating    Float    @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  partner  Partner   @relation(fields: [partnerId], references: [id], onDelete: Cascade)
+  branches Branch[]
+  services Service[]
+  staff    Staff[]
+  bookings Booking[]
+  reviews  Review[]
+
+  @@index([partnerId])
+}
+
+model Branch {
+  id        String   @id
+  shopId    String
+  name      String
+  zone      String
+  lat       Float
+  lng       Float
+  openHours String
+  capacity  Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  shop            Shop              @relation(fields: [shopId], references: [id], onDelete: Cascade)
+  bookings        Booking[]
+  SlotReservation SlotReservation[]
+
+  @@index([shopId])
+  @@index([zone])
+}
+
+model Service {
+  id              String      @id
+  shopId          String
+  name            String
+  durationMinutes Int
+  price           Int
+  mode            ServiceMode
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+
+  shop     Shop      @relation(fields: [shopId], references: [id], onDelete: Cascade)
+  bookings Booking[]
+
+  @@index([shopId])
+}
+
+model Staff {
+  id        String   @id
+  shopId    String
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  shop   Shop         @relation(fields: [shopId], references: [id], onDelete: Cascade)
+  skills StaffSkill[]
+
+  @@index([shopId])
+}
+
+model StaffSkill {
+  id      String @id @default(uuid())
+  staffId String
+  skill   String
+
+  staff Staff @relation(fields: [staffId], references: [id], onDelete: Cascade)
+
+  @@unique([staffId, skill])
+}
+
+model Booking {
+  id           String        @id
+  customerId   String
+  partnerId    String
+  shopId       String
+  branchId     String
+  serviceId    String
+  slotAt       DateTime
+  status       BookingStatus
+  amount       Int
+  quoteAmount  Int
+  cancelReason String?
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+
+  customer Customer @relation(fields: [customerId], references: [id], onDelete: Restrict)
+  partner  Partner  @relation(fields: [partnerId], references: [id], onDelete: Restrict)
+  shop     Shop     @relation(fields: [shopId], references: [id], onDelete: Restrict)
+  branch   Branch   @relation(fields: [branchId], references: [id], onDelete: Restrict)
+  service  Service  @relation(fields: [serviceId], references: [id], onDelete: Restrict)
+
+  payment     Payment?
+  reservation SlotReservation?
+  events      BookingEvent[]
+  review      Review?
+  dispute     Dispute?
+
+  @@index([customerId, createdAt])
+  @@index([partnerId, status])
+}
+
+model SlotReservation {
+  id        String    @id
+  branchId  String
+  slotAt    DateTime
+  bookingId String    @unique
+  createdAt DateTime  @default(now())
+  expiresAt DateTime?
+
+  branch  Branch  @relation(fields: [branchId], references: [id], onDelete: Cascade)
+  booking Booking @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+
+  @@unique([branchId, slotAt])
+  @@index([branchId, slotAt])
+}
+
+model BookingEvent {
+  id          String         @id @default(uuid())
+  bookingId   String
+  type        String
+  statusFrom  BookingStatus?
+  statusTo    BookingStatus?
+  message     String?
+  actorUserId String?
+  requestId   String?
+  createdAt   DateTime       @default(now())
+
+  booking Booking @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+
+  @@index([bookingId, createdAt])
+}
+
+model Payment {
+  id          String        @id
+  bookingId   String        @unique
+  provider    String        @default("mock")
+  providerRef String?
+  status      PaymentStatus
+  amount      Int
+  currency    String        @default("THB")
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  booking Booking @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+}
+
+model Wallet {
+  id        String   @id
+  partnerId String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  partner Partner @relation(fields: [partnerId], references: [id], onDelete: Cascade)
+}
+
+model LedgerEntry {
+  id        String   @id
+  partnerId String
+  bookingId String?
+  direction String
+  amount    Int
+  reason    String
+  createdAt DateTime @default(now())
+
+  partner Partner @relation(fields: [partnerId], references: [id], onDelete: Cascade)
+
+  @@index([partnerId, createdAt])
+}
+
+model Withdrawal {
+  id        String           @id
+  partnerId String
+  amount    Int
+  status    WithdrawalStatus
+  createdAt DateTime         @default(now())
+  updatedAt DateTime         @updatedAt
+
+  partner Partner @relation(fields: [partnerId], references: [id], onDelete: Cascade)
+
+  @@index([partnerId, createdAt])
+}
+
+model Review {
+  id         String   @id
+  bookingId  String   @unique
+  shopId     String
+  customerId String
+  rating     Int
+  comment    String?
+  createdAt  DateTime @default(now())
+
+  booking  Booking  @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  shop     Shop     @relation(fields: [shopId], references: [id], onDelete: Cascade)
+  customer Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+
+  @@index([shopId, createdAt])
+}
+
+model Dispute {
+  id        String        @id
+  bookingId String        @unique
+  openedBy  String
+  reason    String
+  status    DisputeStatus @default(opened)
+  evidence  Json?
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+
+  booking Booking @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+}
+
+model PartnerDocument {
+  id        String   @id
+  partnerId String
+  type      String
+  objectKey String
+  status    String   @default("uploaded")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  partner Partner @relation(fields: [partnerId], references: [id], onDelete: Cascade)
+
+  @@index([partnerId, createdAt])
+}
+
+model AuthSession {
+  id           String    @id
+  userId       String
+  role         UserRole
+  refreshToken String    @unique
+  createdAt    DateTime  @default(now())
+  expiresAt    DateTime
+  rotatedAt    DateTime?
+  revokedAt    DateTime?
+  ip           String?
+  userAgent    String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+}
+
+model AuditLog {
+  id          String   @id @default(uuid())
+  action      String
+  actorUserId String?
+  requestId   String?
+  path        String?
+  method      String?
+  metadata    Json?
+  createdAt   DateTime @default(now())
+
+  actor User? @relation(fields: [actorUserId], references: [id], onDelete: SetNull)
+
+  @@index([action, createdAt])
+  @@index([actorUserId, createdAt])
 }

@@ -1,9 +1,9 @@
 import { Controller, Get, Param, Query } from "@nestjs/common";
-import { MvpCoreService } from "../../common/services/mvp-core.service";
+import { DbCoreService } from "../../common/services/db-core.service";
 
 @Controller("discovery")
 export class DiscoveryController {
-  constructor(private readonly mvpCoreService: MvpCoreService) {}
+  constructor(private readonly dbCoreService: DbCoreService) {}
 
   @Get("nearby")
   nearby(
@@ -13,7 +13,7 @@ export class DiscoveryController {
     @Query("q") q?: string,
     @Query("sort") sort?: "rating_desc" | "rating_asc" | "price_asc" | "price_desc"
   ) {
-    return this.mvpCoreService.listShops({
+    return this.dbCoreService.listShops({
       zone,
       min_rating: minRating ? Number(minRating) : undefined,
       service_mode: serviceMode,
@@ -24,7 +24,7 @@ export class DiscoveryController {
 
   @Get("shops/:shopId")
   shopDetail(@Param("shopId") shopId: string) {
-    return this.mvpCoreService.getShopDetail(shopId);
+    return this.dbCoreService.getShopDetail(shopId);
   }
 
   @Get("shops/:shopId/availability")
@@ -34,7 +34,7 @@ export class DiscoveryController {
     @Query("service_id") serviceId: string,
     @Query("date") date: string
   ) {
-    return this.mvpCoreService.getAvailability({
+    return this.dbCoreService.getAvailability({
       shop_id: shopId,
       branch_id: branchId,
       service_id: serviceId,

@@ -8,6 +8,7 @@ import { MetricsService } from "./services/metrics.service";
 import { MinioService } from "./services/minio.service";
 import { PaymentGatewayService } from "./services/payment-gateway.service";
 import { PrismaService } from "./services/prisma.service";
+import { DbCoreService } from "./services/db-core.service";
 import { MvpCoreService } from "./services/mvp-core.service";
 import { PushProviderService } from "./services/push-provider.service";
 import { RedisService } from "./services/redis.service";
@@ -18,6 +19,7 @@ import { RedisService } from "./services/redis.service";
     MetricsService,
     IdempotencyService,
     PrismaService,
+    DbCoreService,
     RedisService,
     BullmqService,
     MinioService,
@@ -30,6 +32,7 @@ import { RedisService } from "./services/redis.service";
     MetricsService,
     IdempotencyService,
     PrismaService,
+    DbCoreService,
     RedisService,
     BullmqService,
     MinioService,

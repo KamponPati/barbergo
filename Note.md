@@ -59,3 +59,15 @@ Updated: 2026-02-14
 ## Web Serving
 - 2026-02-14: migrated `barbergo-web.service` from `vite preview` to `nginx` static serving on port `5173`.
 - Nginx config: `infra/nginx/barbergo-web.conf`
+
+## Phase 5 - Data + Domain (DB Backing) (2026-02-14)
+- Added Prisma core schema for marketplace domains (shop/branch/service/staff/booking/payment/ledger/review/dispute/etc).
+- Added `SlotReservation` table for conflict-free slot locking.
+- Added `apps/api/prisma/seed.ts` to seed demo identities and shops used by the web shell (`admin_1`, `partner_1`, `cust_1`, `shop_1/2`).
+- Implemented `apps/api/src/common/services/db-core.service.ts` and switched these endpoints to DB-backed logic:
+- `GET /api/v1/discovery/*`
+- `POST /api/v1/customer/bookings/quote`
+- `POST /api/v1/customer/bookings/checkout`
+- `GET /api/v1/customer/bookings/:customerId`
+- `POST /api/v1/partner/bookings/:bookingId/(confirm|start|complete)`
+- Notes: write endpoints require `Idempotency-Key` header by design.
