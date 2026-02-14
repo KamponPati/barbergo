@@ -1,0 +1,18 @@
+# Allow self-hosted runner user `yee` to restart BarberGo services non-interactively.
+# Required for GitHub Actions jobs that run `sudo -n /bin/systemctl restart ...`.
+#
+# Install (run once, as root):
+#   sudo install -m 0440 infra/sudoers/barbergo-gha /etc/sudoers.d/barbergo-gha
+#   sudo visudo -cf /etc/sudoers.d/barbergo-gha
+#
+# Verify:
+#   sudo -n /bin/systemctl restart barbergo-api
+#   sudo -n /bin/systemctl restart barbergo-web
+
+Cmnd_Alias BARBERGO_SYSTEMCTL = /bin/systemctl restart barbergo-api, \
+  /bin/systemctl restart barbergo-web, \
+  /bin/systemctl status barbergo-api, \
+  /bin/systemctl status barbergo-web
+
+yee ALL=(root) NOPASSWD: BARBERGO_SYSTEMCTL
+

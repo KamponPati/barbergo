@@ -46,6 +46,7 @@ Updated: 2026-02-14
 - Runner sudo policy: required for CI deploy hooks.
 - `scripts/release/*` uses `sudo -n /bin/systemctl restart barbergo-api|barbergo-web`.
 - If `sudo -n` still prompts for password, deploy jobs will fail until a NOPASSWD sudoers rule is installed.
+- Sudoers template file in repo: `infra/sudoers/barbergo-gha`
 - Deploy hooks now run local scripts (no command parsing from GitHub secrets):
 - `scripts/release/deploy-canary-local.sh`
 - `scripts/release/promote-full-local.sh`
