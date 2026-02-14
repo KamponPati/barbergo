@@ -14,6 +14,7 @@ corepack pnpm --filter @barbergo/api exec prisma generate
 corepack pnpm --filter @barbergo/api exec prisma migrate deploy
 corepack pnpm --filter @barbergo/api build
 corepack pnpm --filter @barbergo/web build
+bash scripts/release/ensure-ports-free.sh
 sudo -n /bin/systemctl restart barbergo-api
 sudo -n /bin/systemctl restart barbergo-web
 

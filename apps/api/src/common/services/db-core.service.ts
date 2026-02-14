@@ -625,6 +625,70 @@ export class DbCoreService {
     };
   }
 
+  async getDailyReconciliationSummary(date: string): Promise<{
+    date: string;
+    bookings: { by_status: Record<string, number>; total: number; gross_amount: number };
+    payments: { by_status: Record<string, number>; total: number; gross_amount: number; mismatches: Array<{ booking_id: string; issue: string }> };
+    ledger: { credits: number; debits: number; net: number };
+  }> {
+    const dayStart = new Date(`${date}T00:00:00.000Z`);
+    const dayEnd = new Date(`${date}T23:59:59.999Z`);
+    if (Number.isNaN(dayStart.getTime()) || Number.isNaN(dayEnd.getTime())) {
+      throw new BadRequestException({ code: "INVALID_DATE", message: "date must be YYYY-MM-DD" });
+    }
+
+    const bookings = await this.prisma.booking.findMany({
+      where: { createdAt: { gte: dayStart, lte: dayEnd } },
+      include: { payment: true }
+    });
+
+    const bookingByStatus: Record<string, number> = {};
+    let bookingGross = 0;
+    for (const b of bookings) {
+      bookingByStatus[b.status] = (bookingByStatus[b.status] ?? 0) + 1;
+      bookingGross += b.amount;
+    }
+
+    const paymentByStatus: Record<string, number> = {};
+    let paymentGross = 0;
+    const mismatches: Array<{ booking_id: string; issue: string }> = [];
+    for (const b of bookings) {
+      const p = b.payment;
+      if (!p) {
+        mismatches.push({ booking_id: b.id, issue: "missing_payment" });
+        continue;
+      }
+
+      paymentByStatus[p.status] = (paymentByStatus[p.status] ?? 0) + 1;
+      paymentGross += p.amount;
+
+      if (b.status === BookingStatus.completed && p.status !== PaymentStatus.captured) {
+        mismatches.push({ booking_id: b.id, issue: `completed_but_payment_${p.status}` });
+      }
+      if (b.status === BookingStatus.cancelled && p.status !== PaymentStatus.refunded) {
+        mismatches.push({ booking_id: b.id, issue: `cancelled_but_payment_${p.status}` });
+      }
+    }
+
+    const ledgerRows = await this.prisma.ledgerEntry.findMany({
+      where: { createdAt: { gte: dayStart, lte: dayEnd } }
+    });
+
+    let credits = 0;
+    let debits = 0;
+    for (const row of ledgerRows) {
+      if (row.direction === "credit") credits += row.amount;
+      else debits += row.amount;
+    }
+
+    return {
+      date,
+      bookings: { by_status: bookingByStatus, total: bookings.length, gross_amount: bookingGross },
+      payments: { by_status: paymentByStatus, total: Object.values(paymentByStatus).reduce((a, b) => a + b, 0), gross_amount: paymentGross, mismatches },
+      ledger: { credits, debits, net: credits - debits }
+    };
+  }
+
 
   async listShops(filters: SearchFilters): Promise<{ data: Array<ApiShop & { branches: ApiBranch[] }> }> {
     const where: Prisma.ShopWhereInput = {};

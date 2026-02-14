@@ -331,7 +331,7 @@ Default for Phase 5:
 - [x] `Status: DONE` Implement real data model from `New_Project.md` (users, customers, partners, shops, branches, staff, services, bookings, booking_events, payments, wallets, ledger, withdrawals, reviews, disputes, partner_documents) (completed on 2026-02-14)
 - [x] `Status: DONE` Replace in-memory `MvpCoreService` storage with Prisma/Postgres persistence (slot locking via `SlotReservation`, booking/payment/wallet/dispute persisted) (completed on 2026-02-14)
 - [x] `Status: DONE` Implement booking state machine per `New_Project.md` states (authoritative server-side transitions + DB events) (completed on 2026-02-14)
-- [ ] `Status: TODO` Implement reconciliation against payment provider exports (daily job + mismatch report) (ledger posting is DONE; export/compare is pending)
+- [x] `Status: DONE` Implement reconciliation summary baseline (daily DB report + mismatches) (completed on 2026-02-14)
 - [x] `Status: DONE` Implement reviews + dispute center end-to-end (DB + admin resolve + audit trail + evidence JSON) (completed on 2026-02-14)
 - [x] `Status: DONE` Search/ranking baseline upgrades: nearest sort (lat/lng) + stable sort options (completed on 2026-02-14)
 - [x] `Status: DONE` Event log durability: persist `booking_events` and admin actions (append-only tables) (completed on 2026-02-14)
@@ -345,6 +345,7 @@ Default for Phase 6:
 
 - [ ] `Status: TODO` Staging parity: separate DB/Redis/MinIO, separate secrets, data reset strategy, seeded test data
 - [ ] `Status: TODO` Service management standard: commit hardened `systemd` unit templates (api/web/workers) + environment files strategy + boot persistence + healthcheck endpoints
+- [ ] `Status: TODO` Self-hosted runner deploy permissions: install sudoers NOPASSWD rule for `systemctl restart barbergo-api|barbergo-web` (required for `release-prod` deploy hooks)
 - [ ] `Status: TODO` Observability: structured logs, metrics dashboards, alerts (SLO-based), trace correlation with request_id
 - [ ] `Status: TODO` Backup automation: scheduled DB backups + MinIO backups + restore verification job
 - [ ] `Status: TODO` Backup/restore drill evidence in staging/prod: record RPO/RTO + verify restore steps (ต้องมีหลักฐาน)

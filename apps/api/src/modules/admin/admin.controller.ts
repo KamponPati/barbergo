@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, Put, UseGuards } from "@nestjs/common";
+import { Body, Controller, Get, Param, Post, Put, Query, UseGuards } from "@nestjs/common";
 import { AuditLogService } from "../../common/services/audit-log.service";
 import { DbCoreService } from "../../common/services/db-core.service";
 import { MvpCoreService } from "../../common/services/mvp-core.service";
@@ -215,5 +215,11 @@ export class AdminController {
   @Get("alerts")
   alerts() {
     return this.dbCoreService.getNotificationFeed("admin");
+  }
+
+  @Get("reconciliation/daily")
+  reconciliationDaily(@Query("date") date?: string) {
+    const day = date ?? new Date().toISOString().slice(0, 10);
+    return this.dbCoreService.getDailyReconciliationSummary(day);
   }
 }

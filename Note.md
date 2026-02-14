@@ -43,11 +43,9 @@ Updated: 2026-02-14
 ## Release Pipeline Update (2026-02-14)
 - `release-prod` job `deploy-and-verify` changed to `self-hosted` runner to avoid SSH timeout from GitHub-hosted runners to private IPs.
 - Workflow file updated: `.github/workflows/release-prod.yml`
-- Runner sudo policy configured:
-- `/etc/sudoers.d/barbergo-gha` allows `yee` to run
-- `sudo /bin/systemctl restart barbergo-api`
-- `sudo /bin/systemctl restart barbergo-web`
-- without password prompt (verified).
+- Runner sudo policy: required for CI deploy hooks.
+- `scripts/release/*` uses `sudo -n /bin/systemctl restart barbergo-api|barbergo-web`.
+- If `sudo -n` still prompts for password, deploy jobs will fail until a NOPASSWD sudoers rule is installed.
 - Deploy hooks now run local scripts (no command parsing from GitHub secrets):
 - `scripts/release/deploy-canary-local.sh`
 - `scripts/release/promote-full-local.sh`
@@ -75,3 +73,6 @@ Updated: 2026-02-14
 - Persisted idempotency store to Redis (in-memory fallback).
 - Persisted auth refresh sessions to DB table `AuthSession` (rotation/revoke survives restart).
 - Persisted audit logs to DB table `AuditLog` (best-effort write; admin can read historical logs).
+- Added admin reconciliation summary endpoint:
+- `GET /api/v1/admin/reconciliation/daily?date=YYYY-MM-DD`
+- Added deploy guard for port conflicts (single-host runner): `scripts/release/ensure-ports-free.sh`

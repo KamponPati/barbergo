@@ -18,6 +18,7 @@ if [ "${BARBERGO_RUN_SEED:-}" = "true" ]; then
 fi
 corepack pnpm --filter @barbergo/api build
 corepack pnpm --filter @barbergo/web build
+bash scripts/release/ensure-ports-free.sh
 sudo -n /bin/systemctl restart barbergo-api
 sudo -n /bin/systemctl restart barbergo-web
 
