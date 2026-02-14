@@ -61,6 +61,20 @@ get_json() {
 }
 
 echo "[1/8] checking web shell"
+echo "[INFO] waiting for web to become ready: $WEB_BASE_URL"
+web_ok=false
+for i in $(seq 1 30); do
+  if curl "${CURL_OK_FLAGS[@]}" "$WEB_BASE_URL" >/dev/null 2>&1; then
+    web_ok=true
+    break
+  fi
+  sleep 1
+done
+if [ "$web_ok" != "true" ]; then
+  echo "[FAIL] web not reachable after 30s: $WEB_BASE_URL"
+  exit 1
+fi
+
 WEB_HTML="$(curl "${CURL_OK_FLAGS[@]}" "$WEB_BASE_URL")"
 if ! echo "$WEB_HTML" | grep -Eq "BarberGo Web App|<div id=\"root\">"; then
   echo "[FAIL] web shell content not detected"
