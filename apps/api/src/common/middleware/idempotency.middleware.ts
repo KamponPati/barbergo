@@ -31,7 +31,7 @@ export class IdempotencyMiddleware implements NestMiddleware {
       .digest("hex");
   }
 
-  use(req: RequestWithContext, res: Response, next: NextFunction): void {
+  async use(req: RequestWithContext, res: Response, next: NextFunction): Promise<void> {
     if (!this.requiresIdempotency(req.method, req.path)) {
       next();
       return;
@@ -49,7 +49,7 @@ export class IdempotencyMiddleware implements NestMiddleware {
 
     const scopeKey = `${req.ip}:${req.method}:${req.path}:${key}`;
     const requestHash = this.buildRequestHash(req);
-    const existing = this.idempotencyService.get(scopeKey);
+    const existing = await this.idempotencyService.get(scopeKey);
 
     if (existing) {
       if (existing.requestHash !== requestHash) {
@@ -71,15 +71,19 @@ export class IdempotencyMiddleware implements NestMiddleware {
       const statusCode = res.statusCode;
       if (statusCode >= 200 && statusCode < 500) {
         const ttlSeconds = Number(process.env.IDEMPOTENCY_TTL_SECONDS ?? 86400);
-        this.idempotencyService.set(
-          scopeKey,
-          {
-            requestHash,
-            statusCode,
-            body
-          },
-          ttlSeconds
-        );
+        void this.idempotencyService
+          .set(
+            scopeKey,
+            {
+              requestHash,
+              statusCode,
+              body
+            },
+            ttlSeconds
+          )
+          .catch(() => {
+            // Best-effort; idempotency must not break the request path.
+          });
       }
 
       return originalJson(body);

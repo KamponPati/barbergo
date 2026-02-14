@@ -39,8 +39,17 @@ describe("Security and reliability", () => {
   });
 
   it("supports idempotency and dead-letter on handler failure", async () => {
-    const idempotency = new IdempotencyService();
-    idempotency.set(
+    const idempotency = new IdempotencyService({
+      connectIfNeeded: async () => {
+        throw new Error("redis unavailable in unit test");
+      },
+      client: {
+        get: async () => null,
+        set: async () => "OK"
+      }
+    } as any);
+
+    await idempotency.set(
       "idem-1",
       {
         requestHash: "hash-1",
@@ -50,7 +59,7 @@ describe("Security and reliability", () => {
       60
     );
 
-    expect(idempotency.get("idem-1")?.statusCode).toBe(201);
+    expect((await idempotency.get("idem-1"))?.statusCode).toBe(201);
 
     const queueAdd = jest.fn().mockResolvedValue(undefined);
     const mockBullmq = {
