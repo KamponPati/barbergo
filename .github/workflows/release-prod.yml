@@ -69,8 +69,9 @@ jobs:
 
       - name: Production smoke verification
         env:
-          API_BASE_URL: ${{ github.event.inputs.api_base_url }}
-          WEB_BASE_URL: ${{ github.event.inputs.web_base_url }}
+          # On self-hosted runner, verify local origin directly to avoid Cloudflare Access/WAF blocking (403).
+          API_BASE_URL: "http://127.0.0.1:3000/api/v1"
+          WEB_BASE_URL: "http://127.0.0.1:5173"
           SMOKE_ALLOW_INSECURE_TLS: "true"
         run: bash scripts/staging/smoke-critical-journeys.sh
 
