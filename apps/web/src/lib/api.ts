@@ -2,7 +2,7 @@ import type { Booking, Shop, UserRole } from "./types";
 
 const runtimeApiBase =
   typeof window !== "undefined"
-    ? `${window.location.protocol}//${window.location.hostname}:3000/api/v1`
+    ? `${window.location.origin}/api/v1`
     : "http://localhost:3000/api/v1";
 
 export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? runtimeApiBase;
