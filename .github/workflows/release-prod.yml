@@ -66,9 +66,11 @@ jobs:
         run: sudo apt-get update && sudo apt-get install -y ripgrep
 
       - name: Deploy canary (hook)
+        env:
+          PROD_DEPLOY_CANARY_CMD: ${{ secrets.PROD_DEPLOY_CANARY_CMD }}
         run: |
-          if [ -n "${{ secrets.PROD_DEPLOY_CANARY_CMD }}" ]; then
-            bash -lc "${{ secrets.PROD_DEPLOY_CANARY_CMD }}"
+          if [ -n "${PROD_DEPLOY_CANARY_CMD:-}" ]; then
+            bash -lc "$PROD_DEPLOY_CANARY_CMD"
           else
             echo "[WARN] PROD_DEPLOY_CANARY_CMD is not configured"
           fi
@@ -80,18 +82,22 @@ jobs:
         run: bash scripts/staging/smoke-critical-journeys.sh
 
       - name: Promote full rollout (hook)
+        env:
+          PROD_DEPLOY_FULL_CMD: ${{ secrets.PROD_DEPLOY_FULL_CMD }}
         run: |
-          if [ -n "${{ secrets.PROD_DEPLOY_FULL_CMD }}" ]; then
-            bash -lc "${{ secrets.PROD_DEPLOY_FULL_CMD }}"
+          if [ -n "${PROD_DEPLOY_FULL_CMD:-}" ]; then
+            bash -lc "$PROD_DEPLOY_FULL_CMD"
           else
             echo "[WARN] PROD_DEPLOY_FULL_CMD is not configured"
           fi
 
       - name: Rollback on failure (hook)
         if: failure()
+        env:
+          PROD_ROLLBACK_CMD: ${{ secrets.PROD_ROLLBACK_CMD }}
         run: |
-          if [ -n "${{ secrets.PROD_ROLLBACK_CMD }}" ]; then
-            bash -lc "${{ secrets.PROD_ROLLBACK_CMD }}"
+          if [ -n "${PROD_ROLLBACK_CMD:-}" ]; then
+            bash -lc "$PROD_ROLLBACK_CMD"
           else
             echo "[WARN] PROD_ROLLBACK_CMD is not configured"
           fi
