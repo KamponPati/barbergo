@@ -49,7 +49,9 @@ jobs:
         run: bash scripts/release/predeploy-gate.sh
 
   deploy-and-verify:
-    runs-on: ubuntu-latest
+    runs-on:
+      - self-hosted
+      - linux
     environment: production
     needs: predeploy
     timeout-minutes: 20
