@@ -3,8 +3,18 @@ set -euo pipefail
 
 API_BASE_URL="${API_BASE_URL:-http://localhost:3000/api/v1}"
 WEB_BASE_URL="${WEB_BASE_URL:-http://localhost:5173}"
+SMOKE_ALLOW_INSECURE_TLS="${SMOKE_ALLOW_INSECURE_TLS:-false}"
 TMP_DIR="$(mktemp -d)"
 trap 'rm -rf "$TMP_DIR"' EXIT
+
+# Use -f for "must succeed" requests, but do not use it for "capture http_code" requests (404/400 expected).
+CURL_OK_FLAGS=(-sS -f)
+CURL_ANY_FLAGS=(-sS)
+if [ "$SMOKE_ALLOW_INSECURE_TLS" = "true" ]; then
+  CURL_OK_FLAGS+=(-k)
+  CURL_ANY_FLAGS+=(-k)
+  echo "[WARN] SMOKE_ALLOW_INSECURE_TLS=true (TLS cert verification disabled)"
+fi
 
 json_get() {
   local path="$1"
@@ -25,14 +35,14 @@ post_json() {
   local auth="${3:-}"
   local idempotency_key="smoke-$(date +%s%N)-$RANDOM"
   if [ -n "$auth" ]; then
-    curl -sS -f \
+    curl "${CURL_OK_FLAGS[@]}" \
       -H "content-type: application/json" \
       -H "authorization: Bearer $auth" \
       -H "Idempotency-Key: $idempotency_key" \
       -d "$payload" \
       "$url"
   else
-    curl -sS -f \
+    curl "${CURL_OK_FLAGS[@]}" \
       -H "content-type: application/json" \
       -H "Idempotency-Key: $idempotency_key" \
       -d "$payload" \
@@ -44,14 +54,14 @@ get_json() {
   local url="$1"
   local auth="${2:-}"
   if [ -n "$auth" ]; then
-    curl -sS -f -H "authorization: Bearer $auth" "$url"
+    curl "${CURL_OK_FLAGS[@]}" -H "authorization: Bearer $auth" "$url"
   else
-    curl -sS -f "$url"
+    curl "${CURL_OK_FLAGS[@]}" "$url"
   fi
 }
 
 echo "[1/8] checking web shell"
-WEB_HTML="$(curl -sS -f "$WEB_BASE_URL")"
+WEB_HTML="$(curl "${CURL_OK_FLAGS[@]}" "$WEB_BASE_URL")"
 if ! echo "$WEB_HTML" | grep -Eq "BarberGo Web App|<div id=\"root\">"; then
   echo "[FAIL] web shell content not detected"
   exit 1
@@ -100,7 +110,7 @@ post_json "$API_BASE_URL/admin/scale/dynamic-pricing/estimate" '{"zone_id":"cent
 
 echo "[7/8] payment webhook signature verification path"
 WEBHOOK_RESPONSE_CODE="$(
-  curl -sS -o "$TMP_DIR/webhook.out" -w '%{http_code}' \
+  curl "${CURL_ANY_FLAGS[@]}" -o "$TMP_DIR/webhook.out" -w '%{http_code}' \
     -H "content-type: application/json" \
     -H "x-provider-signature: invalid" \
     -d "{\"booking_id\":\"$BOOKING_ID\",\"status\":\"captured\"}" \
@@ -113,7 +123,7 @@ fi
 
 echo "[8/8] trust signed URL endpoint"
 TRUST_CODE="$(
-  curl -sS -o "$TMP_DIR/trust.out" -w '%{http_code}' \
+  curl "${CURL_ANY_FLAGS[@]}" -o "$TMP_DIR/trust.out" -w '%{http_code}' \
     -H "content-type: application/json" \
     -H "authorization: Bearer $PARTNER_TOKEN" \
     -H "Idempotency-Key: smoke-$(date +%s%N)-$RANDOM" \

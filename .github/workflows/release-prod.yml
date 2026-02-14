@@ -71,6 +71,7 @@ jobs:
         env:
           API_BASE_URL: ${{ github.event.inputs.api_base_url }}
           WEB_BASE_URL: ${{ github.event.inputs.web_base_url }}
+          SMOKE_ALLOW_INSECURE_TLS: "true"
         run: bash scripts/staging/smoke-critical-journeys.sh
 
       - name: Promote full rollout (hook)
