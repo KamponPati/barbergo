@@ -52,7 +52,7 @@ get_json() {
 
 echo "[1/8] checking web shell"
 WEB_HTML="$(curl -sS -f "$WEB_BASE_URL")"
-if ! echo "$WEB_HTML" | rg -q "BarberGo Web App|<div id=\"root\">"; then
+if ! echo "$WEB_HTML" | grep -Eq "BarberGo Web App|<div id=\"root\">"; then
   echo "[FAIL] web shell content not detected"
   exit 1
 fi
@@ -86,7 +86,7 @@ post_json "$API_BASE_URL/partner/bookings/$BOOKING_ID/complete" "{}" "$PARTNER_T
 
 echo "[5/8] customer history contains booking"
 HISTORY="$(get_json "$API_BASE_URL/customer/bookings/cust_1" "$CUST_TOKEN")"
-if ! echo "$HISTORY" | rg -q "$BOOKING_ID"; then
+if ! echo "$HISTORY" | grep -q "$BOOKING_ID"; then
   echo "[FAIL] booking not found in customer history"
   exit 1
 fi
