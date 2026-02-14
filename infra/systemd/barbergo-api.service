@@ -7,12 +7,20 @@ Type=simple
 User=yee
 Group=yee
 WorkingDirectory=/home/yee/app
+EnvironmentFile=-/etc/barbergo/production.env
 EnvironmentFile=-/home/yee/app/.env
 Environment=NODE_ENV=production
 Environment=PORT=3000
+# Fail fast if critical env is missing.
+ExecStartPre=/usr/bin/env bash -lc 'test -n "${DATABASE_URL:-}"'
+ExecStartPre=/usr/bin/env bash -lc 'test -n "${JWT_SECRET:-}"'
 ExecStart=/usr/bin/env bash -lc 'corepack pnpm --filter @barbergo/api start'
 Restart=always
 RestartSec=3
+TimeoutStopSec=20
+KillSignal=SIGTERM
+LimitNOFILE=65535
+NoNewPrivileges=true
 
 [Install]
 WantedBy=multi-user.target

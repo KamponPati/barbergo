@@ -10,6 +10,7 @@ import { CommonModule } from "./common/common.module";
 import { AuditLogMiddleware } from "./common/middleware/audit-log.middleware";
 import { IdempotencyMiddleware } from "./common/middleware/idempotency.middleware";
 import { MetricsMiddleware } from "./common/middleware/metrics.middleware";
+import { RequestLoggingMiddleware } from "./common/middleware/request-logging.middleware";
 import { RequestContextMiddleware } from "./common/middleware/request-context.middleware";
 import { PlatformModule } from "./modules/platform/platform.module";
 
@@ -29,7 +30,7 @@ import { PlatformModule } from "./modules/platform/platform.module";
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer): void {
     consumer
-      .apply(RequestContextMiddleware, MetricsMiddleware)
+      .apply(RequestContextMiddleware, MetricsMiddleware, RequestLoggingMiddleware)
       .forRoutes({ path: "*", method: RequestMethod.ALL });
 
     consumer

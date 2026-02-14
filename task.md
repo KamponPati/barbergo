@@ -343,14 +343,14 @@ Default for Phase 5:
 Default for Phase 6:
 - `Owner: Codex | Priority: P0 | Sprint: S4-W3..S4-W8 | Due: 2026-08-09 | Dependency: DEP-04 | DoD: reproducible infra + recovery evidence | Deliverable: staging parity + backups + observability | Blocker: accounts/domains`
 
-- [ ] `Status: TODO` Staging parity: separate DB/Redis/MinIO, separate secrets, data reset strategy, seeded test data
-- [ ] `Status: TODO` Service management standard: commit hardened `systemd` unit templates (api/web/workers) + environment files strategy + boot persistence + healthcheck endpoints
-- [ ] `Status: TODO` Self-hosted runner deploy permissions: install sudoers NOPASSWD rule for `systemctl restart barbergo-api|barbergo-web` (required for `release-prod` deploy hooks)
-- [ ] `Status: TODO` Observability: structured logs, metrics dashboards, alerts (SLO-based), trace correlation with request_id
-- [ ] `Status: TODO` Backup automation: scheduled DB backups + MinIO backups + restore verification job
-- [ ] `Status: TODO` Backup/restore drill evidence in staging/prod: record RPO/RTO + verify restore steps (ต้องมีหลักฐาน)
-- [ ] `Status: TODO` Production reverse proxy frontdoor for web+api: TLS termination, security headers, gzip/brotli, rate limits
-- [ ] `Status: TODO` Production deploy packaging: containerize API/Web (or hardened systemd) with versioned artifacts
+- [ ] `Status: IN_PROGRESS` Staging parity: separate DB/Redis/MinIO, separate secrets, data reset strategy, seeded test data
+- [ ] `Status: IN_PROGRESS` Service management standard: commit hardened `systemd` unit templates (api/web/workers) + environment files strategy + boot persistence + healthcheck endpoints
+- [x] `Status: DONE` Self-hosted runner deploy permissions: install sudoers NOPASSWD rule for `systemctl restart barbergo-api|barbergo-web` (required for `release-prod` deploy hooks) (completed on 2026-02-15)
+- [ ] `Status: IN_PROGRESS` Observability: structured logs, metrics dashboards, alerts (SLO-based), trace correlation with request_id
+- [ ] `Status: IN_PROGRESS` Backup automation: scheduled DB backups + MinIO backups + restore verification job
+- [ ] `Status: IN_PROGRESS` Backup/restore drill evidence in staging/prod: record RPO/RTO + verify restore steps (ต้องมีหลักฐาน)
+- [ ] `Status: IN_PROGRESS` Production reverse proxy frontdoor for web+api: TLS termination, security headers, gzip/brotli, rate limits
+- [ ] `Status: IN_PROGRESS` Production deploy packaging: containerize API/Web (or hardened systemd) with versioned artifacts
 
 ## Phase 7 - UI/UX Hi-Fi (Single Theme) (P0)
 

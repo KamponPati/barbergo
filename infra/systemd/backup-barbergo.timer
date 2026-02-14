@@ -1,0 +1,11 @@
+[Unit]
+Description=BarberGo Backup Timer (daily)
+
+[Timer]
+OnCalendar=*-*-* 02:30:00
+Persistent=true
+Unit=backup-barbergo.service
+
+[Install]
+WantedBy=timers.target
+

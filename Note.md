@@ -58,6 +58,7 @@ Updated: 2026-02-14
 ## Web Serving
 - 2026-02-14: migrated `barbergo-web.service` from `vite preview` to `nginx` static serving on port `5173`.
 - Nginx config: `infra/nginx/barbergo-web.conf`
+- 2026-02-15: fixed web API base to same-origin and added nginx reverse proxy `/api/v1/*` -> `http://127.0.0.1:3000` (so browsers never hit `:3000` directly).
 
 ## Phase 5 - Data + Domain (DB Backing) (2026-02-14)
 - Added Prisma core schema for marketplace domains (shop/branch/service/staff/booking/payment/ledger/review/dispute/etc).
@@ -77,3 +78,22 @@ Updated: 2026-02-14
 - Added admin reconciliation summary endpoint:
 - `GET /api/v1/admin/reconciliation/daily?date=YYYY-MM-DD`
 - Added deploy guard for port conflicts (single-host runner): `scripts/release/ensure-ports-free.sh`
+
+## Phase 6 - Infra + Recovery (IN_PROGRESS) (2026-02-15)
+- Added promtail for nginx logs into Loki: `infra/observability/promtail/promtail-config.yml` + `infra/docker/docker-compose.observability.yml`
+- Added structured request logging + request_id correlation and improved metrics:
+- `apps/api/src/common/middleware/request-logging.middleware.ts`
+- `apps/api/src/common/middleware/metrics.middleware.ts`
+- `apps/api/src/common/services/metrics.service.ts`
+- Added backup automation scripts + restore verification:
+- `scripts/backup/run-backup.sh`
+- `scripts/backup/backup-postgres.sh`
+- `scripts/backup/backup-minio.sh`
+- `scripts/backup/verify-restore.sh`
+- Added systemd timer templates for backups:
+- `infra/systemd/backup-barbergo.service`
+- `infra/systemd/backup-barbergo.timer`
+- Backup notes:
+- Backup scripts use Docker (`docker exec ...`). If running backups as user `yee`, either add `yee` to `docker` group or run the backup systemd unit as `root` (template does `User=root`).
+- Added staging-parity dependency compose (alt ports):
+- `infra/docker/docker-compose.staging.yml`

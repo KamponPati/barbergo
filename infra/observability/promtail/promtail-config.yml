@@ -1,0 +1,19 @@
+server:
+  http_listen_port: 9080
+  grpc_listen_port: 0
+
+positions:
+  filename: /tmp/positions.yaml
+
+clients:
+  - url: http://loki:3100/loki/api/v1/push
+
+scrape_configs:
+  # Tail nginx logs that this project writes to /tmp/* so it works unprivileged.
+  - job_name: barbergo-nginx
+    static_configs:
+      - targets: [localhost]
+        labels:
+          job: barbergo-nginx
+          __path__: /host-tmp/barbergo-nginx-*.log
+

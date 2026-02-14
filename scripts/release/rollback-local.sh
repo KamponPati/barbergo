@@ -2,9 +2,11 @@
 set -euo pipefail
 
 ROOT_DIR="/home/yee/app"
+VERSION_FILE="$ROOT_DIR/VERSION"
 
 cd "$ROOT_DIR"
 git reset --hard HEAD~1
+git rev-parse HEAD >"$VERSION_FILE"
 corepack pnpm install --frozen-lockfile=false
 set -a
 # shellcheck disable=SC1090

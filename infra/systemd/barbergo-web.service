@@ -12,6 +12,9 @@ ExecStart=/usr/sbin/nginx -c /home/yee/app/infra/nginx/barbergo-web.conf -g 'dae
 ExecReload=/usr/sbin/nginx -c /home/yee/app/infra/nginx/barbergo-web.conf -s reload
 Restart=always
 RestartSec=3
+TimeoutStopSec=10
+KillSignal=SIGTERM
+NoNewPrivileges=true
 
 [Install]
 WantedBy=multi-user.target

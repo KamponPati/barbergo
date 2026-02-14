@@ -7,8 +7,10 @@ export class MetricsMiddleware implements NestMiddleware {
   constructor(private readonly metricsService: MetricsService) {}
 
   use(_req: Request, res: Response, next: NextFunction): void {
+    const startedAt = Date.now();
     res.on("finish", () => {
-      this.metricsService.incrementRequests();
+      const durationMs = Date.now() - startedAt;
+      this.metricsService.recordRequest(res.statusCode, durationMs);
     });
 
     next();

@@ -26,6 +26,25 @@ export class AllExceptionsFilter implements ExceptionFilter {
       }
     }
 
+    // Best-effort structured error log to stderr for Loki/Grafana correlation.
+    console.error(
+      JSON.stringify({
+        ts: new Date().toISOString(),
+        level: "error",
+        msg: "http_exception",
+        request_id: request.requestId ?? null,
+        method: request.method,
+        path: request.originalUrl,
+        status,
+        code,
+        message,
+        error:
+          exception instanceof Error
+            ? { name: exception.name, message: exception.message, stack: exception.stack }
+            : { value: String(exception) }
+      })
+    );
+
     response.status(status).json({
       code,
       message,

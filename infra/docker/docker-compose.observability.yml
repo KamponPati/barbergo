@@ -6,6 +6,8 @@ services:
     container_name: barbergo-prometheus
     ports:
       - "9090:9090"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     volumes:
       - ../observability/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
 
@@ -28,4 +30,17 @@ services:
       GF_SECURITY_ADMIN_PASSWORD: admin
     depends_on:
       - prometheus
+      - loki
+
+  promtail:
+    image: grafana/promtail:3.4.1
+    container_name: barbergo-promtail
+    ports:
+      - "9080:9080"
+    command: -config.file=/etc/promtail/config.yml
+    volumes:
+      - ../observability/promtail/promtail-config.yml:/etc/promtail/config.yml:ro
+      # Nginx logs are written to /tmp by barbergo-web nginx config.
+      - /tmp:/host-tmp:ro
+    depends_on:
       - loki
