@@ -42,7 +42,7 @@ for i in $(seq 1 30); do
 done
 
 echo "[INFO] restoring dump into temp postgres"
-gunzip -c "$latest" | $DOCKER_BIN exec -i "$cid" psql -U "$USER" -d "$DB" >/dev/null
+gunzip -c "$latest" | $DOCKER_BIN exec -i "$cid" psql -v ON_ERROR_STOP=1 -U "$USER" -d "$DB" >/dev/null
 
 echo "[INFO] running sanity checks"
 $DOCKER_BIN exec "$cid" psql -U "$USER" -d "$DB" -c "select count(*) as users from \"User\";" >/dev/null

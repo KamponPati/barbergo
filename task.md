@@ -347,8 +347,8 @@ Default for Phase 6:
 - [ ] `Status: IN_PROGRESS` Service management standard: commit hardened `systemd` unit templates (api/web/workers) + environment files strategy + boot persistence + healthcheck endpoints
 - [x] `Status: DONE` Self-hosted runner deploy permissions: install sudoers NOPASSWD rule for `systemctl restart barbergo-api|barbergo-web` (required for `release-prod` deploy hooks) (completed on 2026-02-15)
 - [ ] `Status: IN_PROGRESS` Observability: structured logs, metrics dashboards, alerts (SLO-based), trace correlation with request_id
-- [ ] `Status: IN_PROGRESS` Backup automation: scheduled DB backups + MinIO backups + restore verification job
-- [ ] `Status: IN_PROGRESS` Backup/restore drill evidence in staging/prod: record RPO/RTO + verify restore steps (ต้องมีหลักฐาน)
+- [x] `Status: DONE` Backup automation: scheduled DB backups + MinIO backups + restore verification job (completed on 2026-02-15)
+- [x] `Status: DONE` Backup/restore drill evidence in staging/prod: record RPO/RTO + verify restore steps (ต้องมีหลักฐาน) (completed on 2026-02-15)
 - [ ] `Status: IN_PROGRESS` Production reverse proxy frontdoor for web+api: TLS termination, security headers, gzip/brotli, rate limits
 - [ ] `Status: IN_PROGRESS` Production deploy packaging: containerize API/Web (or hardened systemd) with versioned artifacts
 

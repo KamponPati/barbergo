@@ -16,6 +16,7 @@ mkdir -p "$OUT_DIR"
 OUT_FILE="$OUT_DIR/postgres_${DB}_${TS}.sql.gz"
 
 echo "[INFO] dumping postgres: container=$CONTAINER db=$DB -> $OUT_FILE"
-$DOCKER_BIN exec -e PGPASSWORD="$PASSWORD" "$CONTAINER" pg_dump -U "$USER" "$DB" | gzip -c >"$OUT_FILE"
+# Make dumps restorable in a clean verification container without requiring matching roles/privileges.
+$DOCKER_BIN exec -e PGPASSWORD="$PASSWORD" "$CONTAINER" pg_dump --no-owner --no-privileges -U "$USER" "$DB" | gzip -c >"$OUT_FILE"
 
 echo "[OK] postgres backup created: $OUT_FILE"

@@ -97,3 +97,7 @@ Updated: 2026-02-14
 - Backup scripts use Docker (`docker exec ...`). If running backups as user `yee`, either add `yee` to `docker` group or run the backup systemd unit as `root` (template does `User=root`).
 - Added staging-parity dependency compose (alt ports):
 - `infra/docker/docker-compose.staging.yml`
+- Backup/restore drill evidence (ran on 2026-02-15):
+- Created Postgres backup: `/var/backups/barbergo/postgres_barbergo_20260215T150950Z.sql.gz`
+- Restore verification passed: `sudo -n /usr/bin/bash /home/yee/app/scripts/backup/verify-restore.sh`
+- Backup timer enabled: `backup-barbergo.timer` (daily 02:30)

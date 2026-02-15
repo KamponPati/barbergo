@@ -26,14 +26,31 @@ if [ "$MINIO_USE_SSL" = "true" ]; then
 fi
 
 echo "[INFO] mirroring minio bucket: ${scheme}://${MINIO_ENDPOINT}:${MINIO_PORT}/${MINIO_BUCKET} -> $DEST"
+
+# minio/mc image does not ship with a shell, so run mc twice using a shared config dir.
+MC_CONFIG_DIR="$OUT_DIR/.mc-config"
+mkdir -p "$MC_CONFIG_DIR"
+
 $DOCKER_BIN run --rm \
   --network host \
+  -v "$MC_CONFIG_DIR:/root/.mc" \
+  minio/mc:RELEASE.2025-01-17T23-25-50Z \
+  alias set barbergo "${scheme}://${MINIO_ENDPOINT}:${MINIO_PORT}" "$MINIO_ACCESS_KEY" "$MINIO_SECRET_KEY"
+
+$DOCKER_BIN run --rm \
+  --network host \
+  -v "$MC_CONFIG_DIR:/root/.mc" \
+  minio/mc:RELEASE.2025-01-17T23-25-50Z \
+  ls "barbergo/${MINIO_BUCKET}" >/dev/null 2>&1 || {
+  echo "[WARN] minio bucket does not exist, skipping mirror: $MINIO_BUCKET"
+  exit 0
+}
+
+$DOCKER_BIN run --rm \
+  --network host \
+  -v "$MC_CONFIG_DIR:/root/.mc" \
   -v "$OUT_DIR:/backup" \
   minio/mc:RELEASE.2025-01-17T23-25-50Z \
-  /bin/sh -lc "
-    set -e
-    mc alias set barbergo ${scheme}://${MINIO_ENDPOINT}:${MINIO_PORT} ${MINIO_ACCESS_KEY} ${MINIO_SECRET_KEY}
-    mc mirror --overwrite barbergo/${MINIO_BUCKET} /backup/$(basename "$DEST")
-  "
+  mirror --overwrite "barbergo/${MINIO_BUCKET}" "/backup/$(basename "$DEST")"
 
 echo "[OK] minio mirror completed: $DEST"
