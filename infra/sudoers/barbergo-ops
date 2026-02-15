@@ -1,0 +1,22 @@
+# Allow user `yee` to run limited ops scripts without password.
+# Install:
+#   sudo install -m 0440 infra/sudoers/barbergo-ops /etc/sudoers.d/barbergo-ops
+#   sudo visudo -cf /etc/sudoers.d/barbergo-ops
+#
+# Verify:
+#   sudo -n /usr/bin/bash /home/yee/app/scripts/ops/install-systemd-units.sh
+#   sudo -n /usr/bin/bash /home/yee/app/scripts/backup/run-backup.sh
+#   sudo -n /usr/bin/bash /home/yee/app/scripts/backup/verify-restore.sh
+
+Cmnd_Alias BARBERGO_OPS = \
+  /usr/bin/bash /home/yee/app/scripts/ops/install-systemd-units.sh, \
+  /usr/bin/bash /home/yee/app/scripts/backup/run-backup.sh, \
+  /usr/bin/bash /home/yee/app/scripts/backup/verify-restore.sh, \
+  /bin/systemctl enable --now backup-barbergo.timer, \
+  /bin/systemctl start backup-barbergo.service, \
+  /bin/systemctl status backup-barbergo.timer, \
+  /bin/systemctl status backup-barbergo.service, \
+  /bin/systemctl daemon-reload
+
+yee ALL=(root) NOPASSWD: BARBERGO_OPS
+

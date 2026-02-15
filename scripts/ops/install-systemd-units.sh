@@ -4,6 +4,11 @@ set -euo pipefail
 # Install systemd unit files from this repo into /etc/systemd/system and (re)start.
 # Requires sudo.
 
+SUDO="sudo"
+if [ "$(id -u)" -eq 0 ]; then
+  SUDO=""
+fi
+
 units=(
   barbergo-api.service
   barbergo-web.service
@@ -13,13 +18,12 @@ units=(
 
 echo "[INFO] installing units to /etc/systemd/system"
 for u in "${units[@]}"; do
-  sudo install -m 0644 "infra/systemd/$u" "/etc/systemd/system/$u"
+  $SUDO install -m 0644 "infra/systemd/$u" "/etc/systemd/system/$u"
 done
 
-sudo systemctl daemon-reload
-sudo systemctl enable --now barbergo-api.service barbergo-web.service
-sudo systemctl enable --now backup-barbergo.timer
-sudo systemctl restart barbergo-api.service barbergo-web.service
+$SUDO systemctl daemon-reload
+$SUDO systemctl enable --now barbergo-api.service barbergo-web.service
+$SUDO systemctl enable --now backup-barbergo.timer
+$SUDO systemctl restart barbergo-api.service barbergo-web.service
 
 echo "[SUCCESS] installed and restarted"
-
