@@ -72,7 +72,7 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "{job=\"barbergo-api\"} | json",
+          "expr": "{job=\"barbergo-api\"} |= \"http_request\" | json",
           "queryType": "range",
           "refId": "A"
         }
@@ -93,4 +93,3 @@
   "uid": "barbergo-api-overview",
   "version": 1
 }
-
