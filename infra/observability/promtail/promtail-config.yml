@@ -17,3 +17,10 @@ scrape_configs:
           job: barbergo-nginx
           __path__: /host-tmp/barbergo-nginx-*.log
 
+  # API writes JSON logs to /tmp via systemd StandardOutput/StandardError (Phase 6).
+  - job_name: barbergo-api
+    static_configs:
+      - targets: [localhost]
+        labels:
+          job: barbergo-api
+          __path__: /host-tmp/barbergo-api.log

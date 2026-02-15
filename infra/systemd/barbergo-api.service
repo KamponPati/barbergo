@@ -21,6 +21,8 @@ TimeoutStopSec=20
 KillSignal=SIGTERM
 LimitNOFILE=65535
 NoNewPrivileges=true
+StandardOutput=append:/tmp/barbergo-api.log
+StandardError=append:/tmp/barbergo-api.log
 
 [Install]
 WantedBy=multi-user.target

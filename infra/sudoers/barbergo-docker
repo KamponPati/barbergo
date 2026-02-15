@@ -1,0 +1,21 @@
+# Allow user `yee` to manage BarberGo docker compose stacks without password.
+# Install:
+#   sudo install -m 0440 infra/sudoers/barbergo-docker /etc/sudoers.d/barbergo-docker
+#   sudo visudo -cf /etc/sudoers.d/barbergo-docker
+#
+# Verify:
+#   sudo -n /usr/bin/docker ps
+#   sudo -n /usr/bin/docker compose -f /home/yee/app/infra/docker/docker-compose.observability.yml up -d
+
+Cmnd_Alias BARBERGO_DOCKER = \
+  /usr/bin/docker ps, \
+  /usr/bin/docker compose -f /home/yee/app/infra/docker/docker-compose.observability.yml up -d, \
+  /usr/bin/docker compose -f /home/yee/app/infra/docker/docker-compose.observability.yml down, \
+  /usr/bin/docker compose -f /home/yee/app/infra/docker/docker-compose.observability.yml ps, \
+  /usr/bin/docker compose -f /home/yee/app/infra/docker/docker-compose.observability.yml logs *, \
+  /usr/bin/docker compose -f /home/yee/app/infra/docker/docker-compose.observability.yml pull, \
+  /usr/bin/docker compose -f /home/yee/app/infra/docker/docker-compose.observability.yml up -d --pull always, \
+  /usr/bin/docker compose -f /home/yee/app/infra/docker/docker-compose.observability.yml up -d --build
+
+yee ALL=(root) NOPASSWD: BARBERGO_DOCKER
+

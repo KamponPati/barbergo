@@ -1,0 +1,96 @@
+{
+  "annotations": { "list": [] },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "id": null,
+  "links": [],
+  "panels": [
+    {
+      "datasource": { "type": "prometheus", "uid": "Prometheus" },
+      "fieldConfig": { "defaults": {}, "overrides": [] },
+      "gridPos": { "h": 8, "w": 24, "x": 0, "y": 0 },
+      "id": 1,
+      "options": { "legend": { "displayMode": "table", "placement": "bottom" } },
+      "targets": [
+        {
+          "editorMode": "code",
+          "expr": "rate(barbergo_requests_total[5m])",
+          "legendFormat": "requests/s",
+          "range": true,
+          "refId": "A"
+        },
+        {
+          "editorMode": "code",
+          "expr": "rate(barbergo_errors_total[5m])",
+          "legendFormat": "errors/s (5xx)",
+          "range": true,
+          "refId": "B"
+        }
+      ],
+      "title": "API Throughput + Errors",
+      "type": "timeseries"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "Prometheus" },
+      "fieldConfig": { "defaults": {}, "overrides": [] },
+      "gridPos": { "h": 6, "w": 12, "x": 0, "y": 8 },
+      "id": 2,
+      "targets": [
+        {
+          "editorMode": "code",
+          "expr": "barbergo_http_request_duration_ms_avg",
+          "legendFormat": "avg ms",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "Avg Request Duration (ms)",
+      "type": "timeseries"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "Prometheus" },
+      "fieldConfig": { "defaults": {}, "overrides": [] },
+      "gridPos": { "h": 6, "w": 12, "x": 12, "y": 8 },
+      "id": 3,
+      "targets": [
+        {
+          "editorMode": "code",
+          "expr": "sum by (status) (increase(barbergo_http_responses_total[15m]))",
+          "legendFormat": "{{status}}",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "HTTP Responses (last 15m)",
+      "type": "timeseries"
+    },
+    {
+      "datasource": { "type": "loki", "uid": "Loki" },
+      "gridPos": { "h": 10, "w": 24, "x": 0, "y": 14 },
+      "id": 4,
+      "targets": [
+        {
+          "editorMode": "code",
+          "expr": "{job=\"barbergo-api\"} | json",
+          "queryType": "range",
+          "refId": "A"
+        }
+      ],
+      "title": "API Logs (JSON)",
+      "type": "logs"
+    }
+  ],
+  "refresh": "10s",
+  "schemaVersion": 39,
+  "style": "dark",
+  "tags": ["barbergo", "api"],
+  "templating": { "list": [] },
+  "time": { "from": "now-30m", "to": "now" },
+  "timepicker": {},
+  "timezone": "",
+  "title": "BarberGo - API Overview",
+  "uid": "barbergo-api-overview",
+  "version": 1
+}
+
