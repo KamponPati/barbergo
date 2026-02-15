@@ -35,7 +35,8 @@ bash scripts/staging/smoke-critical-journeys.sh
 Starts Prometheus + Loki + Grafana + Promtail (tails nginx logs in `/tmp`):
 
 ```bash
-docker compose -f infra/docker/docker-compose.observability.yml up -d
+docker compose -f infra/docker/docker-compose.observability.yml up -d || \
+docker-compose -f infra/docker/docker-compose.observability.yml up -d
 ```
 
 Default ports:
@@ -86,4 +87,3 @@ Build+run full app via compose (includes api + web + deps):
 ```bash
 docker compose -f infra/docker/docker-compose.app.yml up -d --build
 ```
-
