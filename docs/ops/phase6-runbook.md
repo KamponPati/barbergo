@@ -44,6 +44,9 @@ Default ports:
 - Loki: `http://localhost:3100`
 - Grafana: `http://localhost:3001` (admin/admin)
 
+Dashboard:
+- `BarberGo - API Overview` (auto-provisioned)
+
 ## Backups
 
 Backup scripts assume Docker access.

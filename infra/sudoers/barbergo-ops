@@ -11,6 +11,7 @@
 Cmnd_Alias BARBERGO_OPS = \
   /usr/bin/bash /home/yee/app/scripts/ops/install-systemd-units.sh, \
   /usr/bin/bash /home/yee/app/scripts/ops/observability-up.sh, \
+  /usr/bin/bash /home/yee/app/scripts/ops/observability-down.sh, \
   /usr/bin/bash /home/yee/app/scripts/backup/run-backup.sh, \
   /usr/bin/bash /home/yee/app/scripts/backup/verify-restore.sh, \
   /bin/systemctl enable --now backup-barbergo.timer, \

@@ -101,3 +101,9 @@ Updated: 2026-02-14
 - Created Postgres backup: `/var/backups/barbergo/postgres_barbergo_20260215T150950Z.sql.gz`
 - Restore verification passed: `sudo -n /usr/bin/bash /home/yee/app/scripts/backup/verify-restore.sh`
 - Backup timer enabled: `backup-barbergo.timer` (daily 02:30)
+- Observability stack started (2026-02-15):
+- Prometheus: `http://127.0.0.1:9090`
+- Grafana: `http://127.0.0.1:3001` (admin/admin)
+- Loki: `http://127.0.0.1:3100`
+- Promtail: `http://127.0.0.1:9080`
+- Grafana provisions datasources (uid: `prometheus`, `loki`) and dashboard `BarberGo - API Overview`.
