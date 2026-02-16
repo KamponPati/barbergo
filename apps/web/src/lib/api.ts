@@ -53,9 +53,9 @@ export async function getNearbyShops(): Promise<{ data: Shop[] }> {
   return request("/discovery/nearby?sort=rating_desc");
 }
 
-export async function getAvailability(shopId: string, serviceId: string): Promise<{ slots: string[] }> {
+export async function getAvailability(shopId: string, serviceId: string, branchId = "branch_1"): Promise<{ slots: string[] }> {
   return request(
-    `/discovery/shops/${shopId}/availability?branch_id=branch_1&service_id=${serviceId}&date=2026-02-20`
+    `/discovery/shops/${shopId}/availability?branch_id=${branchId}&service_id=${serviceId}&date=2026-02-20`
   );
 }
 

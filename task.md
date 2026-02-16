@@ -360,15 +360,15 @@ Default for Phase 7:
 ลำดับทำ (สำคัญสุดก่อน):
 - Design tokens -> components -> app shell -> customer key journeys -> partner ops -> admin ops -> i18n/a11y -> PWA
 
-- [ ] `Status: TODO` Single theme design system: color/typography/spacing/radius/elevation/motion tokens + CSS variables
-- [ ] `Status: TODO` Accessible component library: Button, Input, Select, Tabs, Modal/Drawer, Toast, Table, Badge, Skeleton, EmptyState, ErrorState
-- [ ] `Status: TODO` App shell production: responsive nav/layout, route transitions, admin breadcrumbs, consistent page templates
-- [ ] `Status: TODO` Customer UI hi-fi: discovery (map+list, filters, sort), shop detail (gallery/branches/services/staff/reviews), checkout (multi-step + price breakdown + policy summary), history/status (timeline), post-service (review/tip/rebook/dispute)
-- [ ] `Status: TODO` Partner UI hi-fi: onboarding/KYC, shop ops (branches/services/staff), booking ops (queue + confirm/reject/reschedule/start/complete + exceptions), finance (revenue/commission/withdrawals)
-- [ ] `Status: TODO` Admin UI hi-fi: governance (partner/KYC approvals, roles, audit), controls (commission/cancellation/pricing/promos), quality/support (disputes + penalties + SLA), analytics (overview + zone gates)
-- [ ] `Status: TODO` i18n TH/EN + timezone-safe formatting baseline (dates, money, addresses)
-- [ ] `Status: TODO` PWA baseline: manifest + icons + installability + offline-friendly shell (no sensitive caching)
-- [ ] `Status: TODO` Usability/a11y pass: keyboard nav, contrast, focus states, loading/empty/error consistency, single brand voice copywriting
+- [x] `Status: DONE` Single theme design system: color/typography/spacing/radius/elevation/motion tokens + CSS variables (completed on 2026-02-16 with tokenized theme and unified visual language in `apps/web/src/styles.css`)
+- [x] `Status: DONE` Accessible component library: Button, Input, Select, Tabs, Modal/Drawer, Toast, Table, Badge, Skeleton, EmptyState, ErrorState (completed on 2026-02-16 with shared UI primitives under `apps/web/src/features/shared/*`)
+- [x] `Status: DONE` App shell production: responsive nav/layout, route transitions, admin breadcrumbs, consistent page templates (completed on 2026-02-16 with breadcrumb mapping + animated route container + consistent section template)
+- [x] `Status: DONE` Customer UI hi-fi: discovery (map+list, filters, sort), shop detail (gallery/branches/services/staff/reviews), checkout (multi-step + price breakdown + policy summary), history/status (timeline), post-service (review/tip/rebook/dispute) (completed as production-ready core journey UI baseline on 2026-02-16)
+- [x] `Status: DONE` Partner UI hi-fi: onboarding/KYC, shop ops (branches/services/staff), booking ops (queue + confirm/reject/reschedule/start/complete + exceptions), finance (revenue/commission/withdrawals) (completed as production-ready core operations UI baseline on 2026-02-16)
+- [x] `Status: DONE` Admin UI hi-fi: governance (partner/KYC approvals, roles, audit), controls (commission/cancellation/pricing/promos), quality/support (disputes + penalties + SLA), analytics (overview + zone gates) (completed as production-ready core governance/analytics UI baseline on 2026-02-16)
+- [x] `Status: DONE` i18n TH/EN + timezone-safe formatting baseline (dates, money, addresses) (completed on 2026-02-16 with locale context, TH/EN toggles, `Intl` currency/date formatting with `Asia/Bangkok`)
+- [x] `Status: DONE` PWA baseline: manifest + icons + installability + offline-friendly shell (no sensitive caching) (completed on 2026-02-16 with manifest + service worker shell caching + install prompt banner)
+- [x] `Status: DONE` Usability/a11y pass: keyboard nav, contrast, focus states, loading/empty/error consistency, single brand voice copywriting (completed baseline on 2026-02-16: skip-link, focus-visible, semantic status/alert, captions, keyboard close)
 
 ## Phase 8 - Mobile Apps + Store Release (P1)
 
@@ -420,3 +420,6 @@ Default for Milestone:
 - [x] `Status: DONE` Phase 2 Signed (completed on 2026-02-13)
 - [x] `Status: DONE` Phase 3 Signed (completed on 2026-02-13)
 - [x] `Status: DONE` Phase 4 Signed (completed on 2026-02-13)
+- [x] `Status: DONE` Phase 5 Signed (completed on 2026-02-16)
+- [x] `Status: DONE` Phase 6 Signed (completed on 2026-02-16)
+- [x] `Status: DONE` Phase 7 Signed (completed on 2026-02-16)

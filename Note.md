@@ -124,3 +124,55 @@ Updated: 2026-02-16
 - Build passed: `corepack pnpm -r build`
 - Web shell reachable on host: `http://127.0.0.1:5173` => `200`
 - Note: privileged service/docker checks depend on host sudo/docker permissions outside this sandbox.
+
+## Phase 7 - UI/UX Hi-Fi (DONE) (2026-02-16)
+- Started Wave 1 frontend theming and app-shell uplift.
+- Added single-theme tokenized styling in `apps/web/src/styles.css`:
+- color tokens, radius/shadows, chip/button/state styles, responsive stat grid, improved hero/shell layout.
+- Added reusable UI primitives in `apps/web/src/features/shared/UiKit.tsx`:
+- `UiButton`, `Chip`, `StatCard`.
+- Upgraded shared state primitives:
+- `StatusLine` in `apps/web/src/features/shared/UiState.tsx`
+- `JsonView` restyled with `json-view` block.
+- Refactored Customer/Partner/Admin pages to use unified component primitives and status/stat layouts.
+- Updated app shell (`apps/web/src/app/layout/AppLayout.tsx`) and auth/login/forbidden views for consistent theme and hierarchy.
+- Wave 2 complete (foundation extension):
+- Added shared components:
+- `apps/web/src/features/shared/FormControls.tsx` (`Field`, `Input`, `Select`)
+- `apps/web/src/features/shared/Tabs.tsx`
+- `apps/web/src/features/shared/DataTable.tsx`
+- `apps/web/src/features/shared/Skeleton.tsx`
+- `apps/web/src/features/shared/Toast.tsx`
+- Refactored role pages into richer UI flows with tabs/forms/tables/toasts while keeping existing API endpoints:
+- `apps/web/src/features/customer/CustomerPage.tsx`
+- `apps/web/src/features/partner/PartnerPage.tsx`
+- `apps/web/src/features/admin/AdminPage.tsx`
+- Validation:
+- `corepack pnpm --filter @barbergo/web lint` passed
+- `corepack pnpm --filter @barbergo/web build` passed
+- Wave 5 complete (Phase 7 closure):
+- Expanded TH/EN i18n coverage across app shell and role pages (customer/partner/admin + auth screens).
+- Added localized breadcrumb labels and stronger role-copy consistency.
+- Added PWA install UX prompt component: `apps/web/src/features/pwa/PwaInstall.tsx`.
+- Added semantic status/alert roles for loading/error/empty states and keyboard-first improvements.
+- Phase 7 status moved to DONE in `task.md` (signed on 2026-02-16).
+- Wave 3 complete (navigation + interaction components):
+- Added `UiBadge`, `UiModal`, `UiDrawer` in `apps/web/src/features/shared/UiKit.tsx`.
+- Added shell breadcrumb + route transition baseline in `apps/web/src/app/layout/AppLayout.tsx`.
+- Applied modal confirmation flow to customer checkout and drawer detail flow to partner operations.
+- Extended styles for breadcrumbs, badges, overlay/modal/drawer, and transition animation in `apps/web/src/styles.css`.
+- Wave 4 complete (i18n/timezone + a11y baseline):
+- Added i18n provider: `apps/web/src/features/i18n/I18nContext.tsx` with TH/EN locale state, `Asia/Bangkok` timezone-safe datetime formatting, and THB currency formatting.
+- App root wrapped with i18n provider: `apps/web/src/App.tsx`.
+- Added locale toggle (TH/EN) in app shell and reused i18n labels in auth/login/forbidden views.
+- Updated customer/partner/admin pages to use shared currency/date formatters for table/detail outputs.
+- Added a11y baseline improvements:
+- skip-to-content link, focus-visible styles, table captions, keyboard escape close for modal/drawer.
+- Added PWA baseline:
+- `apps/web/public/manifest.webmanifest`
+- `apps/web/public/sw.js` (shell-only caching; excludes `/api/*`)
+- `apps/web/src/main.tsx` service worker registration
+- `apps/web/index.html` manifest/theme-color wiring
+- Validation:
+- `corepack pnpm --filter @barbergo/web lint` passed
+- `corepack pnpm --filter @barbergo/web build` passed

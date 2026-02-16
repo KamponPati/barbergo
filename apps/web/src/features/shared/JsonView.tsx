@@ -1,3 +1,3 @@
 export function JsonView({ value }: { value: unknown }): JSX.Element {
-  return <pre>{JSON.stringify(value, null, 2)}</pre>;
+  return <pre className="json-view">{JSON.stringify(value, null, 2)}</pre>;
 }

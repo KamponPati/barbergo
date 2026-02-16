@@ -1,11 +1,31 @@
 export function LoadingBadge({ text = "Loading..." }: { text?: string }): JSX.Element {
-  return <small className="state-loading">{text}</small>;
+  return (
+    <p className="state-loading" role="status" aria-live="polite">
+      {text}
+    </p>
+  );
 }
 
 export function ErrorBanner({ message }: { message: string }): JSX.Element {
-  return <div className="state-error">{message}</div>;
+  return (
+    <div className="state-error" role="alert">
+      {message}
+    </div>
+  );
 }
 
 export function EmptyHint({ message }: { message: string }): JSX.Element {
-  return <div className="state-empty">{message}</div>;
+  return (
+    <div className="state-empty" role="note">
+      {message}
+    </div>
+  );
+}
+
+export function StatusLine({ label = "Status", value }: { label?: string; value: string }): JSX.Element {
+  return (
+    <p className="status-line">
+      <span>{label}:</span> {value}
+    </p>
+  );
 }
