@@ -181,6 +181,24 @@ h1 {
   border-color: var(--brand-strong);
 }
 
+.nav-subtabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.nav-subtabs a {
+  text-decoration: none;
+  color: var(--muted);
+  font-weight: 700;
+  font-size: 13px;
+}
+
+.nav-subtabs a:hover {
+  color: var(--brand-strong);
+}
+
 .content {
   margin-top: 4px;
 }
@@ -674,6 +692,69 @@ code {
   font-weight: 700;
 }
 
+.marketing-grid {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin: 10px 0 14px;
+}
+
+.support-grid {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.marketing-card {
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: var(--surface-strong);
+  padding: 12px;
+}
+
+.marketing-card h3 {
+  margin: 0 0 8px;
+}
+
+.marketing-card p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.45;
+}
+
+.marketing-list {
+  margin: 8px 0 0;
+  padding-left: 18px;
+  color: var(--muted);
+}
+
+.marketing-list li {
+  margin: 6px 0;
+}
+
+.faq-list {
+  display: grid;
+  gap: 10px;
+}
+
+.faq-item {
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: #fff;
+  padding: 12px;
+}
+
+.faq-item h3 {
+  margin: 0 0 8px;
+  font-size: 16px;
+}
+
+.faq-item p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.45;
+}
+
 @media (max-width: 900px) {
   .hero-top {
     flex-direction: column;
@@ -693,6 +774,11 @@ code {
     grid-template-columns: minmax(0, 1fr);
   }
 
+  .marketing-grid,
+  .support-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
   .drawer {
     width: min(100%, 620px);
   }
@@ -705,5 +791,10 @@ code {
 
   .shell {
     padding: 16px 12px 24px;
+  }
+
+  .marketing-grid,
+  .support-grid {
+    grid-template-columns: minmax(0, 1fr);
   }
 }

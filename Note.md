@@ -157,6 +157,27 @@ Updated: 2026-02-16
 - Added semantic status/alert roles for loading/error/empty states and keyboard-first improvements.
 - Phase 7 status moved to DONE in `task.md` (signed on 2026-02-16).
 
+## Phase 9 - Marketing + Brand + Legal + Support Content (DONE) (2026-02-16)
+- Added public marketing pages and routes:
+  - `/marketing`
+  - `/marketing/partner`
+  - `/marketing/faq`
+  - `/marketing/pricing`
+  - `/marketing/contact`
+- Added legal pages and routes:
+  - `/legal/terms`
+  - `/legal/privacy`
+  - `/legal/cookie`
+  - `/legal/policy`
+- Added support center route:
+  - `/support`
+- Added documentation deliverables:
+  - `docs/brand/brand-kit.md`
+  - `docs/legal/*`
+  - `docs/support/*`
+- Updated app shell navigation/breadcrumb mapping for marketing/legal/support and applied TH/EN copy labels on new public pages.
+- `task.md` updated: Phase 9 tasks set to DONE and milestone sign-off marked complete.
+
 ## Phase 8 - Mobile Apps + Store Release (DONE) (2026-02-16)
 - Mobile stack selected: React Native with Expo (TypeScript).
 - Created `apps/mobile` workspace app and aligned package metadata: `@barbergo/mobile`.

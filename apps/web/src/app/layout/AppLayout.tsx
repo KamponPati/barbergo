@@ -14,6 +14,16 @@ export function AppLayout(): JSX.Element {
     if (segment === "customer") return label("ลูกค้า", "Customer");
     if (segment === "partner") return label("พาร์ทเนอร์", "Partner");
     if (segment === "admin") return label("แอดมิน", "Admin");
+    if (segment === "marketing") return label("การตลาด", "Marketing");
+    if (segment === "legal") return label("กฎหมาย", "Legal");
+    if (segment === "support") return label("ซัพพอร์ต", "Support");
+    if (segment === "terms") return label("เงื่อนไข", "Terms");
+    if (segment === "privacy") return label("ความเป็นส่วนตัว", "Privacy");
+    if (segment === "cookie") return label("คุกกี้", "Cookie");
+    if (segment === "policy") return label("นโยบาย", "Policy");
+    if (segment === "faq") return "FAQ";
+    if (segment === "pricing") return label("ราคา", "Pricing");
+    if (segment === "contact") return label("ติดต่อ", "Contact");
     if (segment === "login") return label("เข้าสู่ระบบ", "Login");
     if (segment === "forbidden") return label("ไม่อนุญาต", "Forbidden");
     return segment;
@@ -36,7 +46,7 @@ export function AppLayout(): JSX.Element {
               )}
             </p>
             <div className="chip-row">
-              <Chip tone="brand">Phase 7</Chip>
+              <Chip tone="brand">Phase 9</Chip>
               <Chip>Web Core + App Core</Chip>
               <Chip>{timeZone}</Chip>
             </div>
@@ -55,10 +65,18 @@ export function AppLayout(): JSX.Element {
           API Base <code>{API_BASE_URL}</code>
         </p>
         <nav className="nav-tabs" aria-label="Main navigation">
-          <NavLink to="/customer">Customer</NavLink>
-          <NavLink to="/partner">Partner</NavLink>
-          <NavLink to="/admin">Admin</NavLink>
-          <Link to="/login">Login</Link>
+          <NavLink to="/marketing">{label("การตลาด", "Marketing")}</NavLink>
+          <NavLink to="/customer">{label("ลูกค้า", "Customer")}</NavLink>
+          <NavLink to="/partner">{label("พาร์ทเนอร์", "Partner")}</NavLink>
+          <NavLink to="/admin">{label("แอดมิน", "Admin")}</NavLink>
+          <Link to="/login">{label("เข้าสู่ระบบ", "Login")}</Link>
+        </nav>
+        <nav className="nav-subtabs" aria-label="Support and legal navigation">
+          <Link to="/support">{label("ศูนย์ช่วยเหลือ", "Support Center")}</Link>
+          <Link to="/legal/terms">{label("ข้อกำหนด", "Terms")}</Link>
+          <Link to="/legal/privacy">{label("นโยบายข้อมูล", "Privacy")}</Link>
+          <Link to="/legal/cookie">{label("คุกกี้", "Cookie")}</Link>
+          <Link to="/legal/policy">{label("ยกเลิก/คืนเงิน", "Refund Policy")}</Link>
         </nav>
         <PwaInstall />
       </header>

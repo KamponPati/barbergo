@@ -1,7 +1,7 @@
 # BarberGo Project Task Board
 
-อัปเดตล่าสุด: 2026-02-14
-สถานะล่าสุด: Phase 0-4 Signed แล้ว (Closed: 2026-02-13) และอยู่ระหว่าง Phase 5 (Production Readiness ก่อน GA)
+อัปเดตล่าสุด: 2026-02-16
+สถานะล่าสุด: Phase 0-9 Signed แล้ว (Phase 9 Closed: 2026-02-16)
 
 ลำดับงานถัดไป (แนะนำ):
 - Phase 5: Data + Domain (ทำให้ระบบ “ใช้ DB จริง” แทน in-memory)
@@ -388,11 +388,11 @@ Default for Phase 8:
 Default for Phase 9:
 - `Owner: Codex | Priority: P1 | Sprint: S4-W4..S4-W10 | Due: 2026-08-21 | Dependency: brand decisions | DoD: content ready | Deliverable: marketing site + legal + support content | Blocker: brand decisions`
 
-- [ ] `Status: TODO` Brand kit: logo, palette, typography, illustration style, tone of voice
-- [ ] `Status: TODO` Marketing website: landing, partner acquisition, FAQ, pricing/commission, contact
-- [ ] `Status: TODO` Legal pages: Terms, Privacy, Cookie, refund/cancellation policy (align with Phase 0 policy matrix)
-- [ ] `Status: TODO` In-app copywriting pass TH/EN: labels, empty states, errors, notifications
-- [ ] `Status: TODO` Support center content: onboarding guides, dispute guides, troubleshooting
+- [x] `Status: DONE` Brand kit: logo, palette, typography, illustration style, tone of voice (completed on 2026-02-16; see `docs/brand/brand-kit.md`)
+- [x] `Status: DONE` Marketing website: landing, partner acquisition, FAQ, pricing/commission, contact (completed on 2026-02-16; routes under `/marketing/*`)
+- [x] `Status: DONE` Legal pages: Terms, Privacy, Cookie, refund/cancellation policy (align with Phase 0 policy matrix) (completed on 2026-02-16; routes under `/legal/*` and docs in `docs/legal/*`)
+- [x] `Status: DONE` In-app copywriting pass TH/EN: labels, empty states, errors, notifications (completed on 2026-02-16; app shell and new public pages localized via `useI18n.label`)
+- [x] `Status: DONE` Support center content: onboarding guides, dispute guides, troubleshooting (completed on 2026-02-16; route `/support` + docs in `docs/support/*`)
 
 ---
 
@@ -424,3 +424,4 @@ Default for Milestone:
 - [x] `Status: DONE` Phase 6 Signed (completed on 2026-02-16)
 - [x] `Status: DONE` Phase 7 Signed (completed on 2026-02-16)
 - [x] `Status: DONE` Phase 8 Signed (completed on 2026-02-16)
+- [x] `Status: DONE` Phase 9 Signed (completed on 2026-02-16)
