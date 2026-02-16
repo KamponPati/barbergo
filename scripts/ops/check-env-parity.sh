@@ -44,7 +44,7 @@ extract_keys() {
     echo "[FAIL] missing env file: $f" >&2
     return 1
   fi
-  rg -n '^[A-Za-z_][A-Za-z0-9_]*=' "$f" -o -r '$0' | sed 's/=.*$//' | sort -u
+  grep -E '^[A-Za-z_][A-Za-z0-9_]*=' "$f" | sed 's/=.*$//' | sort -u
 }
 
 tmp_dir="$(mktemp -d)"
@@ -61,15 +61,14 @@ fi
 
 echo "[INFO] checking required keys"
 for key in "${required_keys[@]}"; do
-  if ! rg -q "^${key}=" "$STAGING_FILE"; then
+  if ! grep -q "^${key}=" "$STAGING_FILE"; then
     echo "[FAIL] missing key in staging: $key" >&2
     exit 1
   fi
-  if ! rg -q "^${key}=" "$PRODUCTION_FILE"; then
+  if ! grep -q "^${key}=" "$PRODUCTION_FILE"; then
     echo "[FAIL] missing key in production: $key" >&2
     exit 1
   fi
 done
 
 echo "[SUCCESS] env parity check passed"
-
