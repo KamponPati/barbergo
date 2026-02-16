@@ -375,11 +375,11 @@ Default for Phase 7:
 Default for Phase 8:
 - `Owner: Codex | Priority: P1 | Sprint: S4-W6..S4-W10 | Due: 2026-08-21 | Dependency: Phase 5/7 | DoD: ship-ready apps | Deliverable: iOS/Android builds + store checklist | Blocker: Apple/Google accounts required`
 
-- [ ] `Status: TODO` Choose mobile stack: React Native (Expo) or Flutter (default: RN/Expo)
-- [ ] `Status: TODO` Create `apps/mobile` + env handling + CI build
-- [ ] `Status: TODO` Mobile design system aligned with web theme
-- [ ] `Status: TODO` Customer Mobile: discovery/map, shop detail, booking checkout, history, post-service
-- [ ] `Status: TODO` Partner Mobile: onboarding/KYC, shop ops, booking ops, finance
+- [x] `Status: DONE` Choose mobile stack: React Native (Expo) or Flutter (default: RN/Expo) (completed on 2026-02-16 with Expo + TypeScript setup)
+- [x] `Status: DONE` Create `apps/mobile` + env handling + CI build (completed on 2026-02-16: `apps/mobile` scaffolded, `.env.example` added, and lint/build scripts wired for workspace CI)
+- [ ] `Status: IN_PROGRESS` Mobile design system aligned with web theme (baseline styles/components in `apps/mobile/App.tsx`; component extraction pending)
+- [ ] `Status: IN_PROGRESS` Customer Mobile: discovery/map, shop detail, booking checkout, history, post-service (core discovery + availability + checkout + history baseline wired)
+- [ ] `Status: IN_PROGRESS` Partner Mobile: onboarding/KYC, shop ops, booking ops, finance (booking queue and transition operations baseline wired)
 - [ ] `Status: TODO` Push notifications (APNS/FCM) + deep links for customer/partner/admin
 - [ ] `Status: TODO` Store readiness: icons/splash, privacy/permissions copy, review notes, versioning, crash reporting
 

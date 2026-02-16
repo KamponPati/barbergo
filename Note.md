@@ -156,6 +156,20 @@ Updated: 2026-02-16
 - Added PWA install UX prompt component: `apps/web/src/features/pwa/PwaInstall.tsx`.
 - Added semantic status/alert roles for loading/error/empty states and keyboard-first improvements.
 - Phase 7 status moved to DONE in `task.md` (signed on 2026-02-16).
+
+## Phase 8 - Mobile Apps + Store Release (IN_PROGRESS) (2026-02-16)
+- Mobile stack selected: React Native with Expo (TypeScript).
+- Created `apps/mobile` workspace app and aligned package metadata: `@barbergo/mobile`.
+- Added mobile env baseline: `apps/mobile/.env.example` with `EXPO_PUBLIC_API_BASE_URL`.
+- Added CI-compatible scripts in mobile package:
+- `lint`: `tsc --noEmit`
+- `build`: `tsc --noEmit`
+- `test`: placeholder baseline
+- Implemented Phase 8 role shell baseline in `apps/mobile/App.tsx`:
+- Customer: login, load shops, availability, quote+checkout, history
+- Partner: login, load queue, confirm/start/complete first booking
+- Admin: login, load core analytics snapshot
+- Status: Phase 8 started; push notifications/deep links/store readiness remain TODO.
 - Wave 3 complete (navigation + interaction components):
 - Added `UiBadge`, `UiModal`, `UiDrawer` in `apps/web/src/features/shared/UiKit.tsx`.
 - Added shell breadcrumb + route transition baseline in `apps/web/src/app/layout/AppLayout.tsx`.
