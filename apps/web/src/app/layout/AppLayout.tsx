@@ -64,20 +64,36 @@ export function AppLayout(): JSX.Element {
         <p className="api-base-line">
           API Base <code>{API_BASE_URL}</code>
         </p>
-        <nav className="nav-tabs" aria-label="Main navigation">
-          <NavLink to="/marketing">{label("การตลาด", "Marketing")}</NavLink>
-          <NavLink to="/customer">{label("ลูกค้า", "Customer")}</NavLink>
-          <NavLink to="/partner">{label("พาร์ทเนอร์", "Partner")}</NavLink>
-          <NavLink to="/admin">{label("แอดมิน", "Admin")}</NavLink>
-          <Link to="/login">{label("เข้าสู่ระบบ", "Login")}</Link>
-        </nav>
-        <nav className="nav-subtabs" aria-label="Support and legal navigation">
-          <Link to="/support">{label("ศูนย์ช่วยเหลือ", "Support Center")}</Link>
-          <Link to="/legal/terms">{label("ข้อกำหนด", "Terms")}</Link>
-          <Link to="/legal/privacy">{label("นโยบายข้อมูล", "Privacy")}</Link>
-          <Link to="/legal/cookie">{label("คุกกี้", "Cookie")}</Link>
-          <Link to="/legal/policy">{label("ยกเลิก/คืนเงิน", "Refund Policy")}</Link>
-        </nav>
+        <section className="nav-groups" aria-label="Global navigation groups">
+          <div className="nav-group">
+            <p className="nav-group-title">{label("Public", "Public")}</p>
+            <nav className="nav-tabs" aria-label="Public navigation">
+              <NavLink to="/marketing">{label("หน้าแนะนำ", "Marketing")}</NavLink>
+              <NavLink to="/marketing/partner">{label("ร่วมเป็นพาร์ทเนอร์", "Partner Acquisition")}</NavLink>
+              <NavLink to="/marketing/faq">FAQ</NavLink>
+              <NavLink to="/marketing/contact">{label("ติดต่อ", "Contact")}</NavLink>
+            </nav>
+          </div>
+          <div className="nav-group">
+            <p className="nav-group-title">{label("Workspaces", "Workspaces")}</p>
+            <nav className="nav-tabs" aria-label="Role workspace navigation">
+              <NavLink to="/customer">{label("ลูกค้า", "Customer")}</NavLink>
+              <NavLink to="/partner">{label("พาร์ทเนอร์", "Partner")}</NavLink>
+              <NavLink to="/admin">{label("แอดมิน", "Admin")}</NavLink>
+              <Link to="/login">{label("เข้าสู่ระบบ", "Login")}</Link>
+            </nav>
+          </div>
+          <div className="nav-group">
+            <p className="nav-group-title">{label("Policy & Help", "Policy and Help")}</p>
+            <nav className="nav-subtabs" aria-label="Support and legal navigation">
+              <Link to="/support">{label("ศูนย์ช่วยเหลือ", "Support Center")}</Link>
+              <Link to="/legal/terms">{label("ข้อกำหนด", "Terms")}</Link>
+              <Link to="/legal/privacy">{label("นโยบายข้อมูล", "Privacy")}</Link>
+              <Link to="/legal/cookie">{label("คุกกี้", "Cookie")}</Link>
+              <Link to="/legal/policy">{label("ยกเลิก/คืนเงิน", "Refund Policy")}</Link>
+            </nav>
+          </div>
+        </section>
         <PwaInstall />
       </header>
 

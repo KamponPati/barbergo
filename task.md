@@ -1,14 +1,10 @@
 # BarberGo Project Task Board
 
 อัปเดตล่าสุด: 2026-02-16
-สถานะล่าสุด: Phase 0-9 Signed แล้ว (Phase 9 Closed: 2026-02-16)
+สถานะล่าสุด: Phase 0-9 Signed แล้ว และอยู่ระหว่าง Phase 10 (UI Polish) (started: 2026-02-16)
 
 ลำดับงานถัดไป (แนะนำ):
-- Phase 5: Data + Domain (ทำให้ระบบ “ใช้ DB จริง” แทน in-memory)
-- Phase 6: Infrastructure + Environments + Recovery (staging/prod parity, backup/restore, observability, reverse proxy)
-- Phase 7: UI/UX Hi-Fi (Single Theme) (ทำหน้าจอจริงให้พร้อมใช้งาน/เข้าถึงได้)
-- Phase 8: Mobile Apps + Store Release (ถ้าต้องการ iOS/Android)
-- Phase 9: Marketing + Brand + Legal + Support Content
+- Phase 10: UI Polish + Visual Excellence (ปรับคุณภาพ UI/UX รอบเก็บงานเชิงประสบการณ์)
 
 วิธีอัปเดตสถานะ:
 - ใช้ `Status: TODO | IN_PROGRESS | BLOCKED | DONE`
@@ -35,6 +31,7 @@
 - `Phase 3`: S3-W1 ถึง S3-W4 (`2026-05-18` ถึง `2026-06-12`)
 - `Phase 4`: S4-W1 ถึง S4-W10 (`2026-06-15` ถึง `2026-08-21`)
 - `Phase 5-9`: TBD (หลัง Phase 4; ปรับตามความเร็วทีม/ความพร้อม infra และ requirement จริง)
+- `Phase 10`: TBD (หลัง Phase 9; เน้น polish, usability metrics, conversion uplift)
 
 ### DoD Baseline by Work Type
 
@@ -393,6 +390,86 @@ Default for Phase 9:
 - [x] `Status: DONE` Legal pages: Terms, Privacy, Cookie, refund/cancellation policy (align with Phase 0 policy matrix) (completed on 2026-02-16; routes under `/legal/*` and docs in `docs/legal/*`)
 - [x] `Status: DONE` In-app copywriting pass TH/EN: labels, empty states, errors, notifications (completed on 2026-02-16; app shell and new public pages localized via `useI18n.label`)
 - [x] `Status: DONE` Support center content: onboarding guides, dispute guides, troubleshooting (completed on 2026-02-16; route `/support` + docs in `docs/support/*`)
+
+## Phase 10 - UI Polish + Visual Excellence (P1)
+
+Default for Phase 10:
+- `Owner: Codex | Priority: P1 | Sprint: S5-W1..S5-W4 | Due: 2026-09-18 | Dependency: Phase 7/8/9 DONE | DoD: measurable UX quality uplift + visual consistency | Deliverable: polished UI release + UX audit report | Blocker: user feedback sample size`
+
+ลำดับทำ (สำคัญสุดก่อน):
+- UX audit baseline -> information hierarchy -> visual rhythm/spacing -> interaction polish -> a11y hardening -> responsive hardening -> copy polish -> experiment/measurement -> sign-off
+
+### 10A) UX Audit and Design QA Baseline
+
+- [x] `Status: DONE` ทำ UI inventory ทั้ง Web/Mobile (screens, components, variants, states) และจัด priority list หน้าเสี่ยง UX สูง (completed on 2026-02-16)
+  `Owner: Codex | Priority: P1 | Sprint: S5-W1 | Due: 2026-08-29 | Dependency: DEP-01 | DoD: inventory ครบ 100% + risk ranking | Deliverable: docs/ui-polish/ui-inventory.md | Blocker: None`
+- [x] `Status: DONE` ตั้ง UX quality rubric (clarity, consistency, affordance, feedback, accessibility, responsiveness) พร้อม scoring template (completed on 2026-02-16)
+  `Owner: Codex | Priority: P1 | Sprint: S5-W1 | Due: 2026-08-29 | Dependency: DEP-01 | DoD: rubric ใช้งานได้กับทุกหน้า | Deliverable: docs/ui-polish/ux-rubric.md | Blocker: None`
+- [x] `Status: DONE` เก็บ baseline metrics: task success rate, time-to-complete journey, error rate, drop-off points (Customer/Partner/Admin) (completed on 2026-02-16)
+  `Owner: Codex | Priority: P1 | Sprint: S5-W1 | Due: 2026-08-30 | Dependency: DEP-04 | DoD: baseline report ครบ 3 role | Deliverable: docs/ui-polish/baseline-metrics.md | Blocker: analytics event gaps`
+
+### 10B) Information Hierarchy and Navigation Polish (Web)
+
+- [ ] `Status: IN_PROGRESS` ปรับโครงลำดับสายตาใน app shell: heading scale, section grouping, action prominence, breadcrumb clarity (started on 2026-02-16; nav group hierarchy shipped in app shell)
+  `Owner: Codex | Priority: P1 | Sprint: S5-W1 | Due: 2026-09-01 | Dependency: DEP-01 | DoD: hierarchy score ดีขึ้นตาม rubric | Deliverable: PR + before/after screenshots | Blocker: None`
+- [ ] `Status: TODO` ปรับ navigation architecture: primary/secondary nav แยกตาม intent และลด cognitive load ในหน้า role dashboards
+  `Owner: Codex | Priority: P1 | Sprint: S5-W1 | Due: 2026-09-01 | Dependency: DEP-01 | DoD: จำนวน mis-click ลดลงจาก baseline | Deliverable: PR + nav decision note | Blocker: None`
+- [ ] `Status: TODO` เพิ่ม contextual help cues (inline helper text/tooltips) เฉพาะจุดที่ user สับสนสูงจาก baseline
+  `Owner: Codex | Priority: P2 | Sprint: S5-W1 | Due: 2026-09-02 | Dependency: DEP-01 | DoD: จุดสับสนหลักมี guidance ครบ | Deliverable: PR + updated UX copy map | Blocker: None`
+
+### 10C) Visual Rhythm, Spacing, and Component Refinement
+
+- [ ] `Status: TODO` ทำ spacing normalization pass (8pt rhythm) ทั้ง panel/header/form/table/card/modal/drawer
+  `Owner: Codex | Priority: P1 | Sprint: S5-W2 | Due: 2026-09-04 | Dependency: DEP-01 | DoD: spacing inconsistency ที่ critical = 0 | Deliverable: PR + spacing audit checklist | Blocker: None`
+- [ ] `Status: TODO` ปรับ typography system pass 2: heading/body/caption/mono hierarchy พร้อม line-height อ่านง่ายบนจอเล็ก
+  `Owner: Codex | Priority: P1 | Sprint: S5-W2 | Due: 2026-09-04 | Dependency: DEP-01 | DoD: readability review ผ่าน | Deliverable: PR + typography matrix | Blocker: None`
+- [ ] `Status: TODO` ปรับ component states ให้คมและสม่ำเสมอ: hover/active/disabled/focus/loading/error/success
+  `Owner: Codex | Priority: P1 | Sprint: S5-W2 | Due: 2026-09-05 | Dependency: DEP-01 | DoD: state coverage ครบทุก component หลัก | Deliverable: PR + component state catalog | Blocker: None`
+
+### 10D) Interaction and Motion Polish
+
+- [ ] `Status: TODO` ปรับ micro-interactions สำคัญ: button press, tab switch, modal open/close, skeleton-to-content transition
+  `Owner: Codex | Priority: P2 | Sprint: S5-W2 | Due: 2026-09-06 | Dependency: DEP-01 | DoD: transition latency และ smoothness ผ่านเกณฑ์ UX | Deliverable: PR + motion spec | Blocker: None`
+- [ ] `Status: TODO` เพิ่ม reduced-motion support ครบจุด animation ทั้ง Web และ Mobile
+  `Owner: Codex | Priority: P1 | Sprint: S5-W2 | Due: 2026-09-06 | Dependency: DEP-01 | DoD: ผ่านทดสอบ prefers-reduced-motion | Deliverable: PR + a11y validation note | Blocker: None`
+- [ ] `Status: TODO` ปรับ feedback latency messaging (loading state copy + optimistic/confirm feedback) สำหรับ action critical
+  `Owner: Codex | Priority: P1 | Sprint: S5-W2 | Due: 2026-09-07 | Dependency: DEP-01 | DoD: user รับรู้สถานะได้ชัดเจนทุก action สำคัญ | Deliverable: PR + interaction matrix | Blocker: None`
+
+### 10E) Accessibility Hardening (WCAG-focused)
+
+- [ ] `Status: TODO` ทำ contrast pass ทุกหน้าด้วย target WCAG AA (text/button/badge/status/error)
+  `Owner: Codex | Priority: P0 | Sprint: S5-W3 | Due: 2026-09-09 | Dependency: DEP-01 | DoD: contrast violations critical = 0 | Deliverable: audit report + PR | Blocker: None`
+- [ ] `Status: TODO` ทำ keyboard flow pass: tab order, focus trap, skip links, modal/drawer escape, form error focus
+  `Owner: Codex | Priority: P0 | Sprint: S5-W3 | Due: 2026-09-09 | Dependency: DEP-01 | DoD: keyboard-only journeys ผ่านครบ | Deliverable: QA checklist + PR | Blocker: None`
+- [ ] `Status: TODO` เพิ่ม semantic/ARIA coverage จุดขาด (landmarks, labels, live regions for status updates)
+  `Owner: Codex | Priority: P1 | Sprint: S5-W3 | Due: 2026-09-10 | Dependency: DEP-01 | DoD: screen-reader smoke test ผ่าน | Deliverable: PR + SR test note | Blocker: None`
+
+### 10F) Responsive and Cross-Device Polish
+
+- [ ] `Status: TODO` ทำ responsive pass เชิงลึกทุก breakpoint (320/375/414/768/1024/1280+) สำหรับ pages สำคัญทั้งหมด
+  `Owner: Codex | Priority: P1 | Sprint: S5-W3 | Due: 2026-09-11 | Dependency: DEP-01 | DoD: major layout break = 0 | Deliverable: screenshot pack + PR | Blocker: None`
+- [ ] `Status: TODO` ปรับ mobile touch targets และ gesture comfort บนแอปมือถือ (minimum tappable size + spacing)
+  `Owner: Codex | Priority: P1 | Sprint: S5-W3 | Due: 2026-09-11 | Dependency: DEP-01 | DoD: touch usability checklist ผ่าน | Deliverable: mobile UX QA report + PR | Blocker: None`
+- [ ] `Status: TODO` ทดสอบ cross-browser pass (Chrome/Edge/Safari/Firefox) สำหรับ web critical journeys
+  `Owner: Codex | Priority: P1 | Sprint: S5-W3 | Due: 2026-09-12 | Dependency: DEP-04 | DoD: critical compatibility issues = 0 | Deliverable: compatibility matrix | Blocker: device/browser availability`
+
+### 10G) Copy and Localization Polish (TH/EN)
+
+- [ ] `Status: TODO` copywriting pass 2: ปรับ microcopy ให้ actionable และลด technical wording ในทุก role flow
+  `Owner: Codex | Priority: P1 | Sprint: S5-W4 | Due: 2026-09-14 | Dependency: DEP-01 | DoD: copy clarity review ผ่าน | Deliverable: copy diff sheet + PR | Blocker: None`
+- [ ] `Status: TODO` localization QA: TH/EN parity, truncation checks, locale-safe formatting consistency
+  `Owner: Codex | Priority: P1 | Sprint: S5-W4 | Due: 2026-09-14 | Dependency: DEP-01 | DoD: translation mismatch critical = 0 | Deliverable: localization QA report | Blocker: None`
+- [ ] `Status: TODO` unify tone-of-voice across Marketing, App Core, Legal summaries, and Support content
+  `Owner: Codex | Priority: P2 | Sprint: S5-W4 | Due: 2026-09-15 | Dependency: DEP-01 | DoD: tone guide compliance pass | Deliverable: updated voice checklist + PR | Blocker: None`
+
+### 10H) Measurement, Experiment, and Sign-off
+
+- [ ] `Status: TODO` ตั้ง measurement dashboard สำหรับ UI polish KPIs (task success, time-to-complete, error rate, conversion)
+  `Owner: Codex | Priority: P1 | Sprint: S5-W4 | Due: 2026-09-16 | Dependency: DEP-04 | DoD: dashboard ใช้งานได้จริง | Deliverable: dashboard link + metric dictionary | Blocker: analytics instrumentation`
+- [ ] `Status: TODO` ทำ A/B test candidate list สำหรับหน้า Marketing + key conversion actions
+  `Owner: Codex | Priority: P2 | Sprint: S5-W4 | Due: 2026-09-16 | Dependency: DEP-04 | DoD: hypothesis + success metric + guardrail ครบ | Deliverable: experiment plan doc | Blocker: traffic volume`
+- [ ] `Status: TODO` UI Polish sign-off: Product + Design + Engineering + Ops acceptance พร้อม before/after evidence pack
+  `Owner: Codex | Priority: P0 | Sprint: S5-W4 | Due: 2026-09-18 | Dependency: ทุกหัวข้อ Phase 10 DONE | DoD: Sign-off | Deliverable: phase10-signoff.md + release checklist | Blocker: pending stakeholder review`
 
 ---
 
