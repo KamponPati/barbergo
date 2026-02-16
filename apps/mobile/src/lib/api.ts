@@ -46,9 +46,11 @@ export async function getAvailability(params: {
   shopId: string;
   branchId: string;
   serviceId: string;
+  date?: string;
 }): Promise<{ slots: string[] }> {
+  const date = params.date ?? "2026-02-20";
   return request(
-    `/discovery/shops/${params.shopId}/availability?branch_id=${params.branchId}&service_id=${params.serviceId}&date=2026-02-20`
+    `/discovery/shops/${params.shopId}/availability?branch_id=${params.branchId}&service_id=${params.serviceId}&date=${date}`
   );
 }
 
@@ -109,10 +111,9 @@ export async function createDispute(token: string, bookingId: string): Promise<v
     token,
     body: {
       booking_id: bookingId,
-      customer_id: "cust_1",
+      created_by: "cust_1",
       reason: "quality_issue",
-      details: "Created from mobile app",
-      evidence: ["mobile_screenshot_ref"]
+      evidence_note: "Created from mobile app"
     }
   });
 }

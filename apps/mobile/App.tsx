@@ -49,6 +49,7 @@ export default function App(): React.ReactElement {
   const [slots, setSlots] = useState<string[]>([]);
   const [history, setHistory] = useState<Booking[]>([]);
   const [queue, setQueue] = useState<Booking[]>([]);
+  const [activePartnerBookingId, setActivePartnerBookingId] = useState("");
   const [adminSnapshot, setAdminSnapshot] = useState<Record<string, unknown> | null>(null);
   const [adminDisputes, setAdminDisputes] = useState<unknown>(null);
   const [adminPolicy, setAdminPolicy] = useState<unknown>(null);
@@ -66,6 +67,28 @@ export default function App(): React.ReactElement {
     if (!q) return shops;
     return shops.filter((shop) => shop.name.toLowerCase().includes(q));
   }, [search, shops]);
+
+  function toIsoDate(date: Date): string {
+    return date.toISOString().slice(0, 10);
+  }
+
+  async function findAvailabilityWithinDays(days: number): Promise<{ date: string; slots: string[] }> {
+    for (let offset = 1; offset <= days; offset += 1) {
+      const d = new Date();
+      d.setDate(d.getDate() + offset);
+      const date = toIsoDate(d);
+      const data = await getAvailability({
+        shopId: selectedShopId,
+        branchId: selectedBranchId,
+        serviceId: selectedServiceId,
+        date
+      });
+      if (data.slots.length > 0) {
+        return { date, slots: data.slots };
+      }
+    }
+    return { date: "", slots: [] };
+  }
 
   useEffect(() => {
     registerForPushNotificationsAsync().then((value) => {
@@ -129,13 +152,13 @@ export default function App(): React.ReactElement {
     if (!token || !selectedShopId) return;
     setError("");
     try {
-      const data = await getAvailability({
-        shopId: selectedShopId,
-        branchId: selectedBranchId,
-        serviceId: selectedServiceId
-      });
-      setSlots(data.slots);
-      setStatus(`Loaded ${data.slots.length} slots`);
+      const found = await findAvailabilityWithinDays(7);
+      setSlots(found.slots);
+      if (found.slots.length > 0) {
+        setStatus(`Loaded ${found.slots.length} slots on ${found.date}`);
+      } else {
+        setStatus("Loaded 0 slots for next 7 days");
+      }
     } catch (e) {
       const message = e instanceof Error ? e.message : "unknown error";
       setError(message);
@@ -161,7 +184,13 @@ export default function App(): React.ReactElement {
     setError("");
     try {
       const quote = await quoteBooking(token, selectedShopId, selectedServiceId);
-      const slot = slots[0] ?? "2026-02-20T10:00:00.000Z";
+      const found = await findAvailabilityWithinDays(7);
+      setSlots(found.slots);
+      const slot = found.slots[0];
+      if (!slot) {
+        setStatus("No slot available in next 7 days. Please retry later.");
+        return;
+      }
       await checkoutBooking({
         token,
         shopId: selectedShopId,
@@ -169,10 +198,25 @@ export default function App(): React.ReactElement {
         serviceId: selectedServiceId,
         slotAt: slot
       });
-      setStatus(`Checkout complete (${quote.total} THB)`);
+      setStatus(`Checkout complete (${quote.total} THB) at ${slot}`);
     } catch (e) {
       const message = e instanceof Error ? e.message : "unknown error";
       setError(message);
+      if (message.includes("SLOT_CONFLICT")) {
+        try {
+          const refreshedAvailability = await findAvailabilityWithinDays(7);
+          setSlots(refreshedAvailability.slots);
+          setStatus(
+            refreshedAvailability.slots.length > 0
+              ? "Selected slot was taken. Slots refreshed, please retry checkout."
+              : "Selected slot was taken and no slots remain in next 7 days."
+          );
+          return;
+        } catch {
+          setStatus("Slot conflict and refresh failed. Please load availability again.");
+          return;
+        }
+      }
       setStatus("Checkout failed");
     }
   }
@@ -205,15 +249,31 @@ export default function App(): React.ReactElement {
   }
 
   async function submitDispute(): Promise<void> {
-    if (!token || history.length === 0) return;
+    if (!token) return;
     setError("");
     try {
-      await createDispute(token, history[0].id);
-      setStatus(`Dispute created for ${history[0].id}`);
+      let latestHistory = history;
+      if (latestHistory.length === 0) {
+        const historyResult = await getCustomerHistory(token);
+        latestHistory = historyResult.data;
+        setHistory(historyResult.data);
+      }
+
+      const disputable = latestHistory.find(
+        (booking) => booking.status === "completed" || booking.status === "started" || booking.status === "confirmed"
+      );
+      if (!disputable) {
+        setStatus("No completed/started/confirmed booking available for dispute.");
+        return;
+      }
+
+      await createDispute(token, disputable.id);
+      setStatus(`Dispute created for ${disputable.id}`);
+      await loadHistory();
     } catch (e) {
       const message = e instanceof Error ? e.message : "unknown error";
       setError(message);
-      setStatus("Create dispute failed");
+      setStatus(`Create dispute failed: ${message}`);
     }
   }
 
@@ -223,6 +283,12 @@ export default function App(): React.ReactElement {
     try {
       const data = await getPartnerQueue(token);
       setQueue(data.data);
+      if (!activePartnerBookingId && data.data.length > 0) {
+        setActivePartnerBookingId(data.data[0].id);
+      }
+      if (data.data.length === 0 && activePartnerBookingId) {
+        setActivePartnerBookingId("");
+      }
       setStatus(`Loaded ${data.data.length} incoming bookings`);
     } catch (e) {
       const message = e instanceof Error ? e.message : "unknown error";
@@ -232,17 +298,56 @@ export default function App(): React.ReactElement {
   }
 
   async function transitionFirst(action: "confirm" | "start" | "complete"): Promise<void> {
-    if (!token || queue.length === 0) return;
+    if (!token) return;
     setError("");
     try {
-      const firstId = queue[0].id;
-      await transitionPartnerBooking(token, firstId, action);
-      setStatus(`${action} succeeded for ${firstId}`);
+      let bookingId = "";
+      if (action === "confirm") {
+        bookingId = queue.find((booking) => booking.status === "authorized")?.id ?? "";
+        if (!bookingId) {
+          setStatus("No authorized booking to confirm.");
+          return;
+        }
+      } else {
+        bookingId = activePartnerBookingId;
+        if (!bookingId) {
+          setStatus("No active booking. Please confirm one booking first.");
+          return;
+        }
+      }
+
+      await transitionPartnerBooking(token, bookingId, action);
+      if (action === "confirm") {
+        setActivePartnerBookingId(bookingId);
+      }
+      if (action === "complete") {
+        setActivePartnerBookingId("");
+      }
+      setStatus(`${action} succeeded for ${bookingId}`);
       await loadQueue();
     } catch (e) {
       const message = e instanceof Error ? e.message : "unknown error";
+      if (
+        action === "start" &&
+        message.includes("BOOKING_INVALID_TRANSITION") &&
+        message.includes("authorized to started")
+      ) {
+        try {
+          await transitionPartnerBooking(token, bookingId, "confirm");
+          await transitionPartnerBooking(token, bookingId, "start");
+          setActivePartnerBookingId(bookingId);
+          setStatus(`start succeeded for ${bookingId} (auto-confirmed first)`);
+          await loadQueue();
+          return;
+        } catch (nested) {
+          const nestedMessage = nested instanceof Error ? nested.message : "unknown error";
+          setError(nestedMessage);
+          setStatus(`start failed after auto-confirm: ${nestedMessage}`);
+          return;
+        }
+      }
       setError(message);
-      setStatus(`${action} failed`);
+      setStatus(`${action} failed: ${message}`);
     }
   }
 
@@ -423,6 +528,7 @@ export default function App(): React.ReactElement {
           <StatTile label="Slots" value={slots.length} />
           <StatTile label="History" value={history.length} />
           <StatTile label="Queue" value={queue.length} />
+          <StatTile label="Active booking" value={activePartnerBookingId || "-"} />
         </View>
 
         {tab === "customer" ? (

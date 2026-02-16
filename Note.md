@@ -193,6 +193,17 @@ Updated: 2026-02-16
 - Partner: onboarding status + branch/service/staff ops + wallet/withdraw
 - Admin: disputes + policy snapshot views
 - Status: Phase 8 marked DONE in `task.md` (signed on 2026-02-16).
+- Mobile stabilization update (2026-02-16, post-UAT):
+- Availability lookup improved to scan next 7 days (instead of single fixed date) before checkout.
+- Checkout flow now auto-refreshes slots on `SLOT_CONFLICT` and shows actionable status text.
+- Partner transition flow now tracks active booking and enforces `confirm -> start -> complete` sequencing in UI logic.
+- Dispute flow now targets eligible booking states (`confirmed|started|completed`) and uses API payload contract (`created_by`, `evidence_note`).
+- Tunnel runbook verified for Expo Go testing via `expo start --tunnel --clear`.
+- Operational note: after API rebuild/restart (`barbergo-api`) partner transition errors observed during mobile test were cleared.
+- Final UAT result on mobile:
+- Customer flow: PASS
+- Partner flow: PASS
+- Admin flow: PASS
 - Workspace verification (2026-02-16):
 - `corepack pnpm lint` passed
 - `corepack pnpm build` passed
