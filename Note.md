@@ -111,3 +111,4 @@ Updated: 2026-02-14
 - Templates: `infra/env/staging.env.example`, `infra/env/production.env.example`
 - Bootstrap: `scripts/ops/bootstrap-env-files.sh` (installs `/etc/barbergo/{staging,production}.env`)
 - Validation: `scripts/ops/check-env-parity.sh` (required key + parity check)
+- 2026-02-16: bootstrapped `/etc/barbergo/staging.env` and `/etc/barbergo/production.env` and verified parity check passed.

@@ -343,7 +343,7 @@ Default for Phase 5:
 Default for Phase 6:
 - `Owner: Codex | Priority: P0 | Sprint: S4-W3..S4-W8 | Due: 2026-08-09 | Dependency: DEP-04 | DoD: reproducible infra + recovery evidence | Deliverable: staging parity + backups + observability | Blocker: accounts/domains`
 
-- [ ] `Status: IN_PROGRESS` Staging parity: separate DB/Redis/MinIO, separate secrets, data reset strategy, seeded test data (env templates + bootstrap/parity scripts added on 2026-02-16)
+- [x] `Status: DONE` Staging parity: separate DB/Redis/MinIO, separate secrets, data reset strategy, seeded test data (env templates + bootstrap/parity scripts + `/etc/barbergo/{staging,production}.env` bootstrapped and parity check passed on 2026-02-16)
 - [ ] `Status: IN_PROGRESS` Service management standard: commit hardened `systemd` unit templates (api/web/workers) + environment files strategy + boot persistence + healthcheck endpoints
 - [x] `Status: DONE` Self-hosted runner deploy permissions: install sudoers NOPASSWD rule for `systemctl restart barbergo-api|barbergo-web` (required for `release-prod` deploy hooks) (completed on 2026-02-15)
 - [ ] `Status: IN_PROGRESS` Observability: structured logs, metrics dashboards, alerts (SLO-based), trace correlation with request_id
