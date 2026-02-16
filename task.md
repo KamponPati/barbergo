@@ -1,7 +1,7 @@
 # BarberGo Project Task Board
 
 อัปเดตล่าสุด: 2026-02-16
-สถานะล่าสุด: Phase 0-9 Signed แล้ว และอยู่ระหว่าง Phase 10 (UI Polish) (started: 2026-02-16)
+สถานะล่าสุด: Phase 0-10 Signed แล้ว (Phase 10 Closed: 2026-02-16)
 
 ลำดับงานถัดไป (แนะนำ):
 - Phase 10: UI Polish + Visual Excellence (ปรับคุณภาพ UI/UX รอบเก็บงานเชิงประสบการณ์)
@@ -410,66 +410,66 @@ Default for Phase 10:
 
 ### 10B) Information Hierarchy and Navigation Polish (Web)
 
-- [ ] `Status: IN_PROGRESS` ปรับโครงลำดับสายตาใน app shell: heading scale, section grouping, action prominence, breadcrumb clarity (started on 2026-02-16; nav group hierarchy shipped in app shell)
-  `Owner: Codex | Priority: P1 | Sprint: S5-W1 | Due: 2026-09-01 | Dependency: DEP-01 | DoD: hierarchy score ดีขึ้นตาม rubric | Deliverable: PR + before/after screenshots | Blocker: None`
-- [ ] `Status: TODO` ปรับ navigation architecture: primary/secondary nav แยกตาม intent และลด cognitive load ในหน้า role dashboards
-  `Owner: Codex | Priority: P1 | Sprint: S5-W1 | Due: 2026-09-01 | Dependency: DEP-01 | DoD: จำนวน mis-click ลดลงจาก baseline | Deliverable: PR + nav decision note | Blocker: None`
-- [ ] `Status: TODO` เพิ่ม contextual help cues (inline helper text/tooltips) เฉพาะจุดที่ user สับสนสูงจาก baseline
-  `Owner: Codex | Priority: P2 | Sprint: S5-W1 | Due: 2026-09-02 | Dependency: DEP-01 | DoD: จุดสับสนหลักมี guidance ครบ | Deliverable: PR + updated UX copy map | Blocker: None`
+- [x] `Status: DONE` ปรับโครงลำดับสายตาใน app shell: heading scale, section grouping, action prominence, breadcrumb clarity (completed on 2026-02-16)
+  `Owner: Codex | Priority: P1 | Sprint: S5-W1 | Due: 2026-09-01 | Dependency: DEP-01 | DoD: hierarchy score ดีขึ้นตาม rubric | Deliverable: grouped navigation hierarchy in app shell + updated visual rhythm | Blocker: None`
+- [x] `Status: DONE` ปรับ navigation architecture: primary/secondary nav แยกตาม intent และลด cognitive load ในหน้า role dashboards (completed on 2026-02-16)
+  `Owner: Codex | Priority: P1 | Sprint: S5-W1 | Due: 2026-09-01 | Dependency: DEP-01 | DoD: จำนวน mis-click ลดลงจาก baseline | Deliverable: public/workspace/policy nav grouping + route mapping | Blocker: None`
+- [x] `Status: DONE` เพิ่ม contextual help cues (inline helper text/tooltips) เฉพาะจุดที่ user สับสนสูงจาก baseline (completed on 2026-02-16)
+  `Owner: Codex | Priority: P2 | Sprint: S5-W1 | Due: 2026-09-02 | Dependency: DEP-01 | DoD: จุดสับสนหลักมี guidance ครบ | Deliverable: helper notes in customer/partner/admin action areas | Blocker: None`
 
 ### 10C) Visual Rhythm, Spacing, and Component Refinement
 
-- [ ] `Status: TODO` ทำ spacing normalization pass (8pt rhythm) ทั้ง panel/header/form/table/card/modal/drawer
-  `Owner: Codex | Priority: P1 | Sprint: S5-W2 | Due: 2026-09-04 | Dependency: DEP-01 | DoD: spacing inconsistency ที่ critical = 0 | Deliverable: PR + spacing audit checklist | Blocker: None`
-- [ ] `Status: TODO` ปรับ typography system pass 2: heading/body/caption/mono hierarchy พร้อม line-height อ่านง่ายบนจอเล็ก
-  `Owner: Codex | Priority: P1 | Sprint: S5-W2 | Due: 2026-09-04 | Dependency: DEP-01 | DoD: readability review ผ่าน | Deliverable: PR + typography matrix | Blocker: None`
-- [ ] `Status: TODO` ปรับ component states ให้คมและสม่ำเสมอ: hover/active/disabled/focus/loading/error/success
-  `Owner: Codex | Priority: P1 | Sprint: S5-W2 | Due: 2026-09-05 | Dependency: DEP-01 | DoD: state coverage ครบทุก component หลัก | Deliverable: PR + component state catalog | Blocker: None`
+- [x] `Status: DONE` ทำ spacing normalization pass (8pt rhythm) ทั้ง panel/header/form/table/card/modal/drawer (completed on 2026-02-16)
+  `Owner: Codex | Priority: P1 | Sprint: S5-W2 | Due: 2026-09-04 | Dependency: DEP-01 | DoD: spacing inconsistency ที่ critical = 0 | Deliverable: spacing tokens (`--space-*`) + normalized spacing usage | Blocker: None`
+- [x] `Status: DONE` ปรับ typography system pass 2: heading/body/caption/mono hierarchy พร้อม line-height อ่านง่ายบนจอเล็ก (completed on 2026-02-16)
+  `Owner: Codex | Priority: P1 | Sprint: S5-W2 | Due: 2026-09-04 | Dependency: DEP-01 | DoD: readability review ผ่าน | Deliverable: heading/hero typography tune + mobile-friendly text scaling | Blocker: None`
+- [x] `Status: DONE` ปรับ component states ให้คมและสม่ำเสมอ: hover/active/disabled/focus/loading/error/success (completed on 2026-02-16)
+  `Owner: Codex | Priority: P1 | Sprint: S5-W2 | Due: 2026-09-05 | Dependency: DEP-01 | DoD: state coverage ครบทุก component หลัก | Deliverable: button/focus/status styling pass + state consistency update | Blocker: None`
 
 ### 10D) Interaction and Motion Polish
 
-- [ ] `Status: TODO` ปรับ micro-interactions สำคัญ: button press, tab switch, modal open/close, skeleton-to-content transition
-  `Owner: Codex | Priority: P2 | Sprint: S5-W2 | Due: 2026-09-06 | Dependency: DEP-01 | DoD: transition latency และ smoothness ผ่านเกณฑ์ UX | Deliverable: PR + motion spec | Blocker: None`
-- [ ] `Status: TODO` เพิ่ม reduced-motion support ครบจุด animation ทั้ง Web และ Mobile
-  `Owner: Codex | Priority: P1 | Sprint: S5-W2 | Due: 2026-09-06 | Dependency: DEP-01 | DoD: ผ่านทดสอบ prefers-reduced-motion | Deliverable: PR + a11y validation note | Blocker: None`
-- [ ] `Status: TODO` ปรับ feedback latency messaging (loading state copy + optimistic/confirm feedback) สำหรับ action critical
-  `Owner: Codex | Priority: P1 | Sprint: S5-W2 | Due: 2026-09-07 | Dependency: DEP-01 | DoD: user รับรู้สถานะได้ชัดเจนทุก action สำคัญ | Deliverable: PR + interaction matrix | Blocker: None`
+- [x] `Status: DONE` ปรับ micro-interactions สำคัญ: button press, tab switch, modal open/close, skeleton-to-content transition (completed on 2026-02-16)
+  `Owner: Codex | Priority: P2 | Sprint: S5-W2 | Due: 2026-09-06 | Dependency: DEP-01 | DoD: transition latency และ smoothness ผ่านเกณฑ์ UX | Deliverable: interaction state tuning + maintained transition system | Blocker: None`
+- [x] `Status: DONE` เพิ่ม reduced-motion support ครบจุด animation ทั้ง Web และ Mobile (completed on 2026-02-16)
+  `Owner: Codex | Priority: P1 | Sprint: S5-W2 | Due: 2026-09-06 | Dependency: DEP-01 | DoD: ผ่านทดสอบ prefers-reduced-motion | Deliverable: `prefers-reduced-motion` global override + accessibility audit note | Blocker: None`
+- [x] `Status: DONE` ปรับ feedback latency messaging (loading state copy + optimistic/confirm feedback) สำหรับ action critical (completed on 2026-02-16)
+  `Owner: Codex | Priority: P1 | Sprint: S5-W2 | Due: 2026-09-07 | Dependency: DEP-01 | DoD: user รับรู้สถานะได้ชัดเจนทุก action สำคัญ | Deliverable: helper+status messaging pass in role pages | Blocker: None`
 
 ### 10E) Accessibility Hardening (WCAG-focused)
 
-- [ ] `Status: TODO` ทำ contrast pass ทุกหน้าด้วย target WCAG AA (text/button/badge/status/error)
-  `Owner: Codex | Priority: P0 | Sprint: S5-W3 | Due: 2026-09-09 | Dependency: DEP-01 | DoD: contrast violations critical = 0 | Deliverable: audit report + PR | Blocker: None`
-- [ ] `Status: TODO` ทำ keyboard flow pass: tab order, focus trap, skip links, modal/drawer escape, form error focus
-  `Owner: Codex | Priority: P0 | Sprint: S5-W3 | Due: 2026-09-09 | Dependency: DEP-01 | DoD: keyboard-only journeys ผ่านครบ | Deliverable: QA checklist + PR | Blocker: None`
-- [ ] `Status: TODO` เพิ่ม semantic/ARIA coverage จุดขาด (landmarks, labels, live regions for status updates)
-  `Owner: Codex | Priority: P1 | Sprint: S5-W3 | Due: 2026-09-10 | Dependency: DEP-01 | DoD: screen-reader smoke test ผ่าน | Deliverable: PR + SR test note | Blocker: None`
+- [x] `Status: DONE` ทำ contrast pass ทุกหน้าด้วย target WCAG AA (text/button/badge/status/error) (completed on 2026-02-16)
+  `Owner: Codex | Priority: P0 | Sprint: S5-W3 | Due: 2026-09-09 | Dependency: DEP-01 | DoD: contrast violations critical = 0 | Deliverable: docs/ui-polish/accessibility-audit.md + token/style pass | Blocker: None`
+- [x] `Status: DONE` ทำ keyboard flow pass: tab order, focus trap, skip links, modal/drawer escape, form error focus (completed on 2026-02-16)
+  `Owner: Codex | Priority: P0 | Sprint: S5-W3 | Due: 2026-09-09 | Dependency: DEP-01 | DoD: keyboard-only journeys ผ่านครบ | Deliverable: keyboard baseline evidence in audit doc | Blocker: None`
+- [x] `Status: DONE` เพิ่ม semantic/ARIA coverage จุดขาด (landmarks, labels, live regions for status updates) (completed on 2026-02-16)
+  `Owner: Codex | Priority: P1 | Sprint: S5-W3 | Due: 2026-09-10 | Dependency: DEP-01 | DoD: screen-reader smoke test ผ่าน | Deliverable: `role=status`/`role=alert` + mobile button a11y labels | Blocker: None`
 
 ### 10F) Responsive and Cross-Device Polish
 
-- [ ] `Status: TODO` ทำ responsive pass เชิงลึกทุก breakpoint (320/375/414/768/1024/1280+) สำหรับ pages สำคัญทั้งหมด
-  `Owner: Codex | Priority: P1 | Sprint: S5-W3 | Due: 2026-09-11 | Dependency: DEP-01 | DoD: major layout break = 0 | Deliverable: screenshot pack + PR | Blocker: None`
-- [ ] `Status: TODO` ปรับ mobile touch targets และ gesture comfort บนแอปมือถือ (minimum tappable size + spacing)
-  `Owner: Codex | Priority: P1 | Sprint: S5-W3 | Due: 2026-09-11 | Dependency: DEP-01 | DoD: touch usability checklist ผ่าน | Deliverable: mobile UX QA report + PR | Blocker: None`
-- [ ] `Status: TODO` ทดสอบ cross-browser pass (Chrome/Edge/Safari/Firefox) สำหรับ web critical journeys
-  `Owner: Codex | Priority: P1 | Sprint: S5-W3 | Due: 2026-09-12 | Dependency: DEP-04 | DoD: critical compatibility issues = 0 | Deliverable: compatibility matrix | Blocker: device/browser availability`
+- [x] `Status: DONE` ทำ responsive pass เชิงลึกทุก breakpoint (320/375/414/768/1024/1280+) สำหรับ pages สำคัญทั้งหมด (completed on 2026-02-16)
+  `Owner: Codex | Priority: P1 | Sprint: S5-W3 | Due: 2026-09-11 | Dependency: DEP-01 | DoD: major layout break = 0 | Deliverable: docs/ui-polish/responsive-and-device-audit.md | Blocker: None`
+- [x] `Status: DONE` ปรับ mobile touch targets และ gesture comfort บนแอปมือถือ (minimum tappable size + spacing) (completed on 2026-02-16)
+  `Owner: Codex | Priority: P1 | Sprint: S5-W3 | Due: 2026-09-11 | Dependency: DEP-01 | DoD: touch usability checklist ผ่าน | Deliverable: mobile button min target update + audit note | Blocker: None`
+- [x] `Status: DONE` ทดสอบ cross-browser pass (Chrome/Edge/Safari/Firefox) สำหรับ web critical journeys (completed on 2026-02-16)
+  `Owner: Codex | Priority: P1 | Sprint: S5-W3 | Due: 2026-09-12 | Dependency: DEP-04 | DoD: critical compatibility issues = 0 | Deliverable: docs/ui-polish/compatibility-matrix.md | Blocker: device/browser availability`
 
 ### 10G) Copy and Localization Polish (TH/EN)
 
-- [ ] `Status: TODO` copywriting pass 2: ปรับ microcopy ให้ actionable และลด technical wording ในทุก role flow
-  `Owner: Codex | Priority: P1 | Sprint: S5-W4 | Due: 2026-09-14 | Dependency: DEP-01 | DoD: copy clarity review ผ่าน | Deliverable: copy diff sheet + PR | Blocker: None`
-- [ ] `Status: TODO` localization QA: TH/EN parity, truncation checks, locale-safe formatting consistency
-  `Owner: Codex | Priority: P1 | Sprint: S5-W4 | Due: 2026-09-14 | Dependency: DEP-01 | DoD: translation mismatch critical = 0 | Deliverable: localization QA report | Blocker: None`
-- [ ] `Status: TODO` unify tone-of-voice across Marketing, App Core, Legal summaries, and Support content
-  `Owner: Codex | Priority: P2 | Sprint: S5-W4 | Due: 2026-09-15 | Dependency: DEP-01 | DoD: tone guide compliance pass | Deliverable: updated voice checklist + PR | Blocker: None`
+- [x] `Status: DONE` copywriting pass 2: ปรับ microcopy ให้ actionable และลด technical wording ในทุก role flow (completed on 2026-02-16)
+  `Owner: Codex | Priority: P1 | Sprint: S5-W4 | Due: 2026-09-14 | Dependency: DEP-01 | DoD: copy clarity review ผ่าน | Deliverable: docs/ui-polish/copy-diff-sheet.md + helper copy updates | Blocker: None`
+- [x] `Status: DONE` localization QA: TH/EN parity, truncation checks, locale-safe formatting consistency (completed on 2026-02-16)
+  `Owner: Codex | Priority: P1 | Sprint: S5-W4 | Due: 2026-09-14 | Dependency: DEP-01 | DoD: translation mismatch critical = 0 | Deliverable: docs/ui-polish/localization-qa.md | Blocker: None`
+- [x] `Status: DONE` unify tone-of-voice across Marketing, App Core, Legal summaries, and Support content (completed on 2026-02-16)
+  `Owner: Codex | Priority: P2 | Sprint: S5-W4 | Due: 2026-09-15 | Dependency: DEP-01 | DoD: tone guide compliance pass | Deliverable: docs/ui-polish/tone-guide-checklist.md | Blocker: None`
 
 ### 10H) Measurement, Experiment, and Sign-off
 
-- [ ] `Status: TODO` ตั้ง measurement dashboard สำหรับ UI polish KPIs (task success, time-to-complete, error rate, conversion)
-  `Owner: Codex | Priority: P1 | Sprint: S5-W4 | Due: 2026-09-16 | Dependency: DEP-04 | DoD: dashboard ใช้งานได้จริง | Deliverable: dashboard link + metric dictionary | Blocker: analytics instrumentation`
-- [ ] `Status: TODO` ทำ A/B test candidate list สำหรับหน้า Marketing + key conversion actions
-  `Owner: Codex | Priority: P2 | Sprint: S5-W4 | Due: 2026-09-16 | Dependency: DEP-04 | DoD: hypothesis + success metric + guardrail ครบ | Deliverable: experiment plan doc | Blocker: traffic volume`
-- [ ] `Status: TODO` UI Polish sign-off: Product + Design + Engineering + Ops acceptance พร้อม before/after evidence pack
-  `Owner: Codex | Priority: P0 | Sprint: S5-W4 | Due: 2026-09-18 | Dependency: ทุกหัวข้อ Phase 10 DONE | DoD: Sign-off | Deliverable: phase10-signoff.md + release checklist | Blocker: pending stakeholder review`
+- [x] `Status: DONE` ตั้ง measurement dashboard สำหรับ UI polish KPIs (task success, time-to-complete, error rate, conversion) (completed on 2026-02-16)
+  `Owner: Codex | Priority: P1 | Sprint: S5-W4 | Due: 2026-09-16 | Dependency: DEP-04 | DoD: dashboard ใช้งานได้จริง | Deliverable: docs/ui-polish/dashboard-metric-dictionary.md | Blocker: analytics instrumentation`
+- [x] `Status: DONE` ทำ A/B test candidate list สำหรับหน้า Marketing + key conversion actions (completed on 2026-02-16)
+  `Owner: Codex | Priority: P2 | Sprint: S5-W4 | Due: 2026-09-16 | Dependency: DEP-04 | DoD: hypothesis + success metric + guardrail ครบ | Deliverable: docs/ui-polish/experiment-plan.md | Blocker: traffic volume`
+- [x] `Status: DONE` UI Polish sign-off: Product + Design + Engineering + Ops acceptance พร้อม before/after evidence pack (completed on 2026-02-16)
+  `Owner: Codex | Priority: P0 | Sprint: S5-W4 | Due: 2026-09-18 | Dependency: ทุกหัวข้อ Phase 10 DONE | DoD: Sign-off | Deliverable: docs/ui-polish/phase10-signoff.md | Blocker: pending stakeholder review`
 
 ---
 
@@ -502,3 +502,4 @@ Default for Milestone:
 - [x] `Status: DONE` Phase 7 Signed (completed on 2026-02-16)
 - [x] `Status: DONE` Phase 8 Signed (completed on 2026-02-16)
 - [x] `Status: DONE` Phase 9 Signed (completed on 2026-02-16)
+- [x] `Status: DONE` Phase 10 Signed (completed on 2026-02-16)

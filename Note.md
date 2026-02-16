@@ -178,6 +178,32 @@ Updated: 2026-02-16
 - Updated app shell navigation/breadcrumb mapping for marketing/legal/support and applied TH/EN copy labels on new public pages.
 - `task.md` updated: Phase 9 tasks set to DONE and milestone sign-off marked complete.
 
+## Phase 10 - UI Polish + Visual Excellence (DONE) (2026-02-16)
+- Completed 10A UX baseline artifacts:
+  - `docs/ui-polish/ui-inventory.md`
+  - `docs/ui-polish/ux-rubric.md`
+  - `docs/ui-polish/baseline-metrics.md`
+- Completed 10B-10D visual and interaction polish:
+  - App shell navigation grouped by `Public / Workspaces / Policy and Help`
+  - Added contextual helper notes to customer/partner/admin action areas
+  - Spacing token normalization (`--space-*`) and typography/readability pass
+  - Added reduced-motion global fallback and state consistency tweaks
+- Completed 10E accessibility hardening:
+  - `StatusLine` uses `role=status` + live updates
+  - `ErrorBanner` uses assertive alert live region
+  - Mobile action buttons include accessibility role/state/label
+  - Audit note: `docs/ui-polish/accessibility-audit.md`
+- Completed 10F responsive/device pass:
+  - Added 768 breakpoint tune and responsive/device audit doc
+  - Increased mobile touch target baseline in app theme
+  - Compatibility matrix doc added
+- Completed 10G localization/copy/tone pass:
+  - actionable copy updates and helper microcopy
+  - localization QA doc and tone checklist added
+- Completed 10H measurement/experiment/sign-off docs:
+  - KPI dictionary, experiment plan, and phase sign-off package
+  - `docs/ui-polish/phase10-signoff.md`
+
 ## Phase 8 - Mobile Apps + Store Release (DONE) (2026-02-16)
 - Mobile stack selected: React Native with Expo (TypeScript).
 - Created `apps/mobile` workspace app and aligned package metadata: `@barbergo/mobile`.

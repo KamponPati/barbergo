@@ -171,6 +171,12 @@ export function AdminPage(): JSX.Element {
           {label("ประเมินราคา", "Estimate Pricing")}
         </UiButton>
       </div>
+      <p className="helper-note">
+        {label(
+          "เริ่มจาก Zone Gates และ Unit Economics ก่อน แล้วค่อยเปิด Advanced/Pricing",
+          "Start with Zone Gates and Unit Economics, then run Advanced Analytics and Pricing."
+        )}
+      </p>
 
       <Tabs
         value={activeTab}

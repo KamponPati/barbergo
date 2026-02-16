@@ -139,6 +139,12 @@ export function PartnerPage(): JSX.Element {
           {label("จบงาน", "Complete")}
         </UiButton>
       </div>
+      <p className="helper-note">
+        {label(
+          "ลำดับที่ปลอดภัย: Load Queue -> Confirm -> Start -> Complete",
+          "Safe transition order: Load Queue -> Confirm -> Start -> Complete"
+        )}
+      </p>
 
       <Tabs
         value={activeTab}

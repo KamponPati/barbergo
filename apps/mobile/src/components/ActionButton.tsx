@@ -14,6 +14,9 @@ export function ActionButton({
     <Pressable
       onPress={() => void onPress()}
       disabled={disabled}
+      accessibilityRole="button"
+      accessibilityState={{ disabled: Boolean(disabled) }}
+      accessibilityLabel={label}
       style={({ pressed }) => [appStyles.button, pressed && appStyles.buttonPressed, disabled && appStyles.buttonDisabled]}
     >
       <Text style={appStyles.buttonText}>{label}</Text>

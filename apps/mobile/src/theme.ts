@@ -57,8 +57,12 @@ export const appStyles = StyleSheet.create({
   button: {
     backgroundColor: palette.brand,
     borderRadius: 999,
-    paddingVertical: 8,
-    paddingHorizontal: 12
+    paddingVertical: 10,
+    paddingHorizontal: 14,
+    minHeight: 44,
+    minWidth: 84,
+    justifyContent: "center",
+    alignItems: "center"
   },
   buttonPressed: {
     opacity: 0.85

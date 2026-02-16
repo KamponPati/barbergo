@@ -245,6 +245,12 @@ export function CustomerPage(): JSX.Element {
           {label("โหลดประวัติ", "Load History")}
         </UiButton>
       </div>
+      <p className="helper-note">
+        {label(
+          "ลำดับที่แนะนำ: โหลดร้าน -> โหลดเวลาว่าง -> ขอราคา -> ชำระเงิน -> โหลดประวัติ",
+          "Recommended order: Load Shops -> Load Availability -> Quote -> Checkout -> Load History"
+        )}
+      </p>
 
       <Tabs
         value={activeTab}
