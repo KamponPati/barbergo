@@ -107,3 +107,7 @@ Updated: 2026-02-14
 - Loki: `http://127.0.0.1:3100`
 - Promtail: `http://127.0.0.1:9080`
 - Grafana provisions datasources (uid: `prometheus`, `loki`) and dashboard `BarberGo - API Overview`.
+- Added env-separation tooling:
+- Templates: `infra/env/staging.env.example`, `infra/env/production.env.example`
+- Bootstrap: `scripts/ops/bootstrap-env-files.sh` (installs `/etc/barbergo/{staging,production}.env`)
+- Validation: `scripts/ops/check-env-parity.sh` (required key + parity check)

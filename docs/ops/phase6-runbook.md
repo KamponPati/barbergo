@@ -22,6 +22,26 @@ systemctl status barbergo-api --no-pager
 systemctl status barbergo-web --no-pager
 ```
 
+## Environment Separation (Staging vs Production)
+
+The API service reads `/etc/barbergo/production.env` (primary) and keeps local `.env` as fallback.
+
+Bootstrap env files once:
+
+```bash
+sudo bash scripts/ops/bootstrap-env-files.sh
+```
+
+Validate key parity and required keys:
+
+```bash
+sudo bash scripts/ops/check-env-parity.sh
+```
+
+Files:
+- `/etc/barbergo/staging.env`
+- `/etc/barbergo/production.env`
+
 ## Smoke Test
 
 ```bash

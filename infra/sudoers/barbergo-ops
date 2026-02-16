@@ -9,6 +9,8 @@
 #   sudo -n /usr/bin/bash /home/yee/app/scripts/backup/verify-restore.sh
 
 Cmnd_Alias BARBERGO_OPS = \
+  /usr/bin/bash /home/yee/app/scripts/ops/bootstrap-env-files.sh, \
+  /usr/bin/bash /home/yee/app/scripts/ops/check-env-parity.sh, \
   /usr/bin/bash /home/yee/app/scripts/ops/install-systemd-units.sh, \
   /usr/bin/bash /home/yee/app/scripts/ops/observability-up.sh, \
   /usr/bin/bash /home/yee/app/scripts/ops/observability-down.sh, \
