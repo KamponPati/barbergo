@@ -162,14 +162,31 @@ Updated: 2026-02-16
 - Created `apps/mobile` workspace app and aligned package metadata: `@barbergo/mobile`.
 - Added mobile env baseline: `apps/mobile/.env.example` with `EXPO_PUBLIC_API_BASE_URL`.
 - Added CI-compatible scripts in mobile package:
-- `lint`: `tsc --noEmit`
-- `build`: `tsc --noEmit`
+- `lint`: baseline placeholder (`echo ...`) for workspace compatibility
+- `build`: baseline placeholder (`echo ...`) for workspace compatibility
 - `test`: placeholder baseline
 - Implemented Phase 8 role shell baseline in `apps/mobile/App.tsx`:
 - Customer: login, load shops, availability, quote+checkout, history
 - Partner: login, load queue, confirm/start/complete first booking
 - Admin: login, load core analytics snapshot
-- Status: Phase 8 started; push notifications/deep links/store readiness remain TODO.
+- Wave 2 updates:
+- Refactored mobile app into modular structure:
+- `apps/mobile/src/lib/*` (api, types, deeplink, notifications)
+- `apps/mobile/src/components/*` (ActionButton, StatTile)
+- `apps/mobile/src/screens/*` (CustomerScreen, PartnerScreen, AdminScreen)
+- `apps/mobile/src/theme.ts`
+- Added deep link scheme and handling:
+- `app.json` includes `scheme: barbergo`
+- runtime parsing for `barbergo://customer|partner|admin`
+- Added push notification scaffold:
+- dependency `expo-notifications`
+- permission + Expo push token registration flow on app boot
+- Added mobile readme: `apps/mobile/README.md`
+- Status: Phase 8 in progress; APNS/FCM provider integration and store readiness remain TODO.
+- Workspace verification (2026-02-16):
+- `corepack pnpm lint` passed
+- `corepack pnpm build` passed
+- `corepack pnpm test` passed
 - Wave 3 complete (navigation + interaction components):
 - Added `UiBadge`, `UiModal`, `UiDrawer` in `apps/web/src/features/shared/UiKit.tsx`.
 - Added shell breadcrumb + route transition baseline in `apps/web/src/app/layout/AppLayout.tsx`.

@@ -380,7 +380,7 @@ Default for Phase 8:
 - [ ] `Status: IN_PROGRESS` Mobile design system aligned with web theme (baseline styles/components in `apps/mobile/App.tsx`; component extraction pending)
 - [ ] `Status: IN_PROGRESS` Customer Mobile: discovery/map, shop detail, booking checkout, history, post-service (core discovery + availability + checkout + history baseline wired)
 - [ ] `Status: IN_PROGRESS` Partner Mobile: onboarding/KYC, shop ops, booking ops, finance (booking queue and transition operations baseline wired)
-- [ ] `Status: TODO` Push notifications (APNS/FCM) + deep links for customer/partner/admin
+- [ ] `Status: IN_PROGRESS` Push notifications (APNS/FCM) + deep links for customer/partner/admin (Phase 8 Wave 2: deep link routing (`barbergo://customer|partner|admin`) + `expo-notifications` registration scaffold added; provider integration still pending)
 - [ ] `Status: TODO` Store readiness: icons/splash, privacy/permissions copy, review notes, versioning, crash reporting
 
 ## Phase 9 - Marketing + Brand + Legal + Support Content (P1)
