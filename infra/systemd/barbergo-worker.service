@@ -1,0 +1,27 @@
+[Unit]
+Description=BarberGo Worker Service
+After=network.target
+
+[Service]
+Type=simple
+User=yee
+Group=yee
+WorkingDirectory=/home/yee/app
+EnvironmentFile=-/etc/barbergo/production.env
+EnvironmentFile=-/home/yee/app/.env
+Environment=NODE_ENV=production
+ExecStartPre=/usr/bin/env bash -lc 'test -n "${DATABASE_URL:-}"'
+ExecStartPre=/usr/bin/env bash -lc 'test -n "${REDIS_URL:-}"'
+ExecStart=/usr/bin/env bash -lc 'corepack pnpm --filter @barbergo/api start:worker'
+Restart=always
+RestartSec=3
+TimeoutStopSec=20
+KillSignal=SIGTERM
+LimitNOFILE=65535
+NoNewPrivileges=true
+StandardOutput=append:/tmp/barbergo-worker.log
+StandardError=append:/tmp/barbergo-worker.log
+
+[Install]
+WantedBy=multi-user.target
+

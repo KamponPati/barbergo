@@ -1,6 +1,6 @@
 # Project Notes
 
-Updated: 2026-02-14
+Updated: 2026-02-16
 
 ## Environment URLs
 - Staging Web URL: `https://staging.jfav.cloud`
@@ -79,7 +79,7 @@ Updated: 2026-02-14
 - `GET /api/v1/admin/reconciliation/daily?date=YYYY-MM-DD`
 - Added deploy guard for port conflicts (single-host runner): `scripts/release/ensure-ports-free.sh`
 
-## Phase 6 - Infra + Recovery (IN_PROGRESS) (2026-02-15)
+## Phase 6 - Infra + Recovery (DONE) (2026-02-16)
 - Added promtail for nginx logs into Loki: `infra/observability/promtail/promtail-config.yml` + `infra/docker/docker-compose.observability.yml`
 - Added structured request logging + request_id correlation and improved metrics:
 - `apps/api/src/common/middleware/request-logging.middleware.ts`
@@ -114,3 +114,13 @@ Updated: 2026-02-14
 - Bootstrap: `scripts/ops/bootstrap-env-files.sh` (installs `/etc/barbergo/{staging,production}.env`)
 - Validation: `scripts/ops/check-env-parity.sh` (required key + parity check)
 - 2026-02-16: bootstrapped `/etc/barbergo/staging.env` and `/etc/barbergo/production.env` and verified parity check passed.
+- Added worker runtime baseline:
+- `apps/api/src/worker.ts`
+- `infra/systemd/barbergo-worker.service`
+- Added service health check script: `scripts/ops/check-services-health.sh`
+- Added reverse proxy TLS template for direct nginx TLS mode: `infra/nginx/barbergo-web.tls.conf.example`
+- Added versioned image build script: `scripts/release/build-images.sh`
+- Service/runtime validation:
+- Build passed: `corepack pnpm -r build`
+- Web shell reachable on host: `http://127.0.0.1:5173` => `200`
+- Note: privileged service/docker checks depend on host sudo/docker permissions outside this sandbox.

@@ -12,6 +12,7 @@ fi
 units=(
   barbergo-api.service
   barbergo-web.service
+  barbergo-worker.service
   backup-barbergo.service
   backup-barbergo.timer
 )
@@ -22,8 +23,8 @@ for u in "${units[@]}"; do
 done
 
 $SUDO systemctl daemon-reload
-$SUDO systemctl enable --now barbergo-api.service barbergo-web.service
+$SUDO systemctl enable --now barbergo-api.service barbergo-web.service barbergo-worker.service
 $SUDO systemctl enable --now backup-barbergo.timer
-$SUDO systemctl restart barbergo-api.service barbergo-web.service
+$SUDO systemctl restart barbergo-api.service barbergo-web.service barbergo-worker.service
 
 echo "[SUCCESS] installed and restarted"

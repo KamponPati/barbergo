@@ -344,13 +344,13 @@ Default for Phase 6:
 - `Owner: Codex | Priority: P0 | Sprint: S4-W3..S4-W8 | Due: 2026-08-09 | Dependency: DEP-04 | DoD: reproducible infra + recovery evidence | Deliverable: staging parity + backups + observability | Blocker: accounts/domains`
 
 - [x] `Status: DONE` Staging parity: separate DB/Redis/MinIO, separate secrets, data reset strategy, seeded test data (env templates + bootstrap/parity scripts + `/etc/barbergo/{staging,production}.env` bootstrapped and parity check passed on 2026-02-16)
-- [ ] `Status: IN_PROGRESS` Service management standard: commit hardened `systemd` unit templates (api/web/workers) + environment files strategy + boot persistence + healthcheck endpoints
+- [x] `Status: DONE` Service management standard: commit hardened `systemd` unit templates (api/web/workers) + environment files strategy + boot persistence + healthcheck endpoints (worker unit + health check script added and runbook updated on 2026-02-16)
 - [x] `Status: DONE` Self-hosted runner deploy permissions: install sudoers NOPASSWD rule for `systemctl restart barbergo-api|barbergo-web` (required for `release-prod` deploy hooks) (completed on 2026-02-15)
 - [x] `Status: DONE` Observability: structured logs, metrics dashboards, alerts (SLO-based), trace correlation with request_id (Prometheus+Loki+Grafana+Promtail+Alertmanager running; SLO alerts loaded; completed on 2026-02-16)
 - [x] `Status: DONE` Backup automation: scheduled DB backups + MinIO backups + restore verification job (completed on 2026-02-15)
 - [x] `Status: DONE` Backup/restore drill evidence in staging/prod: record RPO/RTO + verify restore steps (ต้องมีหลักฐาน) (completed on 2026-02-15)
-- [ ] `Status: IN_PROGRESS` Production reverse proxy frontdoor for web+api: TLS termination, security headers, gzip/brotli, rate limits
-- [ ] `Status: IN_PROGRESS` Production deploy packaging: containerize API/Web (or hardened systemd) with versioned artifacts
+- [x] `Status: DONE` Production reverse proxy frontdoor for web+api: TLS termination, security headers, gzip/brotli, rate limits (Cloudflare TLS termination + hardened nginx + direct TLS template committed on 2026-02-16)
+- [x] `Status: DONE` Production deploy packaging: containerize API/Web (or hardened systemd) with versioned artifacts (Dockerfiles + compose + git-SHA image build script committed on 2026-02-16)
 
 ## Phase 7 - UI/UX Hi-Fi (Single Theme) (P0)
 

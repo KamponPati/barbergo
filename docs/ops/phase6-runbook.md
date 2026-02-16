@@ -12,14 +12,22 @@ Updated: 2026-02-15
 
 - API: `barbergo-api.service`
 - Web (nginx static + reverse proxy): `barbergo-web.service`
+- Worker: `barbergo-worker.service`
 
 Commands:
 
 ```bash
 sudo -n /bin/systemctl restart barbergo-api
 sudo -n /bin/systemctl restart barbergo-web
+sudo -n /bin/systemctl restart barbergo-worker
 systemctl status barbergo-api --no-pager
 systemctl status barbergo-web --no-pager
+systemctl status barbergo-worker --no-pager
+```
+
+Service health check:
+```bash
+bash scripts/ops/check-services-health.sh
 ```
 
 ## Environment Separation (Staging vs Production)
@@ -124,3 +132,13 @@ Build+run full app via compose (includes api + web + deps):
 ```bash
 docker compose -f infra/docker/docker-compose.app.yml up -d --build
 ```
+
+Build versioned images from git SHA:
+```bash
+IMAGE_REGISTRY=ghcr.io/<org> IMAGE_REPO=barbergo bash scripts/release/build-images.sh
+```
+
+## Reverse Proxy Frontdoor
+
+- Current runtime: Cloudflare TLS termination -> local nginx (`infra/nginx/barbergo-web.conf`)
+- Direct TLS nginx template (if not using Cloudflare TLS): `infra/nginx/barbergo-web.tls.conf.example`
