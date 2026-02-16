@@ -346,7 +346,7 @@ Default for Phase 6:
 - [x] `Status: DONE` Staging parity: separate DB/Redis/MinIO, separate secrets, data reset strategy, seeded test data (env templates + bootstrap/parity scripts + `/etc/barbergo/{staging,production}.env` bootstrapped and parity check passed on 2026-02-16)
 - [ ] `Status: IN_PROGRESS` Service management standard: commit hardened `systemd` unit templates (api/web/workers) + environment files strategy + boot persistence + healthcheck endpoints
 - [x] `Status: DONE` Self-hosted runner deploy permissions: install sudoers NOPASSWD rule for `systemctl restart barbergo-api|barbergo-web` (required for `release-prod` deploy hooks) (completed on 2026-02-15)
-- [ ] `Status: IN_PROGRESS` Observability: structured logs, metrics dashboards, alerts (SLO-based), trace correlation with request_id
+- [x] `Status: DONE` Observability: structured logs, metrics dashboards, alerts (SLO-based), trace correlation with request_id (Prometheus+Loki+Grafana+Promtail+Alertmanager running; SLO alerts loaded; completed on 2026-02-16)
 - [x] `Status: DONE` Backup automation: scheduled DB backups + MinIO backups + restore verification job (completed on 2026-02-15)
 - [x] `Status: DONE` Backup/restore drill evidence in staging/prod: record RPO/RTO + verify restore steps (ต้องมีหลักฐาน) (completed on 2026-02-15)
 - [ ] `Status: IN_PROGRESS` Production reverse proxy frontdoor for web+api: TLS termination, security headers, gzip/brotli, rate limits

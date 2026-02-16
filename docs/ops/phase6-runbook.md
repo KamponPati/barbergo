@@ -67,6 +67,20 @@ Default ports:
 Dashboard:
 - `BarberGo - API Overview` (auto-provisioned)
 
+SLO alert rules (Prometheus):
+- `BarberGoApiDown`
+- `BarberGoHigh5xxRate`
+- `BarberGoHighLatency`
+- `BarberGoLowTraffic`
+
+Alertmanager:
+- URL: `http://localhost:9093`
+
+Health check:
+```bash
+bash scripts/ops/observability-check.sh
+```
+
 ## Backups
 
 Backup scripts assume Docker access.

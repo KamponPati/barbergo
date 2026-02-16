@@ -106,7 +106,9 @@ Updated: 2026-02-14
 - Grafana: `http://127.0.0.1:3001` (admin/admin)
 - Loki: `http://127.0.0.1:3100`
 - Promtail: `http://127.0.0.1:9080`
+- Alertmanager: `http://127.0.0.1:9093`
 - Grafana provisions datasources (uid: `prometheus`, `loki`) and dashboard `BarberGo - API Overview`.
+- Prometheus SLO alerts loaded from `infra/observability/prometheus/alerts.yml` (`BarberGoApiDown`, `BarberGoHigh5xxRate`, `BarberGoHighLatency`, `BarberGoLowTraffic`).
 - Added env-separation tooling:
 - Templates: `infra/env/staging.env.example`, `infra/env/production.env.example`
 - Bootstrap: `scripts/ops/bootstrap-env-files.sh` (installs `/etc/barbergo/{staging,production}.env`)
