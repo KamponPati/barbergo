@@ -11,9 +11,13 @@ export function CustomerScreen({
   setSelectedShopId,
   history,
   onLoadShops,
+  onLoadDetail,
   onLoadAvailability,
   onQuoteCheckout,
   onLoadHistory
+  ,
+  onPostService,
+  onCreateDispute
 }: {
   search: string;
   setSearch: (value: string) => void;
@@ -22,9 +26,12 @@ export function CustomerScreen({
   setSelectedShopId: (value: string) => void;
   history: Booking[];
   onLoadShops: () => void | Promise<void>;
+  onLoadDetail: () => void | Promise<void>;
   onLoadAvailability: () => void | Promise<void>;
   onQuoteCheckout: () => void | Promise<void>;
   onLoadHistory: () => void | Promise<void>;
+  onPostService: () => void | Promise<void>;
+  onCreateDispute: () => void | Promise<void>;
 }): React.ReactElement {
   return (
     <View style={appStyles.section}>
@@ -49,9 +56,12 @@ export function CustomerScreen({
       </View>
       <View style={appStyles.row}>
         <ActionButton label="Load Shops" onPress={onLoadShops} />
+        <ActionButton label="Shop Detail" onPress={onLoadDetail} disabled={!selectedShopId} />
         <ActionButton label="Availability" onPress={onLoadAvailability} disabled={!selectedShopId} />
         <ActionButton label="Quote + Checkout" onPress={onQuoteCheckout} disabled={!selectedShopId} />
         <ActionButton label="History" onPress={onLoadHistory} />
+        <ActionButton label="Post Service" onPress={onPostService} disabled={history.length === 0} />
+        <ActionButton label="Create Dispute" onPress={onCreateDispute} disabled={history.length === 0} />
       </View>
       {history.slice(0, 5).map((booking) => (
         <View key={booking.id} style={appStyles.card}>

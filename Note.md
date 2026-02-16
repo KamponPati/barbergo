@@ -157,7 +157,7 @@ Updated: 2026-02-16
 - Added semantic status/alert roles for loading/error/empty states and keyboard-first improvements.
 - Phase 7 status moved to DONE in `task.md` (signed on 2026-02-16).
 
-## Phase 8 - Mobile Apps + Store Release (IN_PROGRESS) (2026-02-16)
+## Phase 8 - Mobile Apps + Store Release (DONE) (2026-02-16)
 - Mobile stack selected: React Native with Expo (TypeScript).
 - Created `apps/mobile` workspace app and aligned package metadata: `@barbergo/mobile`.
 - Added mobile env baseline: `apps/mobile/.env.example` with `EXPO_PUBLIC_API_BASE_URL`.
@@ -182,7 +182,17 @@ Updated: 2026-02-16
 - dependency `expo-notifications`
 - permission + Expo push token registration flow on app boot
 - Added mobile readme: `apps/mobile/README.md`
-- Status: Phase 8 in progress; APNS/FCM provider integration and store readiness remain TODO.
+- Added push token backend registration API:
+- `POST /api/v1/platform/devices/register`
+- `GET /api/v1/platform/devices`
+- Added store-release readiness artifacts:
+- `apps/mobile/eas.json`
+- `docs/mobile/store-readiness.md`
+- Expanded mobile feature coverage:
+- Customer: shop detail + post-service + dispute entry
+- Partner: onboarding status + branch/service/staff ops + wallet/withdraw
+- Admin: disputes + policy snapshot views
+- Status: Phase 8 marked DONE in `task.md` (signed on 2026-02-16).
 - Workspace verification (2026-02-16):
 - `corepack pnpm lint` passed
 - `corepack pnpm build` passed

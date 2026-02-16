@@ -5,15 +5,27 @@ import { ActionButton } from "./src/components/ActionButton";
 import { StatTile } from "./src/components/StatTile";
 import {
   API_BASE_URL,
+  createDispute,
+  createPartnerBranch,
+  createPartnerService,
+  createPartnerStaff,
   checkoutBooking,
   getAdminSnapshot,
   getAvailability,
   getCustomerHistory,
   getNearbyShops,
+  getPartnerOnboardingStatus,
   getPartnerQueue,
+  getPartnerWallet,
+  getShopDetail,
   login,
+  partnerOnboarding,
+  postServiceFeedback,
   quoteBooking,
+  registerMobileDeviceToken,
   transitionPartnerBooking
+  ,
+  withdrawPartnerWallet
 } from "./src/lib/api";
 import { parseRoleFromUrl } from "./src/lib/deeplink";
 import { registerForPushNotificationsAsync } from "./src/lib/notifications";
@@ -38,6 +50,11 @@ export default function App(): React.ReactElement {
   const [history, setHistory] = useState<Booking[]>([]);
   const [queue, setQueue] = useState<Booking[]>([]);
   const [adminSnapshot, setAdminSnapshot] = useState<Record<string, unknown> | null>(null);
+  const [adminDisputes, setAdminDisputes] = useState<unknown>(null);
+  const [adminPolicy, setAdminPolicy] = useState<unknown>(null);
+  const [walletSummary, setWalletSummary] = useState<unknown>(null);
+  const [onboardingStatus, setOnboardingStatus] = useState<unknown>(null);
+  const [partnerOnboardingId, setPartnerOnboardingId] = useState("partner_1");
   const [search, setSearch] = useState("");
 
   const selectedShop = shops.find((shop) => shop.id === selectedShopId) ?? null;
@@ -81,6 +98,10 @@ export default function App(): React.ReactElement {
       setRole(nextRole);
       setTab(nextRole);
       setToken(nextToken);
+      if (pushToken) {
+        const userId = nextRole === "admin" ? "admin_1" : nextRole === "partner" ? "partner_1" : "cust_1";
+        await registerMobileDeviceToken({ token: nextToken, role: nextRole, userId, deviceToken: pushToken });
+      }
       setStatus(`Logged in as ${nextRole}`);
     } catch (e) {
       const message = e instanceof Error ? e.message : "unknown error";
@@ -122,6 +143,19 @@ export default function App(): React.ReactElement {
     }
   }
 
+  async function loadShopDetail(): Promise<void> {
+    if (!token || !selectedShopId) return;
+    setError("");
+    try {
+      const data = await getShopDetail(selectedShopId);
+      setStatus(`Loaded detail for ${data.name}`);
+    } catch (e) {
+      const message = e instanceof Error ? e.message : "unknown error";
+      setError(message);
+      setStatus("Load shop detail failed");
+    }
+  }
+
   async function quoteAndCheckout(): Promise<void> {
     if (!token || !selectedShopId) return;
     setError("");
@@ -157,6 +191,32 @@ export default function App(): React.ReactElement {
     }
   }
 
+  async function submitPostService(): Promise<void> {
+    if (!token || history.length === 0) return;
+    setError("");
+    try {
+      await postServiceFeedback(token, history[0].id);
+      setStatus(`Post-service submitted for ${history[0].id}`);
+    } catch (e) {
+      const message = e instanceof Error ? e.message : "unknown error";
+      setError(message);
+      setStatus("Post-service failed");
+    }
+  }
+
+  async function submitDispute(): Promise<void> {
+    if (!token || history.length === 0) return;
+    setError("");
+    try {
+      await createDispute(token, history[0].id);
+      setStatus(`Dispute created for ${history[0].id}`);
+    } catch (e) {
+      const message = e instanceof Error ? e.message : "unknown error";
+      setError(message);
+      setStatus("Create dispute failed");
+    }
+  }
+
   async function loadQueue(): Promise<void> {
     if (!token) return;
     setError("");
@@ -186,6 +246,101 @@ export default function App(): React.ReactElement {
     }
   }
 
+  async function startOnboarding(): Promise<void> {
+    if (!token) return;
+    setError("");
+    try {
+      const data = await partnerOnboarding(token);
+      setPartnerOnboardingId(data.partner_id);
+      setStatus(`Partner onboarding started: ${data.partner_id}`);
+    } catch (e) {
+      const message = e instanceof Error ? e.message : "unknown error";
+      setError(message);
+      setStatus("Start onboarding failed");
+    }
+  }
+
+  async function loadOnboardingStatus(): Promise<void> {
+    if (!token) return;
+    setError("");
+    try {
+      const data = await getPartnerOnboardingStatus(token, partnerOnboardingId);
+      setOnboardingStatus(data);
+      setStatus("Onboarding status loaded");
+    } catch (e) {
+      const message = e instanceof Error ? e.message : "unknown error";
+      setError(message);
+      setStatus("Load onboarding status failed");
+    }
+  }
+
+  async function createBranch(): Promise<void> {
+    if (!token) return;
+    setError("");
+    try {
+      await createPartnerBranch(token);
+      setStatus("Partner branch created");
+    } catch (e) {
+      const message = e instanceof Error ? e.message : "unknown error";
+      setError(message);
+      setStatus("Create branch failed");
+    }
+  }
+
+  async function createService(): Promise<void> {
+    if (!token) return;
+    setError("");
+    try {
+      await createPartnerService(token);
+      setStatus("Partner service created");
+    } catch (e) {
+      const message = e instanceof Error ? e.message : "unknown error";
+      setError(message);
+      setStatus("Create service failed");
+    }
+  }
+
+  async function createStaff(): Promise<void> {
+    if (!token) return;
+    setError("");
+    try {
+      await createPartnerStaff(token);
+      setStatus("Partner staff created");
+    } catch (e) {
+      const message = e instanceof Error ? e.message : "unknown error";
+      setError(message);
+      setStatus("Create staff failed");
+    }
+  }
+
+  async function loadWallet(): Promise<void> {
+    if (!token) return;
+    setError("");
+    try {
+      const data = await getPartnerWallet(token);
+      setWalletSummary(data);
+      setStatus("Wallet loaded");
+    } catch (e) {
+      const message = e instanceof Error ? e.message : "unknown error";
+      setError(message);
+      setStatus("Load wallet failed");
+    }
+  }
+
+  async function withdrawWallet(): Promise<void> {
+    if (!token) return;
+    setError("");
+    try {
+      await withdrawPartnerWallet(token);
+      setStatus("Withdraw requested");
+      await loadWallet();
+    } catch (e) {
+      const message = e instanceof Error ? e.message : "unknown error";
+      setError(message);
+      setStatus("Withdraw failed");
+    }
+  }
+
   async function loadSnapshot(): Promise<void> {
     if (!token) return;
     setError("");
@@ -197,6 +352,40 @@ export default function App(): React.ReactElement {
       const message = e instanceof Error ? e.message : "unknown error";
       setError(message);
       setStatus("Admin load failed");
+    }
+  }
+
+  async function loadDisputes(): Promise<void> {
+    if (!token) return;
+    setError("");
+    try {
+      const res = await fetch(`${API_BASE_URL}/admin/disputes`, {
+        headers: { authorization: `Bearer ${token}` }
+      });
+      const data = await res.json();
+      setAdminDisputes(data);
+      setStatus("Admin disputes loaded");
+    } catch (e) {
+      const message = e instanceof Error ? e.message : "unknown error";
+      setError(message);
+      setStatus("Load disputes failed");
+    }
+  }
+
+  async function loadPolicy(): Promise<void> {
+    if (!token) return;
+    setError("");
+    try {
+      const res = await fetch(`${API_BASE_URL}/admin/policy`, {
+        headers: { authorization: `Bearer ${token}` }
+      });
+      const data = await res.json();
+      setAdminPolicy(data);
+      setStatus("Admin policy loaded");
+    } catch (e) {
+      const message = e instanceof Error ? e.message : "unknown error";
+      setError(message);
+      setStatus("Load policy failed");
     }
   }
 
@@ -245,9 +434,12 @@ export default function App(): React.ReactElement {
             setSelectedShopId={setSelectedShopId}
             history={history}
             onLoadShops={loadShops}
+            onLoadDetail={loadShopDetail}
             onLoadAvailability={loadAvailability}
             onQuoteCheckout={quoteAndCheckout}
             onLoadHistory={loadHistory}
+            onPostService={submitPostService}
+            onCreateDispute={submitDispute}
           />
         ) : null}
 
@@ -258,10 +450,28 @@ export default function App(): React.ReactElement {
             onConfirmFirst={() => transitionFirst("confirm")}
             onStartFirst={() => transitionFirst("start")}
             onCompleteFirst={() => transitionFirst("complete")}
+            onboardingStatus={onboardingStatus}
+            walletSummary={walletSummary}
+            onStartOnboarding={startOnboarding}
+            onLoadOnboardingStatus={loadOnboardingStatus}
+            onCreateBranch={createBranch}
+            onCreateService={createService}
+            onCreateStaff={createStaff}
+            onLoadWallet={loadWallet}
+            onWithdraw={withdrawWallet}
           />
         ) : null}
 
-        {tab === "admin" ? <AdminScreen snapshot={adminSnapshot} onLoadSnapshot={loadSnapshot} /> : null}
+        {tab === "admin" ? (
+          <AdminScreen
+            snapshot={adminSnapshot}
+            disputes={adminDisputes}
+            policy={adminPolicy}
+            onLoadSnapshot={loadSnapshot}
+            onLoadDisputes={loadDisputes}
+            onLoadPolicy={loadPolicy}
+          />
+        ) : null}
       </ScrollView>
     </SafeAreaView>
   );

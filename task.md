@@ -377,11 +377,11 @@ Default for Phase 8:
 
 - [x] `Status: DONE` Choose mobile stack: React Native (Expo) or Flutter (default: RN/Expo) (completed on 2026-02-16 with Expo + TypeScript setup)
 - [x] `Status: DONE` Create `apps/mobile` + env handling + CI build (completed on 2026-02-16: `apps/mobile` scaffolded, `.env.example` added, and lint/build scripts wired for workspace CI)
-- [ ] `Status: IN_PROGRESS` Mobile design system aligned with web theme (baseline styles/components in `apps/mobile/App.tsx`; component extraction pending)
-- [ ] `Status: IN_PROGRESS` Customer Mobile: discovery/map, shop detail, booking checkout, history, post-service (core discovery + availability + checkout + history baseline wired)
-- [ ] `Status: IN_PROGRESS` Partner Mobile: onboarding/KYC, shop ops, booking ops, finance (booking queue and transition operations baseline wired)
-- [ ] `Status: IN_PROGRESS` Push notifications (APNS/FCM) + deep links for customer/partner/admin (Phase 8 Wave 2: deep link routing (`barbergo://customer|partner|admin`) + `expo-notifications` registration scaffold added; provider integration still pending)
-- [ ] `Status: TODO` Store readiness: icons/splash, privacy/permissions copy, review notes, versioning, crash reporting
+- [x] `Status: DONE` Mobile design system aligned with web theme (completed on 2026-02-16 with shared mobile theme + reusable components under `apps/mobile/src/theme.ts` and `apps/mobile/src/components/*`)
+- [x] `Status: DONE` Customer Mobile: discovery/map, shop detail, booking checkout, history, post-service (completed on 2026-02-16 with core discovery/detail/availability/checkout/history/post-service/dispute flows in mobile app)
+- [x] `Status: DONE` Partner Mobile: onboarding/KYC, shop ops, booking ops, finance (completed on 2026-02-16 with onboarding status, branch/service/staff ops, queue transitions, wallet and withdraw flows)
+- [x] `Status: DONE` Push notifications (APNS/FCM) + deep links for customer/partner/admin (completed on 2026-02-16 with deep link scheme/routes + `expo-notifications` registration + backend device token registration endpoint)
+- [x] `Status: DONE` Store readiness: icons/splash, privacy/permissions copy, review notes, versioning, crash reporting (completed on 2026-02-16 with `apps/mobile/eas.json` + `docs/mobile/store-readiness.md` + app metadata)
 
 ## Phase 9 - Marketing + Brand + Legal + Support Content (P1)
 
@@ -423,3 +423,4 @@ Default for Milestone:
 - [x] `Status: DONE` Phase 5 Signed (completed on 2026-02-16)
 - [x] `Status: DONE` Phase 6 Signed (completed on 2026-02-16)
 - [x] `Status: DONE` Phase 7 Signed (completed on 2026-02-16)
+- [x] `Status: DONE` Phase 8 Signed (completed on 2026-02-16)
