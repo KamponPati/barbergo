@@ -535,6 +535,94 @@ Default for Phase 11:
 
 ---
 
+## Phase 12 - Customer UI Revamp (BarberGo Product Spec v1.0) (P0)
+
+Default for Phase 12:
+- `Owner: Codex | Priority: P0 | Sprint: S6-W2..S6-W6 | Due: 2026-04-04 | Dependency: Phase 11 engineering baseline | DoD: customer UI/UX aligned to product spec + role integration + acceptance test pass | Deliverable: new customer UI screens + API integration + UX sign-off report | Blocker: real-time map/tracking providers`
+
+ลำดับทำ (สำคัญสุดก่อน):
+- Discovery IA -> In-Shop & Delivery home -> detail views -> booking hub -> live tracking -> loyalty/profile -> business logic hooks -> final usability polish
+
+### 12A) Information Architecture and Navigation
+
+- [ ] `Status: TODO` ออกแบบ IA ใหม่ฝั่งลูกค้าให้แยกชัด `In-Shop` และ `Delivery` แบบ hybrid marketplace (brand-centric vs person-centric)
+- [ ] `Status: TODO` ทำ Customer nav ใหม่: Home, Delivery, Bookings, Tracking, Rewards/Profile โดยมี quick switch ระหว่าง In-Shop/Delivery
+- [ ] `Status: TODO` นิยาม state model ของหน้าลูกค้าใหม่ (loading/empty/error/success + fallback + retry policy) ให้ครบทุกหน้าหลัก
+
+### 12B) In-Shop Discovery (Home)
+
+- [ ] `Status: TODO` ทำ Lookbook Search ตามทรงผม (Two Block/Mullet/Skin Fade/ฯลฯ) แทนชื่อร้านอย่างเดียว
+- [ ] `Status: TODO` ทำ `ASAP Mode` ฟิลเตอร์ร้านที่ว่างตอนนี้หรือว่างใน 15-30 นาที
+- [ ] `Status: TODO` แสดง `Reliability Score` ของร้าน (% ตรงเวลา/%ไม่ยกเลิก)
+- [ ] `Status: TODO` แสดง `Live Queue Insight` จำนวนคิว walk-in แบบ near-real-time
+- [ ] `Status: TODO` ทำ Search/Filters: location, shop style (Luxury/Street/Classic), price tier
+
+### 12C) Delivery Discovery
+
+- [ ] `Status: TODO` สร้าง Delivery discovery หน้าใหม่ที่เน้นตัวตนช่าง (portrait-first profile cards)
+- [ ] `Status: TODO` แสดง `Verification Shield` (KYC + background verified status)
+- [ ] `Status: TODO` แสดง `Ready to Travel` badge แบบ real-time availability
+- [ ] `Status: TODO` แสดง `Travel ETA` ของช่างถึงพิกัดลูกค้า
+- [ ] `Status: TODO` ทำ filter เฉพาะทาง: specialty, ETA, rating, price, ready status
+
+### 12D) Profile Detail Views
+
+- [ ] `Status: TODO` หน้า Barber Detail (Delivery): portfolio gallery + personal bio + specialty summary
+- [ ] `Status: TODO` หน้า Barber Detail: equipment checklist (portable chair/floor protection/sanitation kit)
+- [ ] `Status: TODO` หน้า Shop Detail (In-Shop): branch info + map + ambience + in-house barber list
+- [ ] `Status: TODO` ทำ CTA ชัดเจนจาก detail -> booking โดยคงบริบท In-Shop vs Delivery
+
+### 12E) Booking Hub
+
+- [ ] `Status: TODO` ทำ Bookings hub แบบ tab: `Upcoming` และ `History`
+- [ ] `Status: TODO` ทำ dynamic action buttons ตาม booking mode:
+  `In-Shop -> Open Route`, `Delivery -> Live Tracking`
+- [ ] `Status: TODO` ทำ rating/review หลังจบงาน (5-star + text) พร้อม UX กัน spam/duplicate submit
+- [ ] `Status: TODO` ทำ booking card timeline ที่อ่านง่ายพร้อมสถานะสีตาม phase งาน
+
+### 12F) Live Tracking (Delivery only)
+
+- [ ] `Status: TODO` สร้างหน้า Live Tracking (แผนที่ + barber marker + route/ETA updates)
+- [ ] `Status: TODO` เพิ่ม communication actions: call + in-app message
+- [ ] `Status: TODO` เพิ่ม `Safety/SOS` action ติดต่อ admin ทันที พร้อม audit trail
+- [ ] `Status: TODO` ทำ fallback UX เมื่อ geolocation/tracking unavailable (manual refresh + safety notice)
+
+### 12G) Profile, Wallet, Rewards and Loyalty
+
+- [ ] `Status: TODO` ทำ `BarberGo Rewards` points wallet ในหน้าลูกค้า
+- [ ] `Status: TODO` ทำ membership tiers (Silver/Gold/Platinum) + benefits display
+- [ ] `Status: TODO` ขยาย wallet UI: payment methods + payment history + tip history
+- [ ] `Status: TODO` ทำ `Favorite Barbers` สำหรับช่างประจำ + quick rebook flow
+
+### 12H) Core Business Logic Hooks
+
+- [ ] `Status: TODO` ผูก Hybrid Marketplace logic: สลับ mode In-Shop/Delivery แบบ seamless ใน booking flow เดียว
+- [ ] `Status: TODO` ผูก Trust & Safety Engine indicators เข้าหน้า UI (verification/reliability/risk flags)
+- [ ] `Status: TODO` ผูก real-time availability sync สำหรับ ASAP และ Ready badges
+- [ ] `Status: TODO` ผูก payment flow แบบ capture-on-completion + in-app tip UX
+
+### 12I) Required User Flows
+
+- [ ] `Status: TODO` Implement Flow A (In-Shop): lookbook -> shop -> queue/slot -> barber -> payment -> QR check-in -> completion -> review
+- [ ] `Status: TODO` Implement Flow B (Delivery): ready+verified barber -> portfolio/equipment -> address+ETA -> payment -> tracking -> completion -> review
+- [ ] `Status: TODO` เพิ่ม end-to-end automation test สำหรับสอง flow ข้างต้น (web + mobile where applicable)
+
+### 12J) Visual System Alignment (Customer Experience)
+
+- [ ] `Status: TODO` ปรับ customer design tokens ตาม spec:
+  `Primary Blue #2563EB`, `Secondary Purple #9333EA`, `Alert Orange #F97316`
+- [ ] `Status: TODO` ปรับ typography scale สำหรับ customer journey ให้ใช้หัวข้อหนัก (Extra Bold/Black) อย่างสม่ำเสมอ
+- [ ] `Status: TODO` ปรับ component shape/fidelity เป็น rounded modern style (`rounded-3xl/4xl`) ทั้ง customer views
+- [ ] `Status: TODO` ทำ motion/accessibility pass รอบใหม่เฉพาะ customer flow (focus, screen-reader labels, reduced-motion, gesture comfort)
+
+### 12K) Acceptance and Sign-Off
+
+- [ ] `Status: TODO` ทำ customer UX acceptance checklist เทียบ Product Spec v1.0 แบบหัวข้อ-ต่อ-หัวข้อ
+- [ ] `Status: TODO` เก็บ usability metrics หลัง revamp (task completion/time/error/drop-off) เทียบ baseline ก่อนปรับ
+- [ ] `Status: TODO` Sign-off revamp รอบลูกค้า (Product + Design + Engineering + Ops)
+
+---
+
 ## Cross-Phase Governance (ทำต่อเนื่องทุก Phase)
 
 Default for Cross-Phase:
