@@ -1,10 +1,10 @@
 # BarberGo Project Task Board
 
-อัปเดตล่าสุด: 2026-02-16
-สถานะล่าสุด: Phase 0-10 Signed แล้ว (Phase 10 Closed: 2026-02-16)
+อัปเดตล่าสุด: 2026-02-17
+สถานะล่าสุด: Phase 0-10 Signed แล้ว, เปิด `Phase 11 - Production Closure Program` (เริ่ม 2026-02-17)
 
 ลำดับงานถัดไป (แนะนำ):
-- Phase 10: UI Polish + Visual Excellence (ปรับคุณภาพ UI/UX รอบเก็บงานเชิงประสบการณ์)
+- Phase 11: Production Closure Program (ปิดงาน production readiness + go-live sign-off)
 
 วิธีอัปเดตสถานะ:
 - ใช้ `Status: TODO | IN_PROGRESS | BLOCKED | DONE`
@@ -32,6 +32,7 @@
 - `Phase 4`: S4-W1 ถึง S4-W10 (`2026-06-15` ถึง `2026-08-21`)
 - `Phase 5-9`: TBD (หลัง Phase 4; ปรับตามความเร็วทีม/ความพร้อม infra และ requirement จริง)
 - `Phase 10`: TBD (หลัง Phase 9; เน้น polish, usability metrics, conversion uplift)
+- `Phase 11`: Production Closure window (`2026-02-17` ถึง `2026-03-07`)
 
 ### DoD Baseline by Work Type
 
@@ -476,6 +477,64 @@ Default for Phase 10:
 
 ---
 
+## Phase 11 - Production Closure Program (P0)
+
+Default for Phase 11:
+- `Owner: Codex | Priority: P0 | Sprint: S6-W1..S6-W3 | Due: 2026-03-07 | Dependency: Phase 0-10 DONE | DoD: production sign-off ครบทุกมิติ | Deliverable: go-live checklist + acceptance evidence pack | Blocker: external accounts/approvals`
+
+ลำดับทำ (สำคัญสุดก่อน):
+- Critical path hardening -> real production topology -> security/compliance gate -> reliability/performance gate -> UAT + runbook drill -> controlled go-live + rollback drill -> final sign-off
+
+### 11A) Product and UX Completion (Customer/Partner/Admin)
+
+- [ ] `Status: TODO` Customer mobile production journey pass: login -> discovery -> availability -> quote -> checkout -> history -> dispute (real environment, no mock path)
+- [ ] `Status: TODO` Partner mobile production journey pass: login -> queue -> confirm -> start -> complete -> finance (state transition guard + clear failure recovery)
+- [ ] `Status: TODO` Admin web production journey pass: governance + economics + analytics + pricing controls with role audit evidence
+- [ ] `Status: TODO` Profile/Settings persistence: เชื่อม API จริงสำหรับ preference/account settings และ state sync ข้ามอุปกรณ์
+- [ ] `Status: TODO` Final UI acceptance for 3 persona: visual consistency + accessibility + empty/error/loading behavior checklist sign-off
+
+### 11B) API, Data, and Domain Correctness Gate
+
+- [ ] `Status: TODO` Freeze API contract v1.1 (customer/partner/admin/mobile) + backward compatibility matrix + changelog
+- [ ] `Status: TODO` Data integrity gate: booking/payment/wallet/reconciliation correctness on production-like dataset
+- [ ] `Status: TODO` Idempotency + concurrency gate: verify no duplicate booking/payment under retry/race conditions
+- [ ] `Status: TODO` Event and audit completeness gate: critical business actions traceable end-to-end by `request_id`
+- [ ] `Status: TODO` Migration safety gate: roll-forward/rollback tested with backup restore evidence
+
+### 11C) Security and Compliance Gate
+
+- [ ] `Status: TODO` Secrets hardening: rotate all staging/prod credentials, verify no hardcoded secrets in repo/history
+- [ ] `Status: TODO` SAST/Dependency/Container scan gate: critical/high findings = 0 before go-live tag
+- [ ] `Status: TODO` Auth hardening final pass: refresh token rotation, session invalidation, brute-force/abuse protection, RBAC negative tests
+- [ ] `Status: TODO` External endpoint security: CORS/CSP/headers/rate-limit/WAF baseline verified on public domains
+- [ ] `Status: TODO` Compliance pack refresh: Terms/Privacy/Cookie/Refund policy + retention/deletion workflow evidence
+
+### 11D) Reliability, Performance, and Observability Gate
+
+- [ ] `Status: TODO` SLO gate: latency/error-rate/availability ผ่านเกณฑ์ช่วง 7 วันต่อเนื่อง
+- [ ] `Status: TODO` Load/stress/soak test gate for critical APIs (booking, payment, queue transitions, admin analytics)
+- [ ] `Status: TODO` DR drill gate: backup restore + failover + rollback rehearsal with measured RPO/RTO
+- [ ] `Status: TODO` Alert quality gate: paging rules tuned, noise ลดลง, on-call runbook ครบสำหรับ sev1/sev2
+- [ ] `Status: TODO` Production dashboard gate: web/mobile/api/business KPI panels พร้อม executive summary
+
+### 11E) Deployment, Environments, and Runtime Operations
+
+- [ ] `Status: TODO` Production topology finalize: domain/TLS/tunnel/reverse-proxy routing (web/api/mobile endpoints) + zero-downtime restart policy
+- [ ] `Status: TODO` Release pipeline hardening: protected branch, required checks, manual approval gates, artifact signing/versioning
+- [ ] `Status: TODO` Self-hosted runner hardening: least privilege sudoers, runner isolation, auto-update, audit logging
+- [ ] `Status: TODO` Blue/green or canary rollout playbook: promote, verify, rollback within target time
+- [ ] `Status: TODO` Nightly smoke + weekly full e2e schedule with report retention and failure escalation
+
+### 11F) UAT, Go-Live, and Post-Go-Live Control
+
+- [ ] `Status: TODO` UAT รอบสุดท้าย 3 persona (customer/partner/admin) พร้อม defect triage และ closure log
+- [ ] `Status: TODO` Go-live readiness review (Product/Engineering/Ops/Security) with explicit go/no-go criteria
+- [ ] `Status: TODO` Controlled go-live execution + live verification checklist + rollback readiness confirmation
+- [ ] `Status: TODO` Hypercare 7 วัน: incident triage war-room cadence + KPI watch + daily postmortem snapshots
+- [ ] `Status: TODO` Production sign-off package: architecture/runtime/security/perf/UAT evidence + ownership handoff complete
+
+---
+
 ## Cross-Phase Governance (ทำต่อเนื่องทุก Phase)
 
 Default for Cross-Phase:
@@ -506,3 +565,4 @@ Default for Milestone:
 - [x] `Status: DONE` Phase 8 Signed (completed on 2026-02-16)
 - [x] `Status: DONE` Phase 9 Signed (completed on 2026-02-16)
 - [x] `Status: DONE` Phase 10 Signed (completed on 2026-02-16)
+- [ ] `Status: TODO` Phase 11 Signed (target 2026-03-07)
