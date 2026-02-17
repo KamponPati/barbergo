@@ -9,7 +9,6 @@ async function bootstrapWorker(): Promise<void> {
   });
 
   const shutdown = async (signal: string) => {
-    // eslint-disable-next-line no-console
     console.log(`[worker] received ${signal}, shutting down...`);
     await app.close();
     process.exit(0);
@@ -18,9 +17,7 @@ async function bootstrapWorker(): Promise<void> {
   process.on("SIGINT", () => void shutdown("SIGINT"));
   process.on("SIGTERM", () => void shutdown("SIGTERM"));
 
-  // eslint-disable-next-line no-console
   console.log("[worker] started");
 }
 
 void bootstrapWorker();
-
