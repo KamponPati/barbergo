@@ -1,10 +1,11 @@
 # BarberGo Project Task Board
 
 อัปเดตล่าสุด: 2026-02-17
-สถานะล่าสุด: Phase 0-10 Signed แล้ว, เปิด `Phase 11 - Production Closure Program` (เริ่ม 2026-02-17)
+สถานะล่าสุด: Phase 0-10 Signed แล้ว, `Phase 11 - Production Closure Program` กำลังปิด gate และเปิด `Phase 12 - UI Revamp (Customer + Partner)`
 
 ลำดับงานถัดไป (แนะนำ):
 - Phase 11: Production Closure Program (ปิดงาน production readiness + go-live sign-off)
+- Phase 12: Customer + Partner Experience Revamp ตาม Product Spec v1.0
 
 วิธีอัปเดตสถานะ:
 - ใช้ `Status: TODO | IN_PROGRESS | BLOCKED | DONE`
@@ -620,6 +621,49 @@ Default for Phase 12:
 - [ ] `Status: TODO` ทำ customer UX acceptance checklist เทียบ Product Spec v1.0 แบบหัวข้อ-ต่อ-หัวข้อ
 - [ ] `Status: TODO` เก็บ usability metrics หลัง revamp (task completion/time/error/drop-off) เทียบ baseline ก่อนปรับ
 - [ ] `Status: TODO` Sign-off revamp รอบลูกค้า (Product + Design + Engineering + Ops)
+
+### 12L) Partner Hub IA and Mode Switching
+
+- [ ] `Status: TODO` ออกแบบ IA ฝั่งพาร์ทเนอร์ใหม่: Dashboard, Services, Bookings, Wallet, Settings โดยรองรับทั้ง Shop Owner และ Freelance Barber
+- [ ] `Status: TODO` ทำ role-based navigation + theme switch เมื่อเข้า Partner Mode ให้เปลี่ยนทั้ง visual system และ bottom nav ในแอปเดียว
+- [ ] `Status: TODO` นิยาม state model ฝั่ง Partner (loading/empty/error/success + offline fallback + retry policy) ให้ครบทุกหน้าหลัก
+
+### 12M) Smart Dashboard and Incoming Jobs
+
+- [ ] `Status: TODO` ทำ Online/Offline status bar ขนาดใหญ่ (tap target >= 48px) พร้อมสถานะสีชัดเจน
+- [ ] `Status: TODO` ทำ Quick Look analytics: Today's Jobs, Net Earnings, Avg Rating และ trend indicator
+- [ ] `Status: TODO` ทำ growth chart รายสัปดาห์/รายเดือนแบบอ่านง่ายบน mobile
+- [ ] `Status: TODO` ทำ Incoming Delivery Job card: customer, distance, ETA, net earnings, accept timeout, accept/decline actions
+- [ ] `Status: TODO` เพิ่มเสียง/visual alert สำหรับ incoming request และ clear action feedback
+
+### 12N) Live Job Lifecycle and Queue Operations
+
+- [ ] `Status: TODO` ทำ lifecycle ปุ่มงาน Delivery: `Draft -> Confirmed -> On the way -> In Progress -> Completed` พร้อม guard transition และ error recovery
+- [ ] `Status: TODO` ทำ In-Shop queue management สำหรับพาร์ทเนอร์: incoming queue + confirm/start/complete + reason codes เมื่อทำไม่ได้
+- [ ] `Status: TODO` ทำ Active Job detail view (route/ETA/status timeline/customer memo) และ action safety checks
+- [ ] `Status: TODO` เพิ่ม GPS tracking hook ระหว่างสถานะ `On the way` (mock+real integration point ทุก 30 วินาที)
+
+### 12O) Service Catalog, Schedule, and Availability
+
+- [ ] `Status: TODO` ทำ Service CRUD ครบ (name, price, duration, mode, surcharge, availability toggle)
+- [ ] `Status: TODO` ทำ shift schedule grid รายสัปดาห์ + quick break 30 นาที + vacation mode
+- [ ] `Status: TODO` ทำ dynamic surcharge setup สำหรับ delivery distance / overtime
+- [ ] `Status: TODO` ทำ validation + guardrails ของ service pricing/duration เพื่อป้องกันค่าผิดพลาด
+
+### 12P) Partner Wallet, Payout, and Client Memo
+
+- [ ] `Status: TODO` ทำ Wallet UI: available balance, pending balance, payout request (instant/weekly)
+- [ ] `Status: TODO` ทำ transaction history พร้อม job id, fee/tax, net payout
+- [ ] `Status: TODO` ทำ customer history + style memo (เช่น ทรงที่ลูกค้าชอบ) สำหรับ re-service quality
+- [ ] `Status: TODO` ทำ KYC verification banner/state และ block flow ที่จำเป็นก่อนรับงานจริง
+
+### 12Q) Partner Technical and QA Gates
+
+- [ ] `Status: TODO` ผูก mock+API state สำหรับ `is_online_status`, `incoming_jobs`, `active_services`, `selected_profile`, `current_view` ให้ครบ
+- [ ] `Status: TODO` ทำ optional chaining safety pass และ defensive rendering ครบทุก Partner views
+- [ ] `Status: TODO` ทำ mobile-first responsive + accessibility pass (focus, contrast, reduced motion, one-hand usage)
+- [ ] `Status: TODO` เพิ่ม E2E tests: partner critical flows (online/offline, accept job, lifecycle complete, wallet payout request)
+- [ ] `Status: TODO` Sign-off revamp รอบพาร์ทเนอร์ (Product + Design + Engineering + Ops)
 
 ---
 
