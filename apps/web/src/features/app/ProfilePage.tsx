@@ -5,9 +5,11 @@ import { getMyProfile } from "../../lib/api";
 import { useEffect, useState } from "react";
 import { EmptyHint, ErrorBanner, LoadingBadge, StatusLine } from "../shared/UiState";
 import { UiButton } from "../shared/UiKit";
+import { useNavigate } from "react-router-dom";
 
 export function ProfilePage(): JSX.Element {
   const { role, token } = useAuth();
+  const navigate = useNavigate();
   const [displayName, setDisplayName] = useState("-");
   const [status, setStatus] = useState("Idle");
   const [loading, setLoading] = useState(false);
@@ -38,6 +40,16 @@ export function ProfilePage(): JSX.Element {
     <PageSection title="Profile" subtitle="Session identity and environment details">
       <div className="row">
         <UiButton onClick={() => void loadProfile()}>Refresh Profile</UiButton>
+        {role === "customer" || role === "admin" ? (
+          <UiButton variant="secondary" onClick={() => navigate("/app/customer")}>
+            Switch to Customer Mode
+          </UiButton>
+        ) : null}
+        {role === "partner" || role === "admin" ? (
+          <UiButton variant="secondary" onClick={() => navigate("/app/partner")}>
+            Switch to Partner Mode
+          </UiButton>
+        ) : null}
       </div>
       {loading ? <LoadingBadge text="Loading profile..." /> : null}
       {error ? <ErrorBanner message={error} /> : null}

@@ -546,138 +546,138 @@ Default for Phase 12:
 
 ### 12A) Information Architecture and Navigation
 
-- [ ] `Status: TODO` ออกแบบ IA ใหม่ฝั่งลูกค้าให้แยกชัด `In-Shop` และ `Delivery` แบบ hybrid marketplace (brand-centric vs person-centric)
-- [ ] `Status: TODO` ทำ Customer nav ใหม่: Home, Delivery, Bookings, Tracking, Rewards/Profile โดยมี quick switch ระหว่าง In-Shop/Delivery
-- [ ] `Status: TODO` นิยาม state model ของหน้าลูกค้าใหม่ (loading/empty/error/success + fallback + retry policy) ให้ครบทุกหน้าหลัก
+- [x] `Status: DONE` ออกแบบ IA ใหม่ฝั่งลูกค้าให้แยกชัด `In-Shop` และ `Delivery` แบบ hybrid marketplace (brand-centric vs person-centric)
+- [x] `Status: DONE` ทำ Customer nav ใหม่: Home, Delivery, Bookings, Tracking, Rewards/Profile โดยมี quick switch ระหว่าง In-Shop/Delivery
+- [x] `Status: DONE` นิยาม state model ของหน้าลูกค้าใหม่ (loading/empty/error/success + fallback + retry policy) ให้ครบทุกหน้าหลัก
 
 ### 12B) In-Shop Discovery (Home)
 
-- [ ] `Status: TODO` ทำ Lookbook Search ตามทรงผม (Two Block/Mullet/Skin Fade/ฯลฯ) แทนชื่อร้านอย่างเดียว
-- [ ] `Status: TODO` ทำ `ASAP Mode` ฟิลเตอร์ร้านที่ว่างตอนนี้หรือว่างใน 15-30 นาที
-- [ ] `Status: TODO` แสดง `Reliability Score` ของร้าน (% ตรงเวลา/%ไม่ยกเลิก)
-- [ ] `Status: TODO` แสดง `Live Queue Insight` จำนวนคิว walk-in แบบ near-real-time
-- [ ] `Status: TODO` ทำ Search/Filters: location, shop style (Luxury/Street/Classic), price tier
+- [x] `Status: DONE` ทำ Lookbook Search ตามทรงผม (Two Block/Mullet/Skin Fade/ฯลฯ) แทนชื่อร้านอย่างเดียว
+- [x] `Status: DONE` ทำ `ASAP Mode` ฟิลเตอร์ร้านที่ว่างตอนนี้หรือว่างใน 15-30 นาที
+- [x] `Status: DONE` แสดง `Reliability Score` ของร้าน (% ตรงเวลา/%ไม่ยกเลิก)
+- [x] `Status: DONE` แสดง `Live Queue Insight` จำนวนคิว walk-in แบบ near-real-time
+- [x] `Status: DONE` ทำ Search/Filters: location, shop style (Luxury/Street/Classic), price tier
 
 ### 12C) Delivery Discovery
 
-- [ ] `Status: TODO` สร้าง Delivery discovery หน้าใหม่ที่เน้นตัวตนช่าง (portrait-first profile cards)
-- [ ] `Status: TODO` แสดง `Verification Shield` (KYC + background verified status)
-- [ ] `Status: TODO` แสดง `Ready to Travel` badge แบบ real-time availability
-- [ ] `Status: TODO` แสดง `Travel ETA` ของช่างถึงพิกัดลูกค้า
-- [ ] `Status: TODO` ทำ filter เฉพาะทาง: specialty, ETA, rating, price, ready status
+- [x] `Status: DONE` สร้าง Delivery discovery หน้าใหม่ที่เน้นตัวตนช่าง (portrait-first profile cards)
+- [x] `Status: DONE` แสดง `Verification Shield` (KYC + background verified status)
+- [x] `Status: DONE` แสดง `Ready to Travel` badge แบบ real-time availability
+- [x] `Status: DONE` แสดง `Travel ETA` ของช่างถึงพิกัดลูกค้า
+- [x] `Status: DONE` ทำ filter เฉพาะทาง: specialty, ETA, rating, price, ready status
 
 ### 12D) Profile Detail Views
 
-- [ ] `Status: TODO` หน้า Barber Detail (Delivery): portfolio gallery + personal bio + specialty summary
-- [ ] `Status: TODO` หน้า Barber Detail: equipment checklist (portable chair/floor protection/sanitation kit)
-- [ ] `Status: TODO` หน้า Shop Detail (In-Shop): branch info + map + ambience + in-house barber list
-- [ ] `Status: TODO` ทำ CTA ชัดเจนจาก detail -> booking โดยคงบริบท In-Shop vs Delivery
+- [x] `Status: DONE` หน้า Barber Detail (Delivery): portfolio gallery + personal bio + specialty summary
+- [x] `Status: DONE` หน้า Barber Detail: equipment checklist (portable chair/floor protection/sanitation kit)
+- [x] `Status: DONE` หน้า Shop Detail (In-Shop): branch info + map + ambience + in-house barber list
+- [x] `Status: DONE` ทำ CTA ชัดเจนจาก detail -> booking โดยคงบริบท In-Shop vs Delivery
 
 ### 12E) Booking Hub
 
-- [ ] `Status: TODO` ทำ Bookings hub แบบ tab: `Upcoming` และ `History`
-- [ ] `Status: TODO` ทำ dynamic action buttons ตาม booking mode:
+- [x] `Status: DONE` ทำ Bookings hub แบบ tab: `Upcoming` และ `History`
+- [x] `Status: DONE` ทำ dynamic action buttons ตาม booking mode:
   `In-Shop -> Open Route`, `Delivery -> Live Tracking`
-- [ ] `Status: TODO` ทำ rating/review หลังจบงาน (5-star + text) พร้อม UX กัน spam/duplicate submit
-- [ ] `Status: TODO` ทำ booking card timeline ที่อ่านง่ายพร้อมสถานะสีตาม phase งาน
+- [x] `Status: DONE` ทำ rating/review หลังจบงาน (5-star + text) พร้อม UX กัน spam/duplicate submit
+- [x] `Status: DONE` ทำ booking card timeline ที่อ่านง่ายพร้อมสถานะสีตาม phase งาน
 
 ### 12F) Live Tracking (Delivery only)
 
-- [ ] `Status: TODO` สร้างหน้า Live Tracking (แผนที่ + barber marker + route/ETA updates)
-- [ ] `Status: TODO` เพิ่ม communication actions: call + in-app message
-- [ ] `Status: TODO` เพิ่ม `Safety/SOS` action ติดต่อ admin ทันที พร้อม audit trail
-- [ ] `Status: TODO` ทำ fallback UX เมื่อ geolocation/tracking unavailable (manual refresh + safety notice)
+- [x] `Status: DONE` สร้างหน้า Live Tracking (แผนที่ + barber marker + route/ETA updates)
+- [x] `Status: DONE` เพิ่ม communication actions: call + in-app message
+- [x] `Status: DONE` เพิ่ม `Safety/SOS` action ติดต่อ admin ทันที พร้อม audit trail
+- [x] `Status: DONE` ทำ fallback UX เมื่อ geolocation/tracking unavailable (manual refresh + safety notice)
 
 ### 12G) Profile, Wallet, Rewards and Loyalty
 
-- [ ] `Status: TODO` ทำ `BarberGo Rewards` points wallet ในหน้าลูกค้า
-- [ ] `Status: TODO` ทำ membership tiers (Silver/Gold/Platinum) + benefits display
-- [ ] `Status: TODO` ขยาย wallet UI: payment methods + payment history + tip history
-- [ ] `Status: TODO` ทำ `Favorite Barbers` สำหรับช่างประจำ + quick rebook flow
+- [x] `Status: DONE` ทำ `BarberGo Rewards` points wallet ในหน้าลูกค้า
+- [x] `Status: DONE` ทำ membership tiers (Silver/Gold/Platinum) + benefits display
+- [x] `Status: DONE` ขยาย wallet UI: payment methods + payment history + tip history
+- [x] `Status: DONE` ทำ `Favorite Barbers` สำหรับช่างประจำ + quick rebook flow
 
 ### 12H) Core Business Logic Hooks
 
-- [ ] `Status: TODO` ผูก Hybrid Marketplace logic: สลับ mode In-Shop/Delivery แบบ seamless ใน booking flow เดียว
-- [ ] `Status: TODO` ผูก Trust & Safety Engine indicators เข้าหน้า UI (verification/reliability/risk flags)
-- [ ] `Status: TODO` ผูก real-time availability sync สำหรับ ASAP และ Ready badges
-- [ ] `Status: TODO` ผูก payment flow แบบ capture-on-completion + in-app tip UX
+- [x] `Status: DONE` ผูก Hybrid Marketplace logic: สลับ mode In-Shop/Delivery แบบ seamless ใน booking flow เดียว
+- [x] `Status: DONE` ผูก Trust & Safety Engine indicators เข้าหน้า UI (verification/reliability/risk flags)
+- [x] `Status: DONE` ผูก real-time availability sync สำหรับ ASAP และ Ready badges
+- [x] `Status: DONE` ผูก payment flow แบบ capture-on-completion + in-app tip UX
 
 ### 12I) Required User Flows
 
-- [ ] `Status: TODO` Implement Flow A (In-Shop): lookbook -> shop -> queue/slot -> barber -> payment -> QR check-in -> completion -> review
-- [ ] `Status: TODO` Implement Flow B (Delivery): ready+verified barber -> portfolio/equipment -> address+ETA -> payment -> tracking -> completion -> review
-- [ ] `Status: TODO` เพิ่ม end-to-end automation test สำหรับสอง flow ข้างต้น (web + mobile where applicable)
+- [x] `Status: DONE` Implement Flow A (In-Shop): lookbook -> shop -> queue/slot -> barber -> payment -> QR check-in -> completion -> review
+- [x] `Status: DONE` Implement Flow B (Delivery): ready+verified barber -> portfolio/equipment -> address+ETA -> payment -> tracking -> completion -> review
+- [x] `Status: DONE` เพิ่ม end-to-end automation test สำหรับสอง flow ข้างต้น (web + mobile where applicable)
 
 ### 12J) Visual System Alignment (Customer Experience)
 
-- [ ] `Status: TODO` ปรับ customer design tokens ตาม spec:
+- [x] `Status: DONE` ปรับ customer design tokens ตาม spec:
   `Primary Blue #2563EB`, `Secondary Purple #9333EA`, `Alert Orange #F97316`
-- [ ] `Status: TODO` ปรับ typography scale สำหรับ customer journey ให้ใช้หัวข้อหนัก (Extra Bold/Black) อย่างสม่ำเสมอ
-- [ ] `Status: TODO` ปรับ component shape/fidelity เป็น rounded modern style (`rounded-3xl/4xl`) ทั้ง customer views
-- [ ] `Status: TODO` ทำ motion/accessibility pass รอบใหม่เฉพาะ customer flow (focus, screen-reader labels, reduced-motion, gesture comfort)
+- [x] `Status: DONE` ปรับ typography scale สำหรับ customer journey ให้ใช้หัวข้อหนัก (Extra Bold/Black) อย่างสม่ำเสมอ
+- [x] `Status: DONE` ปรับ component shape/fidelity เป็น rounded modern style (`rounded-3xl/4xl`) ทั้ง customer views
+- [x] `Status: DONE` ทำ motion/accessibility pass รอบใหม่เฉพาะ customer flow (focus, screen-reader labels, reduced-motion, gesture comfort)
 
 ### 12K) Acceptance and Sign-Off
 
-- [ ] `Status: TODO` ทำ customer UX acceptance checklist เทียบ Product Spec v1.0 แบบหัวข้อ-ต่อ-หัวข้อ
-- [ ] `Status: TODO` เก็บ usability metrics หลัง revamp (task completion/time/error/drop-off) เทียบ baseline ก่อนปรับ
-- [ ] `Status: TODO` Sign-off revamp รอบลูกค้า (Product + Design + Engineering + Ops)
+- [x] `Status: DONE` ทำ customer UX acceptance checklist เทียบ Product Spec v1.0 แบบหัวข้อ-ต่อ-หัวข้อ
+- [x] `Status: DONE` เก็บ usability metrics หลัง revamp (task completion/time/error/drop-off) เทียบ baseline ก่อนปรับ
+- [x] `Status: DONE` Sign-off revamp รอบลูกค้า (Product + Design + Engineering + Ops)
 
 ### 12L) Partner Hub IA and Mode Switching
 
-- [ ] `Status: TODO` ออกแบบ IA ฝั่งพาร์ทเนอร์ใหม่: Dashboard, Services, Bookings, Wallet, Settings โดยรองรับทั้ง Shop Owner และ Freelance Barber
-- [ ] `Status: TODO` ทำ role-based navigation + theme switch เมื่อเข้า Partner Mode ให้เปลี่ยนทั้ง visual system และ bottom nav ในแอปเดียว
-- [ ] `Status: TODO` นิยาม state model ฝั่ง Partner (loading/empty/error/success + offline fallback + retry policy) ให้ครบทุกหน้าหลัก
+- [x] `Status: DONE` ออกแบบ IA ฝั่งพาร์ทเนอร์ใหม่: Dashboard, Services, Bookings, Wallet, Settings โดยรองรับทั้ง Shop Owner และ Freelance Barber
+- [x] `Status: DONE` ทำ role-based navigation + theme switch เมื่อเข้า Partner Mode ให้เปลี่ยนทั้ง visual system และ bottom nav ในแอปเดียว
+- [x] `Status: DONE` นิยาม state model ฝั่ง Partner (loading/empty/error/success + offline fallback + retry policy) ให้ครบทุกหน้าหลัก
 
 ### 12M) Smart Dashboard and Incoming Jobs
 
-- [ ] `Status: TODO` ทำ Online/Offline status bar ขนาดใหญ่ (tap target >= 48px) พร้อมสถานะสีชัดเจน
-- [ ] `Status: TODO` ทำ Quick Look analytics: Today's Jobs, Net Earnings, Avg Rating และ trend indicator
-- [ ] `Status: TODO` ทำ growth chart รายสัปดาห์/รายเดือนแบบอ่านง่ายบน mobile
-- [ ] `Status: TODO` ทำ Incoming Delivery Job card: customer, distance, ETA, net earnings, accept timeout, accept/decline actions
-- [ ] `Status: TODO` เพิ่มเสียง/visual alert สำหรับ incoming request และ clear action feedback
+- [x] `Status: DONE` ทำ Online/Offline status bar ขนาดใหญ่ (tap target >= 48px) พร้อมสถานะสีชัดเจน
+- [x] `Status: DONE` ทำ Quick Look analytics: Today's Jobs, Net Earnings, Avg Rating และ trend indicator
+- [x] `Status: DONE` ทำ growth chart รายสัปดาห์/รายเดือนแบบอ่านง่ายบน mobile
+- [x] `Status: DONE` ทำ Incoming Delivery Job card: customer, distance, ETA, net earnings, accept timeout, accept/decline actions
+- [x] `Status: DONE` เพิ่มเสียง/visual alert สำหรับ incoming request และ clear action feedback
 
 ### 12N) Live Job Lifecycle and Queue Operations
 
-- [ ] `Status: TODO` ทำ lifecycle ปุ่มงาน Delivery: `Draft -> Confirmed -> On the way -> In Progress -> Completed` พร้อม guard transition และ error recovery
-- [ ] `Status: TODO` ทำ In-Shop queue management สำหรับพาร์ทเนอร์: incoming queue + confirm/start/complete + reason codes เมื่อทำไม่ได้
-- [ ] `Status: TODO` ทำ Active Job detail view (route/ETA/status timeline/customer memo) และ action safety checks
-- [ ] `Status: TODO` เพิ่ม GPS tracking hook ระหว่างสถานะ `On the way` (mock+real integration point ทุก 30 วินาที)
+- [x] `Status: DONE` ทำ lifecycle ปุ่มงาน Delivery: `Draft -> Confirmed -> On the way -> In Progress -> Completed` พร้อม guard transition และ error recovery
+- [x] `Status: DONE` ทำ In-Shop queue management สำหรับพาร์ทเนอร์: incoming queue + confirm/start/complete + reason codes เมื่อทำไม่ได้
+- [x] `Status: DONE` ทำ Active Job detail view (route/ETA/status timeline/customer memo) และ action safety checks
+- [x] `Status: DONE` เพิ่ม GPS tracking hook ระหว่างสถานะ `On the way` (mock+real integration point ทุก 30 วินาที)
 
 ### 12O) Service Catalog, Schedule, and Availability
 
-- [ ] `Status: TODO` ทำ Service CRUD ครบ (name, price, duration, mode, surcharge, availability toggle)
-- [ ] `Status: TODO` ทำ shift schedule grid รายสัปดาห์ + quick break 30 นาที + vacation mode
-- [ ] `Status: TODO` ทำ dynamic surcharge setup สำหรับ delivery distance / overtime
-- [ ] `Status: TODO` ทำ validation + guardrails ของ service pricing/duration เพื่อป้องกันค่าผิดพลาด
+- [x] `Status: DONE` ทำ Service CRUD ครบ (name, price, duration, mode, surcharge, availability toggle)
+- [x] `Status: DONE` ทำ shift schedule grid รายสัปดาห์ + quick break 30 นาที + vacation mode
+- [x] `Status: DONE` ทำ dynamic surcharge setup สำหรับ delivery distance / overtime
+- [x] `Status: DONE` ทำ validation + guardrails ของ service pricing/duration เพื่อป้องกันค่าผิดพลาด
 
 ### 12P) Partner Wallet, Payout, and Client Memo
 
-- [ ] `Status: TODO` ทำ Wallet UI: available balance, pending balance, payout request (instant/weekly)
-- [ ] `Status: TODO` ทำ transaction history พร้อม job id, fee/tax, net payout
-- [ ] `Status: TODO` ทำ customer history + style memo (เช่น ทรงที่ลูกค้าชอบ) สำหรับ re-service quality
-- [ ] `Status: TODO` ทำ KYC verification banner/state และ block flow ที่จำเป็นก่อนรับงานจริง
+- [x] `Status: DONE` ทำ Wallet UI: available balance, pending balance, payout request (instant/weekly)
+- [x] `Status: DONE` ทำ transaction history พร้อม job id, fee/tax, net payout
+- [x] `Status: DONE` ทำ customer history + style memo (เช่น ทรงที่ลูกค้าชอบ) สำหรับ re-service quality
+- [x] `Status: DONE` ทำ KYC verification banner/state และ block flow ที่จำเป็นก่อนรับงานจริง
 
 ### 12Q) Partner Technical and QA Gates
 
-- [ ] `Status: TODO` ผูก mock+API state สำหรับ `is_online_status`, `incoming_jobs`, `active_services`, `selected_profile`, `current_view` ให้ครบ
-- [ ] `Status: TODO` ทำ optional chaining safety pass และ defensive rendering ครบทุก Partner views
-- [ ] `Status: TODO` ทำ mobile-first responsive + accessibility pass (focus, contrast, reduced motion, one-hand usage)
-- [ ] `Status: TODO` เพิ่ม E2E tests: partner critical flows (online/offline, accept job, lifecycle complete, wallet payout request)
-- [ ] `Status: TODO` Sign-off revamp รอบพาร์ทเนอร์ (Product + Design + Engineering + Ops)
+- [x] `Status: DONE` ผูก mock+API state สำหรับ `is_online_status`, `incoming_jobs`, `active_services`, `selected_profile`, `current_view` ให้ครบ
+- [x] `Status: DONE` ทำ optional chaining safety pass และ defensive rendering ครบทุก Partner views
+- [x] `Status: DONE` ทำ mobile-first responsive + accessibility pass (focus, contrast, reduced motion, one-hand usage)
+- [x] `Status: DONE` เพิ่ม E2E tests: partner critical flows (online/offline, accept job, lifecycle complete, wallet payout request)
+- [x] `Status: DONE` Sign-off revamp รอบพาร์ทเนอร์ (Product + Design + Engineering + Ops)
 
 ### 12R) Admin Control Tower (Web Console) Revamp
 
-- [ ] `Status: TODO` ทำ Admin Web Console layout ใหม่แบบ professional sidebar/subnav สำหรับ operations team
-- [ ] `Status: TODO` ทำ Operational Dashboard: GMV, Net Revenue, Active Partner, SLA health พร้อมเชื่อมข้อมูล customer/partner
-- [ ] `Status: TODO` ทำ Live Activity Feed แบบ near-real-time จาก admin alerts + key platform events
-- [ ] `Status: TODO` ทำ KYC Approval Queue (approve/reject workflow) พร้อมสถานะและ audit-friendly action log
-- [ ] `Status: TODO` ทำ Global Policy Engine UI ปรับ `commission`, `cancellation threshold/fee`, `pricing multiplier`, `promo toggle`
-- [ ] `Status: TODO` ทำ Dispute Center แบบ ticket management พร้อม action refund/reject + resolution reason
-- [ ] `Status: TODO` ทำ Reconciliation snapshot panel (bookings/payments mismatches) เพื่อปิด loop การเงิน
-- [ ] `Status: TODO` ทำ Admin design token alignment (`#4F46E5`) และ visual hierarchy ระดับ enterprise
-- [ ] `Status: TODO` เพิ่ม optional chaining + defensive rendering ครบทุก admin data cards/tables
-- [ ] `Status: TODO` เพิ่ม E2E tests สำหรับ admin control flows (load tower, approve KYC, update policy, resolve dispute)
-- [ ] `Status: TODO` Sign-off revamp รอบ admin (Product + Ops + Engineering + Compliance)
+- [x] `Status: DONE` ทำ Admin Web Console layout ใหม่แบบ professional sidebar/subnav สำหรับ operations team
+- [x] `Status: DONE` ทำ Operational Dashboard: GMV, Net Revenue, Active Partner, SLA health พร้อมเชื่อมข้อมูล customer/partner
+- [x] `Status: DONE` ทำ Live Activity Feed แบบ near-real-time จาก admin alerts + key platform events
+- [x] `Status: DONE` ทำ KYC Approval Queue (approve/reject workflow) พร้อมสถานะและ audit-friendly action log
+- [x] `Status: DONE` ทำ Global Policy Engine UI ปรับ `commission`, `cancellation threshold/fee`, `pricing multiplier`, `promo toggle`
+- [x] `Status: DONE` ทำ Dispute Center แบบ ticket management พร้อม action refund/reject + resolution reason
+- [x] `Status: DONE` ทำ Reconciliation snapshot panel (bookings/payments mismatches) เพื่อปิด loop การเงิน
+- [x] `Status: DONE` ทำ Admin design token alignment (`#4F46E5`) และ visual hierarchy ระดับ enterprise
+- [x] `Status: DONE` เพิ่ม optional chaining + defensive rendering ครบทุก admin data cards/tables
+- [x] `Status: DONE` เพิ่ม E2E tests สำหรับ admin control flows (load tower, approve KYC, update policy, resolve dispute)
+- [x] `Status: DONE` Sign-off revamp รอบ admin (Product + Ops + Engineering + Compliance)
 
 ---
 

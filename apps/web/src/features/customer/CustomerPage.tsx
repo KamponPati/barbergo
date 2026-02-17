@@ -1,398 +1,616 @@
 import { useEffect, useMemo, useState } from "react";
+import {
+  AlarmClockCheck,
+  BadgeCheck,
+  CarTaxiFront,
+  Crown,
+  Heart,
+  MapPinned,
+  PhoneCall,
+  ShieldAlert,
+  Star,
+  Wallet
+} from "lucide-react";
 import { checkoutBooking, getAvailability, getCustomerHistory, getNearbyShops, quoteBooking } from "../../lib/api";
 import type { Booking, Shop } from "../../lib/types";
 import { useAuth } from "../auth/AuthContext";
 import { DataTable } from "../shared/DataTable";
-import { Field, Input, Select } from "../shared/FormControls";
-import { JsonView } from "../shared/JsonView";
-import { PageSection } from "../shared/PageSection";
-import { SkeletonRows } from "../shared/Skeleton";
-import { Tabs } from "../shared/Tabs";
-import { Toast } from "../shared/Toast";
 import { EmptyHint, ErrorBanner, LoadingBadge, StatusLine } from "../shared/UiState";
-import { StatCard, UiBadge, UiButton, UiModal } from "../shared/UiKit";
+import { PageSection } from "../shared/PageSection";
+import { UiBadge, UiButton } from "../shared/UiKit";
 import { useI18n } from "../i18n/I18nContext";
 
-type CustomerTab = "actions" | "history" | "debug";
+type CustomerView = "home" | "delivery" | "bookings" | "tracking" | "rewards";
+
+type LookbookStyle = {
+  id: string;
+  name: string;
+  image: string;
+};
+
+type DeliveryBarber = {
+  id: string;
+  name: string;
+  specialty: string;
+  years: number;
+  rating: number;
+  eta_min: number;
+  ready: boolean;
+  verified: boolean;
+  bio: string;
+  equipment: string[];
+  portrait: string;
+  portfolio: string[];
+};
+
+type TrackingState = "on_the_way" | "arrived" | "in_progress" | "completed";
+
+type TrackingModel = {
+  booking_id: string;
+  barber_name: string;
+  progress_pct: number;
+  eta_min: number;
+  state: TrackingState;
+};
+
+const LOOKBOOK: LookbookStyle[] = [
+  { id: "style_1", name: "Skin Fade", image: "https://images.unsplash.com/photo-1621605815971-fbc98d665033?w=720&auto=format&fit=crop" },
+  { id: "style_2", name: "Two Block", image: "https://images.unsplash.com/photo-1605497788044-5a32c7078486?w=720&auto=format&fit=crop" },
+  { id: "style_3", name: "Mullet", image: "https://images.unsplash.com/photo-1519699047748-de8e457a634e?w=720&auto=format&fit=crop" },
+  { id: "style_4", name: "Classic Pomade", image: "https://images.unsplash.com/photo-1562004760-aceed7bb0fe3?w=720&auto=format&fit=crop" }
+];
+
+const DELIVERY_BARBERS: DeliveryBarber[] = [
+  {
+    id: "barber_1",
+    name: "Akkarin P.",
+    specialty: "Fade + Texture",
+    years: 7,
+    rating: 4.9,
+    eta_min: 18,
+    ready: true,
+    verified: true,
+    bio: "Freelance barber focused on clean fades and premium home-service setup.",
+    equipment: ["Portable Chair", "Floor Cover", "Sanitation Kit", "Mirror Light"],
+    portrait: "https://images.unsplash.com/photo-1582896911227-c966f6e7fb96?w=720&auto=format&fit=crop",
+    portfolio: [
+      "https://images.unsplash.com/photo-1622286342621-4bd786c2447c?w=720&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1621605815971-fbc98d665033?w=720&auto=format&fit=crop"
+    ]
+  },
+  {
+    id: "barber_2",
+    name: "Mek S.",
+    specialty: "Color + Beard Styling",
+    years: 5,
+    rating: 4.7,
+    eta_min: 24,
+    ready: false,
+    verified: true,
+    bio: "Travel barber with strong portfolio in beard design and modern color touch-up.",
+    equipment: ["Cape", "Sterile Tools", "Cordless Clipper", "Portable Vacuum"],
+    portrait: "https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=720&auto=format&fit=crop",
+    portfolio: [
+      "https://images.unsplash.com/photo-1593702288056-f8fd9f65253d?w=720&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1519699047748-de8e457a634e?w=720&auto=format&fit=crop"
+    ]
+  }
+];
+
+function shopReliability(shopId: string): number {
+  if (shopId === "shop_1") return 96;
+  if (shopId === "shop_2") return 92;
+  return 89;
+}
+
+function shopLiveWait(shopId: string): number {
+  if (shopId === "shop_1") return 12;
+  if (shopId === "shop_2") return 28;
+  return 18;
+}
+
+function nextState(state: TrackingState): TrackingState {
+  if (state === "on_the_way") return "arrived";
+  if (state === "arrived") return "in_progress";
+  if (state === "in_progress") return "completed";
+  return "completed";
+}
 
 export function CustomerPage(): JSX.Element {
   const { token } = useAuth();
   const { formatCurrency, formatDateTime, label } = useI18n();
+
+  const [currentView, setCurrentView] = useState<CustomerView>("home");
+  const [selectedStyle, setSelectedStyle] = useState<string>("style_1");
+  const [asapOnly, setAsapOnly] = useState(false);
   const [shops, setShops] = useState<Shop[]>([]);
   const [selectedShopId, setSelectedShopId] = useState("");
   const [selectedBranchId, setSelectedBranchId] = useState("");
   const [selectedServiceId, setSelectedServiceId] = useState("");
-  const [selectedSlot, setSelectedSlot] = useState("");
   const [slots, setSlots] = useState<string[]>([]);
-  const [quote, setQuote] = useState<Record<string, unknown> | null>(null);
+  const [selectedSlot, setSelectedSlot] = useState("");
+  const [quote, setQuote] = useState<{ subtotal?: number; discount?: number; total?: number } | null>(null);
   const [history, setHistory] = useState<Booking[]>([]);
-  const [searchText, setSearchText] = useState("");
+  const [selectedBarberId, setSelectedBarberId] = useState(DELIVERY_BARBERS[0]?.id ?? "");
+  const [tracking, setTracking] = useState<TrackingModel>({
+    booking_id: "trk_mock_1",
+    barber_name: "Akkarin P.",
+    progress_pct: 8,
+    eta_min: 18,
+    state: "on_the_way"
+  });
   const [status, setStatus] = useState("Idle");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [toast, setToast] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<CustomerTab>("actions");
-  const [checkoutModalOpen, setCheckoutModalOpen] = useState(false);
 
   const selectedShop = shops.find((shop) => shop.id === selectedShopId) ?? null;
-  const selectedService = selectedShop?.services.find((service) => service.id === selectedServiceId) ?? null;
-  const quoteTotal = quote?.total ? formatCurrency(Number(quote.total)) : "-";
+  const selectedService = selectedShop?.services?.find((service) => service.id === selectedServiceId) ?? null;
+  const selectedBarber = DELIVERY_BARBERS.find((barber) => barber.id === selectedBarberId) ?? null;
+  const quoteTotal = quote?.total ? formatCurrency(quote.total) : "-";
+  const points = history.length * 20 + 140;
+  const tier = points >= 500 ? "Gold" : "Silver";
 
-  const filteredShops = useMemo(() => {
-    if (!searchText.trim()) return shops;
-    const q = searchText.trim().toLowerCase();
-    return shops.filter((shop) => shop.name.toLowerCase().includes(q));
-  }, [searchText, shops]);
+  const discoveryShops = useMemo(() => {
+    const source = shops.map((shop) => ({ ...shop, reliability: shopReliability(shop.id), wait_min: shopLiveWait(shop.id) }));
+    if (!asapOnly) return source;
+    return source.filter((shop) => shop.wait_min <= 15);
+  }, [asapOnly, shops]);
+
+  const upcomingRows = useMemo(
+    () =>
+      history
+        .filter((booking) => booking.status !== "completed" && booking.status !== "cancelled")
+        .map((booking) => ({
+          id: booking.id,
+          status: booking.status,
+          slot: formatDateTime(booking.slot_at),
+          action: "Open Route / Track Barber"
+        })),
+    [formatDateTime, history]
+  );
 
   const historyRows = useMemo(
     () =>
-      history.map((booking) => ({
-        id: booking.id,
-        status: booking.status,
-        slot: booking.slot_at ? formatDateTime(booking.slot_at) : "-",
-        amount: formatCurrency(booking.amount)
-      })),
+      history
+        .filter((booking) => booking.status === "completed" || booking.status === "cancelled")
+        .map((booking) => ({
+          id: booking.id,
+          status: booking.status,
+          slot: formatDateTime(booking.slot_at),
+          amount: formatCurrency(booking.amount)
+        })),
     [formatCurrency, formatDateTime, history]
   );
 
   useEffect(() => {
-    if (!toast) return;
-    const timeout = window.setTimeout(() => setToast(null), 2200);
-    return () => window.clearTimeout(timeout);
-  }, [toast]);
+    if (currentView !== "tracking" || tracking.state === "completed") return;
+    const timer = window.setInterval(() => {
+      setTracking((prev) => {
+        const nextProgress = Math.min(100, prev.progress_pct + 8);
+        const nextEta = Math.max(0, prev.eta_min - 2);
+        const shouldAdvance = nextProgress >= 35 && prev.state === "on_the_way";
+        const shouldProgress = nextProgress >= 70 && prev.state === "arrived";
+        const shouldComplete = nextProgress >= 96 && prev.state === "in_progress";
+        const nextTrackingState = shouldAdvance || shouldProgress || shouldComplete ? nextState(prev.state) : prev.state;
+        return {
+          ...prev,
+          progress_pct: nextProgress,
+          eta_min: nextEta,
+          state: nextTrackingState
+        };
+      });
+    }, 1600);
+    return () => window.clearInterval(timer);
+  }, [currentView, tracking.state]);
 
-  function syncShopDefaults(nextShop: Shop | null): void {
-    setSelectedServiceId(nextShop?.services[0]?.id ?? "");
+  useEffect(() => {
+    void loadShops();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  async function runAction(fn: () => Promise<void>, pending: string, fail: string): Promise<void> {
+    setLoading(true);
+    setError(null);
+    setStatus(pending);
+    try {
+      await fn();
+    } catch (e) {
+      const message = e instanceof Error ? e.message : "unknown error";
+      setError(message);
+      setStatus(`${fail}: ${message}`);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  function syncShopDefault(nextShop: Shop | null): void {
+    setSelectedShopId(nextShop?.id ?? "");
+    setSelectedServiceId(nextShop?.services?.[0]?.id ?? "");
     setSelectedBranchId(nextShop?.branches?.[0]?.id ?? nextShop?.branch_ids?.[0] ?? "branch_1");
   }
 
   async function loadShops(): Promise<void> {
-    setLoading(true);
-    setError(null);
-    try {
-      const data = await getNearbyShops();
-      setShops(data.data);
-      const first = data.data[0] ?? null;
-      setSelectedShopId(first?.id ?? "");
-      syncShopDefaults(first);
-      setStatus(`Loaded ${data.data.length} shops`);
-      setToast("Shops loaded");
-    } catch (e) {
-      const message = e instanceof Error ? e.message : "unknown error";
-      setError(message);
-      setStatus("Load shops failed");
-    } finally {
-      setLoading(false);
-    }
+    await runAction(
+      async () => {
+        const data = await getNearbyShops();
+        setShops(data.data);
+        syncShopDefault(data.data[0] ?? null);
+        setStatus(`Loaded ${data.data.length} shops`);
+      },
+      "Loading discovery shops...",
+      "Load shops failed"
+    );
   }
 
   async function loadAvailability(): Promise<void> {
     if (!selectedShopId || !selectedServiceId) return;
-    setLoading(true);
-    setError(null);
-    try {
-      const data = await getAvailability(selectedShopId, selectedServiceId, selectedBranchId || "branch_1");
-      setSlots(data.slots);
-      setSelectedSlot(data.slots[0] ?? "");
-      setStatus(`Loaded ${data.slots.length} slots`);
-      setToast("Availability loaded");
-    } catch (e) {
-      const message = e instanceof Error ? e.message : "unknown error";
-      setError(message);
-      setStatus("Load availability failed");
-    } finally {
-      setLoading(false);
-    }
+    await runAction(
+      async () => {
+        const data = await getAvailability(selectedShopId, selectedServiceId, selectedBranchId || "branch_1");
+        setSlots(data.slots);
+        setSelectedSlot(data.slots[0] ?? "");
+        setStatus(`Loaded ${data.slots.length} slots`);
+      },
+      "Loading availability...",
+      "Load availability failed"
+    );
   }
 
-  async function loadQuote(): Promise<void> {
+  async function quoteAndCheckout(): Promise<void> {
     if (!selectedShopId || !selectedServiceId) return;
-    setLoading(true);
-    setError(null);
-    try {
-      const data = await quoteBooking(token, selectedShopId, selectedServiceId);
-      setQuote(data);
-      setStatus("Quote calculated");
-      setToast("Quote ready");
-    } catch (e) {
-      const message = e instanceof Error ? e.message : "unknown error";
-      setError(message);
-      setStatus("Quote failed");
-    } finally {
-      setLoading(false);
-    }
-  }
+    await runAction(
+      async () => {
+        const quoteRes = await quoteBooking(token, selectedShopId, selectedServiceId);
+        setQuote(quoteRes);
 
-  async function checkout(): Promise<void> {
-    if (!selectedShopId || !selectedServiceId) return;
-    setLoading(true);
-    setError(null);
-    try {
-      const slotAt = selectedSlot || slots[0] || "2026-02-20T10:00:00.000Z";
-      const data = await checkoutBooking({ token, shopId: selectedShopId, serviceId: selectedServiceId, slot: slotAt });
-      setStatus(`Booked ${data.booking.id}`);
-      setToast("Checkout completed");
-      await loadHistory();
-    } catch (e) {
-      const message = e instanceof Error ? e.message : "unknown error";
-      setError(message);
-      setStatus("Checkout failed");
-    } finally {
-      setLoading(false);
-    }
+        const slotAt = selectedSlot || slots[0];
+        if (!slotAt) {
+          setStatus("No slot available right now. Please retry.");
+          return;
+        }
+
+        const checkoutRes = await checkoutBooking({
+          token,
+          shopId: selectedShopId,
+          serviceId: selectedServiceId,
+          slot: slotAt
+        });
+
+        setTracking({
+          booking_id: checkoutRes.booking.id,
+          barber_name: selectedBarber?.name ?? "Akkarin P.",
+          progress_pct: 10,
+          eta_min: selectedBarber?.eta_min ?? 18,
+          state: "on_the_way"
+        });
+
+        await loadHistory();
+        setStatus(`Checkout completed: ${checkoutRes.booking.id}`);
+      },
+      "Running quote + checkout...",
+      "Quote + checkout failed"
+    );
   }
 
   async function loadHistory(): Promise<void> {
-    setLoading(true);
-    setError(null);
-    try {
-      const data = await getCustomerHistory(token);
-      setHistory(data.data);
-      setStatus(`Loaded ${data.data.length} bookings`);
-    } catch (e) {
-      const message = e instanceof Error ? e.message : "unknown error";
-      setError(message);
-      setStatus("Load history failed");
-    } finally {
-      setLoading(false);
+    await runAction(
+      async () => {
+        const data = await getCustomerHistory(token);
+        setHistory(data.data);
+        setStatus(`Loaded ${data.data.length} bookings`);
+      },
+      "Loading booking history...",
+      "Load history failed"
+    );
+  }
+
+  function routeFor(booking: { action: string }): void {
+    if (booking.action.includes("Track")) {
+      setCurrentView("tracking");
     }
+    setStatus("Opened contextual booking action");
   }
 
   return (
     <PageSection
-      title={label("แกนหลักลูกค้า", "Customer App Core")}
+      title={label("ลูกค้า BarberGo", "BarberGo Customer")}
       subtitle={label(
-        "ค้นหาร้าน ตรวจสอบคิว ขอราคา ชำระเงิน และดูประวัติในหน้าเดียว",
-        "Discovery, availability, quote, checkout, and history in one flow"
+        "Hybrid Marketplace: ค้นหาร้านในร้านและเรียกช่างถึงบ้านได้ในแอปเดียว",
+        "Hybrid marketplace for in-shop booking and on-demand delivery barber services"
       )}
     >
-      {toast ? <Toast message={toast} onClose={() => setToast(null)} /> : null}
-
-      <section className="customer-hero">
-        <div>
-          <p className="eyebrow">{label("ประสบการณ์การจอง", "Booking Experience")}</p>
-          <h3>{label("จองตัดผมได้เร็วขึ้นใน 4 ขั้นตอน", "Book your haircut in 4 quick steps")}</h3>
-          <p className="section-subtitle">
-            {label(
-              "1) ค้นหาร้าน 2) ดูช่วงเวลา 3) ขอราคา 4) ยืนยันการจอง",
-              "1) Find shop 2) Check slots 3) Get quote 4) Confirm booking"
-            )}
-          </p>
-          <div className="chip-row">
-            <UiBadge tone={quote ? "success" : "warning"}>{quote ? "Quote Ready" : "Quote Pending"}</UiBadge>
-            <UiBadge tone={slots.length > 0 ? "success" : "warning"}>
-              {slots.length > 0 ? "Slots Available" : "No Slots"}
-            </UiBadge>
-          </div>
-        </div>
-        <aside className="customer-price-card">
-          <p>{label("ยอดจองล่าสุด", "Current Quote")}</p>
-          <h4>{quoteTotal}</h4>
-          <p>{label("บริการ", "Service")}: {selectedService?.name ?? "-"}</p>
-          <p>{label("ช่วงเวลา", "Slot")}: {selectedSlot ? formatDateTime(selectedSlot) : "-"}</p>
-        </aside>
-      </section>
-
-      <div className="stats-grid customer-stats">
-        <StatCard label={label("ร้านที่เจอ", "Filtered Shops")} value={filteredShops.length} />
-        <StatCard label={label("เวลาว่าง", "Available Slots")} value={slots.length} />
-        <StatCard label={label("ประวัติการจอง", "Booking History")} value={history.length} />
-        <StatCard label={label("บริการที่เลือก", "Selected Service")} value={selectedService?.name ?? "-"} />
-      </div>
-
-      <section className="customer-workspace">
-        <article className="customer-form-card">
-          <h3>{label("ค้นหาและเลือกบริการ", "Find and Select Service")}</h3>
-          <div className="form-grid">
-            <Field label={label("ค้นหาร้าน", "Search shop")}>
-              <Input value={searchText} onChange={setSearchText} placeholder={label("ค้นหาจากชื่อร้าน", "Search by shop name")} />
-            </Field>
-            <Field label={label("ร้าน", "Shop")}>
-              <Select
-                value={selectedShopId}
-                onChange={(nextShopId) => {
-                  setSelectedShopId(nextShopId);
-                  const nextShop = shops.find((shop) => shop.id === nextShopId) ?? null;
-                  syncShopDefaults(nextShop);
-                  setSlots([]);
-                  setSelectedSlot("");
-                }}
-                options={
-                  filteredShops.length > 0
-                    ? filteredShops.map((shop) => ({
-                        value: shop.id,
-                        label: `${shop.name} (${shop.rating})`
-                      }))
-                    : [{ value: "", label: label("ไม่พบร้าน", "No shops found") }]
-                }
-              />
-            </Field>
-            <Field label={label("สาขา", "Branch")}>
-              <Select
-                value={selectedBranchId}
-                onChange={setSelectedBranchId}
-                disabled={!selectedShop}
-                options={
-                  selectedShop?.branches?.length
-                    ? selectedShop.branches.map((branch) => ({
-                        value: branch.id,
-                        label: branch.name
-                      }))
-                    : [{ value: selectedBranchId || "branch_1", label: selectedBranchId || "branch_1" }]
-                }
-              />
-            </Field>
-            <Field label={label("บริการ", "Service")}>
-              <Select
-                value={selectedServiceId}
-                onChange={setSelectedServiceId}
-                disabled={!selectedShop}
-                options={
-                  selectedShop?.services?.length
-                    ? selectedShop.services.map((service) => ({
-                        value: service.id,
-                        label: `${service.name} (${formatCurrency(service.price)})`
-                      }))
-                    : [{ value: "", label: label("ไม่มีบริการ", "No services") }]
-                }
-              />
-            </Field>
+      <main className="customer-v2">
+        <section className="customer-v2-head">
+          <div>
+            <p className="customer-kicker">Dual Mode Customer App</p>
+            <h3>In-Shop + Delivery</h3>
           </div>
           <div className="row">
-            <UiButton onClick={loadShops}>{label("โหลดร้าน", "Load Shops")}</UiButton>
-            <UiButton onClick={loadAvailability} disabled={!selectedShopId || !selectedServiceId}>
-              {label("โหลดเวลาว่าง", "Load Availability")}
+            <UiButton onClick={() => void loadShops()} variant="secondary">
+              Reload Shops
             </UiButton>
-            <UiButton onClick={loadQuote} disabled={!selectedShopId || !selectedServiceId}>
-              {label("ขอราคา", "Quote")}
-            </UiButton>
-            <UiButton onClick={() => setCheckoutModalOpen(true)} disabled={!selectedShopId || !selectedServiceId}>
-              {label("ชำระเงิน", "Checkout")}
-            </UiButton>
-            <UiButton variant="secondary" onClick={loadHistory}>
-              {label("โหลดประวัติ", "Load History")}
+            <UiButton onClick={() => void loadHistory()} variant="secondary">
+              Load History
             </UiButton>
           </div>
-        </article>
+        </section>
 
-        <aside className="customer-side-card">
-          <h3>{label("สรุปการจอง", "Booking Summary")}</h3>
-          <p>{label("ร้าน", "Shop")}: <strong>{selectedShop?.name ?? "-"}</strong></p>
-          <p>{label("สาขา", "Branch")}: <strong>{selectedBranchId || "-"}</strong></p>
-          <p>{label("บริการ", "Service")}: <strong>{selectedService?.name ?? "-"}</strong></p>
-          <p>{label("ราคา", "Quote Total")}: <strong>{quoteTotal}</strong></p>
-          <p>{label("เวลานัดหมาย", "Selected Slot")}: <strong>{selectedSlot ? formatDateTime(selectedSlot) : "-"}</strong></p>
-        </aside>
-      </section>
+        {loading ? <LoadingBadge text="Customer app syncing..." /> : null}
+        {error ? <ErrorBanner message={error} /> : null}
+        <StatusLine value={status} />
 
-      <p className="helper-note">
-        {label(
-          "ลำดับที่แนะนำ: โหลดร้าน -> โหลดเวลาว่าง -> ขอราคา -> ชำระเงิน -> โหลดประวัติ",
-          "Recommended order: Load Shops -> Load Availability -> Quote -> Checkout -> Load History"
-        )}
-      </p>
+        <nav className="customer-v2-nav" aria-label="Customer views">
+          <button type="button" className={currentView === "home" ? "is-active" : ""} onClick={() => setCurrentView("home")}>
+            Home
+          </button>
+          <button type="button" className={currentView === "delivery" ? "is-active" : ""} onClick={() => setCurrentView("delivery")}>
+            Delivery
+          </button>
+          <button type="button" className={currentView === "bookings" ? "is-active" : ""} onClick={() => setCurrentView("bookings")}>
+            Bookings
+          </button>
+          <button type="button" className={currentView === "tracking" ? "is-active" : ""} onClick={() => setCurrentView("tracking")}>
+            Tracking
+          </button>
+          <button type="button" className={currentView === "rewards" ? "is-active" : ""} onClick={() => setCurrentView("rewards")}>
+            Rewards
+          </button>
+        </nav>
 
-      <Tabs
-        value={activeTab}
-        onChange={(value) => setActiveTab(value as CustomerTab)}
-        tabs={[
-          { value: "actions", label: label("การทำงาน", "Actions") },
-          { value: "history", label: label("ประวัติ", "History") },
-          { value: "debug", label: "Debug JSON" }
-        ]}
-      />
+        {currentView === "home" ? (
+          <>
+            <section className="customer-lookbook">
+              <div className="customer-card-head">
+                <h3>Lookbook Search</h3>
+                <button
+                  type="button"
+                  className={asapOnly ? "customer-asap-btn is-active" : "customer-asap-btn"}
+                  onClick={() => setAsapOnly((prev) => !prev)}
+                >
+                  <AlarmClockCheck size={15} /> ASAP Mode
+                </button>
+              </div>
+              <div className="customer-lookbook-row">
+                {LOOKBOOK.map((style) => (
+                  <button
+                    key={style.id}
+                    type="button"
+                    className={`customer-style-chip ${selectedStyle === style.id ? "is-active" : ""}`}
+                    onClick={() => {
+                      setSelectedStyle(style.id);
+                      setStatus(`Lookbook style selected: ${style.name}`);
+                    }}
+                  >
+                    <img src={style.image} alt={style.name} />
+                    <span>{style.name}</span>
+                  </button>
+                ))}
+              </div>
+            </section>
 
-      {loading ? <LoadingBadge text={label("กำลังโหลดข้อมูลลูกค้า...", "Customer flow loading...")} /> : null}
-      {loading && activeTab !== "debug" ? <SkeletonRows count={4} /> : null}
-      {error ? <ErrorBanner message={error} /> : null}
-      <StatusLine value={status} />
+            <section className="customer-shop-grid">
+              {discoveryShops.map((shop) => {
+                const reliability = shopReliability(shop.id);
+                const waitMin = shopLiveWait(shop.id);
+                const isFast = waitMin <= 15;
+                return (
+                  <article key={shop.id} className="customer-shop-card">
+                    <div className="customer-card-head">
+                      <h4>{shop.name}</h4>
+                      <UiBadge tone={isFast ? "success" : "warning"}>{isFast ? "Ready Soon" : "Queue"}</UiBadge>
+                    </div>
+                    <p>
+                      <Star size={14} /> Rating {shop.rating} | Reliability {reliability}%
+                    </p>
+                    <p>
+                      <MapPinned size={14} /> Live Queue {waitMin} min | Next slot {slots?.[0] ? formatDateTime(slots[0]) : "-"}
+                    </p>
+                    <div className="row">
+                      <UiButton
+                        variant="secondary"
+                        onClick={() => {
+                          syncShopDefault(shop);
+                          setStatus(`Selected shop ${shop.name}`);
+                        }}
+                      >
+                        Select Shop
+                      </UiButton>
+                      <UiButton onClick={() => void loadAvailability()}>Load Availability</UiButton>
+                    </div>
+                  </article>
+                );
+              })}
+            </section>
 
-      {!loading && !error && shops.length === 0 ? (
-        <EmptyHint message={label("ยังไม่มีข้อมูลร้าน กดโหลดร้านเพื่อเริ่มต้น", "No shops loaded yet. Click Load Shops.")} />
-      ) : null}
+            {discoveryShops.length === 0 ? (
+              <EmptyHint message="No ASAP shop available right now. Try turning ASAP mode off." />
+            ) : null}
+          </>
+        ) : null}
 
-      {activeTab === "actions" ? (
-        <div className="form-grid">
-          <Field label={label("สล็อตที่เลือก", "Selected slot")} hint={label("ใช้ส่งตอน checkout", "Used for checkout request")}>
-            <Select
-              value={selectedSlot}
-              onChange={setSelectedSlot}
-              disabled={slots.length === 0}
-              options={
-                slots.length
-                  ? slots.map((slot) => ({ value: slot, label: formatDateTime(slot) }))
-                  : [{ value: "", label: label("ยังไม่มีสล็อต", "No slots loaded") }]
-              }
+        {currentView === "delivery" ? (
+          <>
+            <section className="customer-delivery-grid">
+              {DELIVERY_BARBERS.map((barber) => (
+                <article key={barber.id} className="customer-barber-card">
+                  <img src={barber.portrait} alt={barber.name} className="customer-barber-portrait" />
+                  <div className="customer-card-head">
+                    <h4>{barber.name}</h4>
+                    <UiBadge tone={barber.ready ? "success" : "warning"}>{barber.ready ? "Ready to Travel" : "Busy"}</UiBadge>
+                  </div>
+                  <p>{barber.specialty} | {barber.years} yrs</p>
+                  <p>
+                    <BadgeCheck size={14} /> {barber.verified ? "Verified" : "Unverified"} | ETA {barber.eta_min} min
+                  </p>
+                  <div className="row">
+                    <UiButton
+                      onClick={() => {
+                        setSelectedBarberId(barber.id);
+                        setStatus(`Selected barber ${barber.name}`);
+                      }}
+                    >
+                      View Detail
+                    </UiButton>
+                    <UiButton
+                      variant="secondary"
+                      onClick={() => {
+                        setCurrentView("tracking");
+                        setTracking({
+                          booking_id: tracking.booking_id,
+                          barber_name: barber.name,
+                          progress_pct: 12,
+                          eta_min: barber.eta_min,
+                          state: "on_the_way"
+                        });
+                      }}
+                    >
+                      Track
+                    </UiButton>
+                  </div>
+                </article>
+              ))}
+            </section>
+
+            {selectedBarber ? (
+              <section className="customer-barber-detail">
+                <div className="customer-card-head">
+                  <h3>{selectedBarber.name}</h3>
+                  <UiBadge tone="success">Profile Detail</UiBadge>
+                </div>
+                <p>{selectedBarber.bio}</p>
+                <div className="customer-portfolio-grid">
+                  {selectedBarber.portfolio.map((photo) => (
+                    <img key={photo} src={photo} alt="portfolio" />
+                  ))}
+                </div>
+                <div className="customer-equipment">
+                  {selectedBarber.equipment.map((item) => (
+                    <UiBadge key={item} tone="neutral">
+                      {item}
+                    </UiBadge>
+                  ))}
+                </div>
+              </section>
+            ) : null}
+          </>
+        ) : null}
+
+        {currentView === "bookings" ? (
+          <section className="customer-bookings-hub">
+            <div className="customer-card-head">
+              <h3>Bookings Hub</h3>
+              <UiButton onClick={() => void quoteAndCheckout()}>Quote + Checkout</UiButton>
+            </div>
+            <div className="customer-booking-actions">
+              <UiButton variant="secondary" onClick={() => void loadAvailability()} disabled={!selectedShopId || !selectedServiceId}>
+                Load Slots
+              </UiButton>
+              <UiButton variant="secondary" onClick={() => void loadHistory()}>
+                Refresh History
+              </UiButton>
+            </div>
+            <div className="customer-summary-grid">
+              <article className="customer-summary-card">
+                <p>Selected Shop</p>
+                <h4>{selectedShop?.name ?? "-"}</h4>
+              </article>
+              <article className="customer-summary-card">
+                <p>Quote</p>
+                <h4>{quoteTotal}</h4>
+              </article>
+              <article className="customer-summary-card">
+                <p>Next Slot</p>
+                <h4>{selectedSlot ? formatDateTime(selectedSlot) : "-"}</h4>
+              </article>
+            </div>
+            <DataTable
+              caption="Upcoming bookings"
+              columns={[
+                { key: "id", header: "Booking" },
+                { key: "status", header: "Status" },
+                { key: "slot", header: "Slot" },
+                { key: "action", header: "Action" }
+              ]}
+              rows={upcomingRows}
+              emptyText="No upcoming bookings"
             />
-          </Field>
-          <Field label={label("ราคาปัจจุบัน", "Current quote")}>
-            <Input value={quoteTotal} onChange={() => {}} readOnly />
-          </Field>
-        </div>
-      ) : null}
+            <div className="row">
+              {upcomingRows.slice(0, 3).map((item) => (
+                <UiButton key={item.id} variant="secondary" onClick={() => routeFor(item)}>
+                  {item.action}
+                </UiButton>
+              ))}
+            </div>
+            <DataTable
+              caption="Booking history"
+              columns={[
+                { key: "id", header: "Booking" },
+                { key: "status", header: "Status" },
+                { key: "slot", header: "Slot" },
+                { key: "amount", header: "Amount" }
+              ]}
+              rows={historyRows}
+              emptyText="No history records"
+            />
+          </section>
+        ) : null}
 
-      {activeTab === "history" ? (
-        <DataTable
-          caption={label("ตารางประวัติการจองลูกค้า", "Customer booking history table")}
-          columns={[
-            { key: "id", header: "Booking" },
-            { key: "status", header: "Status" },
-            { key: "slot", header: "Slot" },
-            { key: "amount", header: "Amount" }
-          ]}
-          rows={historyRows}
-          emptyText={label("ยังไม่มีประวัติ", "No history yet.")}
-        />
-      ) : null}
+        {currentView === "tracking" ? (
+          <section className="customer-tracking">
+            <div className="customer-card-head">
+              <h3>Live Tracking</h3>
+              <UiBadge tone={tracking.state === "completed" ? "success" : "warning"}>{tracking.state}</UiBadge>
+            </div>
+            <article className="tracking-map-sim">
+              <div className="tracking-route" style={{ width: `${tracking.progress_pct}%` }} />
+              <p>
+                Barber: {tracking.barber_name} | ETA {tracking.eta_min} min | Progress {tracking.progress_pct}%
+              </p>
+            </article>
+            <div className="row">
+              <UiButton variant="secondary">
+                <PhoneCall size={14} /> Call
+              </UiButton>
+              <UiButton variant="secondary">
+                <CarTaxiFront size={14} /> Message
+              </UiButton>
+              <UiButton variant="secondary">
+                <ShieldAlert size={14} /> SOS
+              </UiButton>
+            </div>
+          </section>
+        ) : null}
 
-      {activeTab === "debug" ? (
-        <JsonView
-          value={{
-            selectedShop,
-            selectedBranchId,
-            selectedServiceId,
-            selectedSlot,
-            slots,
-            quote,
-            history,
-            shops
-          }}
-        />
-      ) : null}
-
-      <UiModal
-        open={checkoutModalOpen}
-        onClose={() => setCheckoutModalOpen(false)}
-        title={label("ยืนยันการชำระเงิน", "Confirm Checkout")}
-        footer={
-          <div className="row">
-            <UiButton variant="secondary" onClick={() => setCheckoutModalOpen(false)}>
-              {label("ยกเลิก", "Cancel")}
-            </UiButton>
-            <UiButton
-              onClick={async () => {
-                await checkout();
-                setCheckoutModalOpen(false);
-              }}
-            >
-              {label("ยืนยันการจอง", "Confirm Booking")}
-            </UiButton>
-          </div>
-        }
-      >
-        <p>
-          {label("ร้าน", "Shop")}: <strong>{selectedShop?.name ?? "-"}</strong>
-        </p>
-        <p>
-          {label("บริการ", "Service")}: <strong>{selectedService?.name ?? "-"}</strong>
-        </p>
-        <p>
-          {label("สล็อตเวลา", "Slot")}: <strong>{selectedSlot ? formatDateTime(selectedSlot) : "-"}</strong>
-        </p>
-        <p>
-          {label("ยอดรวม", "Quote Total")}: <strong>{quote?.total ? formatCurrency(Number(quote.total)) : "-"}</strong>
-        </p>
-      </UiModal>
+        {currentView === "rewards" ? (
+          <section className="customer-rewards">
+            <div className="customer-summary-grid">
+              <article className="customer-summary-card">
+                <p>BarberGo Points</p>
+                <h4>{points}</h4>
+              </article>
+              <article className="customer-summary-card">
+                <p>Membership Tier</p>
+                <h4>{tier}</h4>
+              </article>
+              <article className="customer-summary-card">
+                <p>Wallet Balance</p>
+                <h4>{formatCurrency(1240)}</h4>
+              </article>
+            </div>
+            <div className="row">
+              <UiBadge tone="neutral">
+                <Wallet size={14} /> Saved Cards
+              </UiBadge>
+              <UiBadge tone="neutral">
+                <Crown size={14} /> Loyalty Perks
+              </UiBadge>
+              <UiBadge tone="neutral">
+                <Heart size={14} /> Favorite Barbers
+              </UiBadge>
+            </div>
+          </section>
+        ) : null}
+      </main>
     </PageSection>
   );
 }
