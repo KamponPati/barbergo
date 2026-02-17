@@ -665,6 +665,20 @@ Default for Phase 12:
 - [ ] `Status: TODO` เพิ่ม E2E tests: partner critical flows (online/offline, accept job, lifecycle complete, wallet payout request)
 - [ ] `Status: TODO` Sign-off revamp รอบพาร์ทเนอร์ (Product + Design + Engineering + Ops)
 
+### 12R) Admin Control Tower (Web Console) Revamp
+
+- [ ] `Status: TODO` ทำ Admin Web Console layout ใหม่แบบ professional sidebar/subnav สำหรับ operations team
+- [ ] `Status: TODO` ทำ Operational Dashboard: GMV, Net Revenue, Active Partner, SLA health พร้อมเชื่อมข้อมูล customer/partner
+- [ ] `Status: TODO` ทำ Live Activity Feed แบบ near-real-time จาก admin alerts + key platform events
+- [ ] `Status: TODO` ทำ KYC Approval Queue (approve/reject workflow) พร้อมสถานะและ audit-friendly action log
+- [ ] `Status: TODO` ทำ Global Policy Engine UI ปรับ `commission`, `cancellation threshold/fee`, `pricing multiplier`, `promo toggle`
+- [ ] `Status: TODO` ทำ Dispute Center แบบ ticket management พร้อม action refund/reject + resolution reason
+- [ ] `Status: TODO` ทำ Reconciliation snapshot panel (bookings/payments mismatches) เพื่อปิด loop การเงิน
+- [ ] `Status: TODO` ทำ Admin design token alignment (`#4F46E5`) และ visual hierarchy ระดับ enterprise
+- [ ] `Status: TODO` เพิ่ม optional chaining + defensive rendering ครบทุก admin data cards/tables
+- [ ] `Status: TODO` เพิ่ม E2E tests สำหรับ admin control flows (load tower, approve KYC, update policy, resolve dispute)
+- [ ] `Status: TODO` Sign-off revamp รอบ admin (Product + Ops + Engineering + Compliance)
+
 ---
 
 ## Cross-Phase Governance (ทำต่อเนื่องทุก Phase)

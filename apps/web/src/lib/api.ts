@@ -141,6 +141,62 @@ export async function estimateDynamicPricing(token: string): Promise<unknown> {
   });
 }
 
+export async function getAdminOverview(token: string): Promise<unknown> {
+  return request("/admin/analytics/overview", { token });
+}
+
+export async function getAdminAlerts(token: string): Promise<unknown> {
+  return request("/admin/alerts", { token });
+}
+
+export async function getAdminDisputes(token: string): Promise<unknown> {
+  return request("/admin/disputes", { token });
+}
+
+export async function resolveAdminDispute(token: string, disputeId: string, action: "refund" | "reject", note: string): Promise<unknown> {
+  return request(`/admin/disputes/${disputeId}/resolve`, {
+    method: "POST",
+    token,
+    body: { action, note }
+  });
+}
+
+export async function getAdminPolicy(token: string): Promise<unknown> {
+  return request("/admin/policy", { token });
+}
+
+export async function updateAdminPolicy(
+  token: string,
+  payload: {
+    commission_rate?: number;
+    cancellation_fee_rate?: number;
+    pricing_multiplier?: number;
+    promo_enabled?: boolean;
+  }
+): Promise<unknown> {
+  return request("/admin/policy", {
+    method: "PUT",
+    token,
+    body: payload
+  });
+}
+
+export async function setAdminPartnerVerification(
+  token: string,
+  partnerId: string,
+  action: "approve" | "reject"
+): Promise<unknown> {
+  return request(`/admin/partners/${partnerId}/verification`, {
+    method: "POST",
+    token,
+    body: { action }
+  });
+}
+
+export async function getAdminReconciliation(token: string, date: string): Promise<unknown> {
+  return request(`/admin/reconciliation/daily?date=${encodeURIComponent(date)}`, { token });
+}
+
 export type MeProfileResponse = {
   user_id: string;
   role: UserRole;

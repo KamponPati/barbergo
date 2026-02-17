@@ -1409,6 +1409,236 @@ code {
   color: #f3e8ff;
 }
 
+.admin-hub {
+  --admin-bg: #eef2ff;
+  --admin-bg-soft: #e0e7ff;
+  --admin-surface: #ffffff;
+  --admin-line: #c7d2fe;
+  --admin-ink: #1e1b4b;
+  --admin-muted: #4c1d95;
+  --admin-primary: #4f46e5;
+  background:
+    radial-gradient(circle at 0% 0%, rgba(79, 70, 229, 0.22) 0%, transparent 45%),
+    radial-gradient(circle at 100% 100%, rgba(59, 130, 246, 0.2) 0%, transparent 38%),
+    linear-gradient(150deg, var(--admin-bg), var(--admin-bg-soft));
+  border: 1px solid #c7d2fe;
+  border-radius: 30px;
+  padding: 14px;
+  display: grid;
+  gap: 12px;
+  color: var(--admin-ink);
+}
+
+.admin-kicker {
+  margin: 0 0 4px;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #4338ca;
+  font-weight: 700;
+}
+
+.admin-hero-bar {
+  border: 1px solid var(--admin-line);
+  border-radius: 24px;
+  background: #ffffffd4;
+  padding: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.admin-hero-bar h3 {
+  margin: 0;
+  font-size: 24px;
+}
+
+.admin-kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.admin-kpi-card {
+  border: 1px solid var(--admin-line);
+  border-radius: 24px;
+  background: #fff;
+  padding: 12px;
+}
+
+.admin-kpi-card p {
+  margin: 6px 0;
+  color: #4338ca;
+  font-weight: 700;
+}
+
+.admin-kpi-card h4 {
+  margin: 0;
+  font-size: 26px;
+  color: #1e1b4b;
+}
+
+.admin-subnav {
+  border: 1px solid var(--admin-line);
+  border-radius: 22px;
+  background: #ffffffde;
+  padding: 8px;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.admin-subnav button {
+  border: 1px solid transparent;
+  border-radius: 16px;
+  background: transparent;
+  color: #4338ca;
+  min-height: 48px;
+  min-width: 48px;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  cursor: pointer;
+}
+
+.admin-subnav button.is-active {
+  border-color: #a5b4fc;
+  background: #e0e7ff;
+  color: #312e81;
+}
+
+.admin-card {
+  border: 1px solid var(--admin-line);
+  border-radius: 24px;
+  background: var(--admin-surface);
+  padding: 14px;
+  display: grid;
+  gap: 10px;
+}
+
+.admin-card-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+}
+
+.admin-card-head h3 {
+  margin: 0;
+}
+
+.admin-feed-list,
+.admin-action-grid {
+  display: grid;
+  gap: 10px;
+}
+
+.admin-feed-item {
+  border: 1px solid var(--admin-line);
+  border-radius: 18px;
+  background: #f8faff;
+  padding: 10px;
+  display: grid;
+  gap: 6px;
+}
+
+.admin-feed-item p {
+  margin: 0;
+}
+
+.admin-feed-item span {
+  color: #6366f1;
+  font-size: 12px;
+}
+
+.admin-feed-event {
+  color: #312e81;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.admin-panel-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.admin-panel-grid p {
+  margin: 0;
+  color: #3730a3;
+}
+
+.admin-action-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.admin-action-item {
+  border: 1px solid var(--admin-line);
+  border-radius: 18px;
+  background: #f8faff;
+  padding: 10px;
+}
+
+.admin-action-item p {
+  margin: 0 0 8px;
+  color: #312e81;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.admin-policy-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.admin-policy-grid label {
+  display: grid;
+  gap: 6px;
+  font-size: 12px;
+  color: #4338ca;
+}
+
+.admin-input {
+  border-color: var(--admin-line);
+  background: #fff;
+  color: #1e1b4b;
+}
+
+.admin-toggle {
+  border: 1px solid var(--admin-line);
+  border-radius: 999px;
+  min-height: 48px;
+  min-width: 48px;
+  font-weight: 700;
+  color: #312e81;
+  background: #f8faff;
+  cursor: pointer;
+}
+
+.admin-footnote {
+  border: 1px dashed var(--admin-line);
+  border-radius: 18px;
+  padding: 10px;
+  background: #ffffffab;
+}
+
+.admin-footnote p {
+  margin: 0;
+  color: #3730a3;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
 @media (max-width: 900px) {
   .app-shell-v2 {
     grid-template-columns: minmax(0, 1fr);
@@ -1472,6 +1702,14 @@ code {
     grid-template-columns: repeat(4, minmax(0, 1fr));
   }
 
+  .admin-kpi-grid,
+  .admin-panel-grid,
+  .admin-action-grid,
+  .admin-policy-grid,
+  .admin-subnav {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
   .drawer {
     width: min(100%, 620px);
   }
@@ -1514,6 +1752,14 @@ code {
 
   .partner-schedule-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .admin-kpi-grid,
+  .admin-panel-grid,
+  .admin-action-grid,
+  .admin-policy-grid,
+  .admin-subnav {
+    grid-template-columns: minmax(0, 1fr);
   }
 }
 
