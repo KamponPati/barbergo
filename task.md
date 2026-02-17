@@ -490,7 +490,7 @@ Default for Phase 11:
 - [ ] `Status: TODO` Customer mobile production journey pass: login -> discovery -> availability -> quote -> checkout -> history -> dispute (real environment, no mock path)
 - [ ] `Status: TODO` Partner mobile production journey pass: login -> queue -> confirm -> start -> complete -> finance (state transition guard + clear failure recovery)
 - [ ] `Status: TODO` Admin web production journey pass: governance + economics + analytics + pricing controls with role audit evidence
-- [ ] `Status: TODO` Profile/Settings persistence: เชื่อม API จริงสำหรับ preference/account settings และ state sync ข้ามอุปกรณ์
+- [x] `Status: DONE` Profile/Settings persistence: เชื่อม API จริงสำหรับ preference/account settings และ state sync ข้ามอุปกรณ์ (completed on 2026-02-17 with `/auth/me/profile` + `/auth/me/settings` read/write backed by DB `UserPreference`)
 - [ ] `Status: TODO` Final UI acceptance for 3 persona: visual consistency + accessibility + empty/error/loading behavior checklist sign-off
 
 ### 11B) API, Data, and Domain Correctness Gate

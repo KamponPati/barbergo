@@ -140,3 +140,39 @@ export async function estimateDynamicPricing(token: string): Promise<unknown> {
     }
   });
 }
+
+export type MeProfileResponse = {
+  user_id: string;
+  role: UserRole;
+  display_name: string;
+  status: "active" | "disabled";
+  locale: string;
+  time_zone: string;
+};
+
+export type MeSettingsResponse = {
+  locale: string;
+  time_zone: string;
+  email_alerts: boolean;
+  push_alerts: boolean;
+  compact_mode: boolean;
+};
+
+export async function getMyProfile(token: string): Promise<MeProfileResponse> {
+  return request("/auth/me/profile", { token });
+}
+
+export async function getMySettings(token: string): Promise<MeSettingsResponse> {
+  return request("/auth/me/settings", { token });
+}
+
+export async function updateMySettings(
+  token: string,
+  input: Partial<MeSettingsResponse>
+): Promise<MeSettingsResponse> {
+  return request("/auth/me/settings", {
+    method: "PUT",
+    token,
+    body: input
+  });
+}

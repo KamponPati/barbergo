@@ -110,6 +110,23 @@ type NotificationEvent = {
   created_at: string;
 };
 
+type UserProfile = {
+  user_id: string;
+  role: "customer" | "partner" | "admin";
+  display_name: string;
+  status: "active" | "disabled";
+  locale: string;
+  time_zone: string;
+};
+
+type UserSettings = {
+  locale: string;
+  time_zone: string;
+  email_alerts: boolean;
+  push_alerts: boolean;
+  compact_mode: boolean;
+};
+
 const TRANSITIONS: Record<BookingStatus, BookingStatus[]> = {
   requested: ["quoted", "cancelled"],
   quoted: ["authorized", "cancelled"],
@@ -1287,6 +1304,101 @@ export class DbCoreService {
         message: row.message ?? row.type,
         created_at: row.createdAt.toISOString()
       }))
+    };
+  }
+
+  async getUserProfile(userId: string): Promise<UserProfile> {
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+      include: {
+        customer: { select: { name: true } },
+        partner: { select: { name: true } },
+        settings: true
+      }
+    });
+    if (!user) {
+      throw new NotFoundException({ code: "USER_NOT_FOUND", message: "user not found" });
+    }
+
+    const displayName =
+      user.customer?.name ?? user.partner?.name ?? (user.role === UserRole.admin ? "Platform Admin" : user.id);
+    const settings = user.settings;
+
+    return {
+      user_id: user.id,
+      role: user.role,
+      display_name: displayName,
+      status: user.status,
+      locale: settings?.locale ?? "th-TH",
+      time_zone: settings?.timeZone ?? "Asia/Bangkok"
+    };
+  }
+
+  async getUserSettings(userId: string): Promise<UserSettings> {
+    const user = await this.prisma.user.findUnique({ where: { id: userId }, select: { id: true } });
+    if (!user) {
+      throw new NotFoundException({ code: "USER_NOT_FOUND", message: "user not found" });
+    }
+
+    const settings = await this.prisma.userPreference.upsert({
+      where: { userId },
+      update: {},
+      create: {
+        userId,
+        locale: "th-TH",
+        timeZone: "Asia/Bangkok",
+        emailAlerts: true,
+        pushAlerts: true,
+        compactMode: false
+      }
+    });
+
+    return {
+      locale: settings.locale,
+      time_zone: settings.timeZone,
+      email_alerts: settings.emailAlerts,
+      push_alerts: settings.pushAlerts,
+      compact_mode: settings.compactMode
+    };
+  }
+
+  async updateUserSettings(
+    userId: string,
+    input: Partial<UserSettings>
+  ): Promise<UserSettings> {
+    const user = await this.prisma.user.findUnique({ where: { id: userId }, select: { id: true } });
+    if (!user) {
+      throw new NotFoundException({ code: "USER_NOT_FOUND", message: "user not found" });
+    }
+
+    const nextLocale = input.locale?.trim() || "th-TH";
+    const nextTimeZone = input.time_zone?.trim() || "Asia/Bangkok";
+
+    const settings = await this.prisma.userPreference.upsert({
+      where: { userId },
+      create: {
+        userId,
+        locale: nextLocale,
+        timeZone: nextTimeZone,
+        emailAlerts: input.email_alerts ?? true,
+        pushAlerts: input.push_alerts ?? true,
+        compactMode: input.compact_mode ?? false
+      },
+      update: {
+        locale: nextLocale,
+        timeZone: nextTimeZone,
+        emailAlerts: input.email_alerts ?? undefined,
+        pushAlerts: input.push_alerts ?? undefined,
+        compactMode: input.compact_mode ?? undefined
+      }
+    });
+
+    return {
+      locale: settings.locale,
+      time_zone: settings.timeZone,
+      email_alerts: settings.emailAlerts,
+      push_alerts: settings.pushAlerts,
+      compact_mode: settings.compactMode
     };
   }
 

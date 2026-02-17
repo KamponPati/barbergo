@@ -1,16 +1,54 @@
 import { PageSection } from "../shared/PageSection";
 import { useAuth } from "../auth/AuthContext";
 import { API_BASE_URL } from "../../lib/api";
+import { getMyProfile } from "../../lib/api";
+import { useEffect, useState } from "react";
+import { EmptyHint, ErrorBanner, LoadingBadge, StatusLine } from "../shared/UiState";
+import { UiButton } from "../shared/UiKit";
 
 export function ProfilePage(): JSX.Element {
   const { role, token } = useAuth();
+  const [displayName, setDisplayName] = useState("-");
+  const [status, setStatus] = useState("Idle");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  async function loadProfile(): Promise<void> {
+    setLoading(true);
+    setError(null);
+    try {
+      const data = await getMyProfile(token);
+      setDisplayName(data.display_name);
+      setStatus("Profile loaded from API");
+    } catch (e) {
+      const message = e instanceof Error ? e.message : "unknown error";
+      setError(message);
+      setStatus("Load profile failed");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  useEffect(() => {
+    if (!token) return;
+    void loadProfile();
+  }, [token]);
 
   return (
     <PageSection title="Profile" subtitle="Session identity and environment details">
+      <div className="row">
+        <UiButton onClick={() => void loadProfile()}>Refresh Profile</UiButton>
+      </div>
+      {loading ? <LoadingBadge text="Loading profile..." /> : null}
+      {error ? <ErrorBanner message={error} /> : null}
+      <StatusLine value={status} />
+      {!loading && !error && displayName === "-" ? <EmptyHint message="No profile details loaded." /> : null}
+
       <div className="marketing-grid">
         <article className="marketing-card">
           <h3>Account</h3>
           <p>Role: {role ?? "-"}</p>
+          <p>Display Name: {displayName}</p>
           <p>User ID: {role === "admin" ? "admin_1" : role === "partner" ? "partner_1" : role === "customer" ? "cust_1" : "-"}</p>
         </article>
         <article className="marketing-card">

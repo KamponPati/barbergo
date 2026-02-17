@@ -142,6 +142,43 @@ async function main(): Promise<void> {
       create: { staffId: entry.staffId, skill: entry.skill }
     });
   }
+
+  await prisma.userPreference.upsert({
+    where: { userId: "admin_1" },
+    update: {},
+    create: {
+      userId: "admin_1",
+      locale: "en-US",
+      timeZone: "Asia/Bangkok",
+      emailAlerts: true,
+      pushAlerts: true,
+      compactMode: false
+    }
+  });
+  await prisma.userPreference.upsert({
+    where: { userId: "partner_1" },
+    update: {},
+    create: {
+      userId: "partner_1",
+      locale: "th-TH",
+      timeZone: "Asia/Bangkok",
+      emailAlerts: true,
+      pushAlerts: true,
+      compactMode: false
+    }
+  });
+  await prisma.userPreference.upsert({
+    where: { userId: "cust_1" },
+    update: {},
+    create: {
+      userId: "cust_1",
+      locale: "th-TH",
+      timeZone: "Asia/Bangkok",
+      emailAlerts: true,
+      pushAlerts: true,
+      compactMode: false
+    }
+  });
 }
 
 main()
@@ -153,4 +190,3 @@ main()
   .finally(async () => {
     await prisma.$disconnect();
   });
-

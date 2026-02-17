@@ -1,10 +1,11 @@
-import { Body, Controller, Get, Post, Req, Res, UnauthorizedException, UseGuards } from "@nestjs/common";
+import { Body, Controller, Get, Post, Put, Req, Res, UnauthorizedException, UseGuards } from "@nestjs/common";
 import { Request, Response } from "express";
 import { AuthService } from "./auth.service";
 import { JwtAuthGuard } from "./guards/jwt-auth.guard";
 import { Roles } from "./roles.decorator";
 import { RolesGuard } from "./guards/roles.guard";
 import { CurrentUser, CurrentUserPayload } from "./current-user.decorator";
+import { DbCoreService } from "../../common/services/db-core.service";
 
 type LoginRequest = {
   user_id: string;
@@ -19,7 +20,10 @@ type RefreshRequest = {
 export class AuthController {
   private readonly refreshCookieName = "bg_refresh_token";
 
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly dbCoreService: DbCoreService
+  ) {}
 
   @Post("login")
   async login(
@@ -89,6 +93,34 @@ export class AuthController {
   @Get("me")
   me(@CurrentUser() user: CurrentUserPayload): CurrentUserPayload {
     return user;
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get("me/profile")
+  meProfile(@CurrentUser() user: CurrentUserPayload) {
+    return this.dbCoreService.getUserProfile(user.user_id);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get("me/settings")
+  meSettings(@CurrentUser() user: CurrentUserPayload) {
+    return this.dbCoreService.getUserSettings(user.user_id);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Put("me/settings")
+  updateMeSettings(
+    @CurrentUser() user: CurrentUserPayload,
+    @Body()
+    body: {
+      locale?: string;
+      time_zone?: string;
+      email_alerts?: boolean;
+      push_alerts?: boolean;
+      compact_mode?: boolean;
+    }
+  ) {
+    return this.dbCoreService.updateUserSettings(user.user_id, body);
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard)
