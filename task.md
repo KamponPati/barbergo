@@ -511,7 +511,7 @@ Default for Phase 11:
 
 ### 11D) Reliability, Performance, and Observability Gate
 
-- [ ] `Status: BLOCKED` SLO gate: latency/error-rate/availability ผ่านเกณฑ์ช่วง 7 วันต่อเนื่อง (blocked on 2026-02-17: ต้องใช้ runtime window จริง 7 วัน; tooling/evidence template พร้อมใน `docs/phase11/reliability-observability-gate-2026-02-17.md`)
+- [ ] `Status: BLOCKED` SLO gate: latency/error-rate/availability ผ่านเกณฑ์ช่วง 7 วันต่อเนื่อง (blocked on 2026-02-17: ต้องใช้ runtime window จริง 7 วัน; auto-monitor via `.github/workflows/phase11-window-gate.yml`, guide in `docs/phase11/window-gate-automation.md`)
 - [x] `Status: DONE` Load/stress/soak test gate for critical APIs (booking, payment, queue transitions, admin analytics) (completed baseline on 2026-02-17 with `perf-smoke.yml` + k6 + regression schedule, documented in `docs/phase11/reliability-observability-gate-2026-02-17.md`)
 - [x] `Status: DONE` DR drill gate: backup restore + failover + rollback rehearsal with measured RPO/RTO (completed on 2026-02-17 with backup/restore + migration rollback evidence consolidated in `docs/phase11/reliability-observability-gate-2026-02-17.md`)
 - [x] `Status: DONE` Alert quality gate: paging rules tuned, noise ลดลง, on-call runbook ครบสำหรับ sev1/sev2 (completed baseline on 2026-02-17; runbooks and alert stack references in `docs/phase11/reliability-observability-gate-2026-02-17.md`)
@@ -530,7 +530,7 @@ Default for Phase 11:
 - [x] `Status: DONE` UAT รอบสุดท้าย 3 persona (customer/partner/admin) พร้อม defect triage และ closure log (completed on 2026-02-17; consolidated in `docs/phase11/uat-go-live-signoff-pack-2026-02-17.md`)
 - [x] `Status: DONE` Go-live readiness review (Product/Engineering/Ops/Security) with explicit go/no-go criteria (completed on 2026-02-17; criteria and review pack in `docs/phase11/uat-go-live-signoff-pack-2026-02-17.md`)
 - [x] `Status: DONE` Controlled go-live execution + live verification checklist + rollback readiness confirmation (completed baseline on 2026-02-17; checklist and rollback readiness refs in `docs/phase11/uat-go-live-signoff-pack-2026-02-17.md`)
-- [ ] `Status: BLOCKED` Hypercare 7 วัน: incident triage war-room cadence + KPI watch + daily postmortem snapshots (blocked on 2026-02-17: requires elapsed 7-day post-go-live window; plan ready in `docs/phase11/uat-go-live-signoff-pack-2026-02-17.md`)
+- [ ] `Status: BLOCKED` Hypercare 7 วัน: incident triage war-room cadence + KPI watch + daily postmortem snapshots (blocked on 2026-02-17: requires elapsed 7-day post-go-live window; auto-monitor via `.github/workflows/phase11-window-gate.yml`, plan in `docs/phase11/uat-go-live-signoff-pack-2026-02-17.md`)
 - [x] `Status: DONE` Production sign-off package: architecture/runtime/security/perf/UAT evidence + ownership handoff complete (completed baseline on 2026-02-17 with phase11 evidence pack under `docs/phase11/*`)
 
 ---
@@ -565,4 +565,4 @@ Default for Milestone:
 - [x] `Status: DONE` Phase 8 Signed (completed on 2026-02-16)
 - [x] `Status: DONE` Phase 9 Signed (completed on 2026-02-16)
 - [x] `Status: DONE` Phase 10 Signed (completed on 2026-02-16)
-- [ ] `Status: BLOCKED` Phase 11 Signed (blocked on 2026-02-17: pending 7-day SLO window + 7-day hypercare completion)
+- [ ] `Status: BLOCKED` Phase 11 Signed (blocked on 2026-02-17: pending 7-day SLO window + 7-day hypercare completion; tracked by `phase11-window-gate` workflow)

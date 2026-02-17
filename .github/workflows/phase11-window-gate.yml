@@ -1,0 +1,121 @@
+name: phase11-window-gate
+run-name: phase11-window-gate-${{ github.event_name }}-${{ github.event.schedule || 'manual' }}
+
+on:
+  schedule:
+    - cron: "45 18 * * *" # daily 01:45 Asia/Bangkok
+  workflow_dispatch:
+
+permissions:
+  actions: read
+  contents: read
+  issues: write
+
+jobs:
+  evaluate-window:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Evaluate 7-day window gates
+        uses: actions/github-script@v7
+        env:
+          PHASE11_GO_LIVE_DATE: ${{ vars.PHASE11_GO_LIVE_DATE }}
+        with:
+          script: |
+            const core = require('@actions/core');
+
+            const goLiveRaw = process.env.PHASE11_GO_LIVE_DATE;
+            if (!goLiveRaw) {
+              core.setFailed('Missing repo variable PHASE11_GO_LIVE_DATE (YYYY-MM-DD)');
+              return;
+            }
+
+            const goLive = new Date(`${goLiveRaw}T00:00:00Z`);
+            if (Number.isNaN(goLive.getTime())) {
+              core.setFailed(`Invalid PHASE11_GO_LIVE_DATE: ${goLiveRaw}`);
+              return;
+            }
+
+            const now = new Date();
+            const dayMs = 24 * 60 * 60 * 1000;
+            const daysElapsed = Math.floor((now.getTime() - goLive.getTime()) / dayMs);
+            const since = new Date(now.getTime() - 7 * dayMs);
+
+            const runs = await github.paginate(github.rest.actions.listWorkflowRuns, {
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              workflow_id: 'ops-scheduled-validation.yml',
+              per_page: 100
+            });
+
+            const inWindow = runs.filter((run) => {
+              const started = new Date(run.run_started_at || run.created_at);
+              return run.event === 'schedule' && started >= since;
+            });
+
+            const nightlyRuns = inWindow.filter((run) => String(run.display_title || '').includes('15 18 * * *'));
+            const weeklyRuns = inWindow.filter((run) => String(run.display_title || '').includes('30 19 * * 0'));
+
+            const nightlySuccessDates = new Set(
+              nightlyRuns
+                .filter((run) => run.conclusion === 'success')
+                .map((run) => new Date(run.run_started_at || run.created_at).toISOString().slice(0, 10))
+            );
+
+            const weeklySuccessCount = weeklyRuns.filter((run) => run.conclusion === 'success').length;
+
+            const sloWindowPass = daysElapsed >= 7 && nightlySuccessDates.size >= 7;
+            const hypercarePass = daysElapsed >= 7 && nightlySuccessDates.size >= 7 && weeklySuccessCount >= 1;
+
+            const summary = [
+              `go_live_date: ${goLiveRaw}`,
+              `days_elapsed: ${daysElapsed}`,
+              `nightly_success_days_last7: ${nightlySuccessDates.size}`,
+              `weekly_success_count_last7: ${weeklySuccessCount}`,
+              `slo_window_pass: ${sloWindowPass}`,
+              `hypercare_pass: ${hypercarePass}`
+            ].join('\n');
+
+            core.summary
+              .addHeading('Phase 11 Window Gate Evaluation')
+              .addCodeBlock(summary)
+              .write();
+
+            const issueTitle = 'Phase11 Window Gate Tracker';
+            const issueBody = [
+              'Automated phase11 7-day window evaluation.',
+              '',
+              '```txt',
+              summary,
+              '```',
+              '',
+              `Workflow run: ${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`
+            ].join('\n');
+
+            const existing = await github.paginate(github.rest.issues.listForRepo, {
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open',
+              per_page: 100
+            });
+
+            const match = existing.find((it) => it.title === issueTitle);
+            if (match) {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: match.number,
+                body: issueBody
+              });
+            } else {
+              await github.rest.issues.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                title: issueTitle,
+                body: issueBody,
+                labels: ['phase11', 'ops', 'automation']
+              });
+            }
+
+            if (!sloWindowPass || !hypercarePass) {
+              core.setFailed('Window gates not yet satisfied. See summary for details.');
+            }

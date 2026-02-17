@@ -1,4 +1,5 @@
 name: ops-scheduled-validation
+run-name: ops-validation-${{ github.event_name }}-${{ github.event.schedule || github.event.inputs.mode || 'manual' }}
 
 on:
   schedule:
@@ -17,7 +18,9 @@ permissions:
 
 jobs:
   nightly-smoke:
-    if: github.event_name == 'schedule' || github.event.inputs.mode == 'nightly-smoke'
+    if: >
+      (github.event_name == 'schedule' && github.event.schedule == '15 18 * * *') ||
+      (github.event_name == 'workflow_dispatch' && github.event.inputs.mode == 'nightly-smoke')
     runs-on: ubuntu-latest
     environment: staging
     timeout-minutes: 20
@@ -65,7 +68,9 @@ jobs:
             });
 
   weekly-full-e2e:
-    if: github.event_name == 'schedule' || github.event.inputs.mode == 'weekly-e2e'
+    if: >
+      (github.event_name == 'schedule' && github.event.schedule == '30 19 * * 0') ||
+      (github.event_name == 'workflow_dispatch' && github.event.inputs.mode == 'weekly-e2e')
     runs-on: ubuntu-latest
     environment: staging
     timeout-minutes: 40
