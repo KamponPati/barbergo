@@ -530,7 +530,7 @@ Default for Phase 11:
 - [x] `Status: DONE` UAT รอบสุดท้าย 3 persona (customer/partner/admin) พร้อม defect triage และ closure log (completed on 2026-02-17; consolidated in `docs/phase11/uat-go-live-signoff-pack-2026-02-17.md`)
 - [x] `Status: DONE` Go-live readiness review (Product/Engineering/Ops/Security) with explicit go/no-go criteria (completed on 2026-02-17; criteria and review pack in `docs/phase11/uat-go-live-signoff-pack-2026-02-17.md`)
 - [x] `Status: DONE` Controlled go-live execution + live verification checklist + rollback readiness confirmation (completed baseline on 2026-02-17; checklist and rollback readiness refs in `docs/phase11/uat-go-live-signoff-pack-2026-02-17.md`)
-- [ ] `Status: BLOCKED` Hypercare 7 วัน: incident triage war-room cadence + KPI watch + daily postmortem snapshots (blocked on 2026-02-17: requires elapsed 7-day post-go-live window; auto-monitor via `.github/workflows/phase11-window-gate.yml`, plan in `docs/phase11/uat-go-live-signoff-pack-2026-02-17.md`)
+- [ ] `Status: BLOCKED` Hypercare 7 วัน: incident triage war-room cadence + KPI watch + daily postmortem snapshots (blocked on 2026-02-17: requires elapsed 7-day post-go-live window; auto-monitor via `.github/workflows/phase11-window-gate.yml`, daily snapshot via `.github/workflows/phase11-hypercare-daily.yml`, playbook in `docs/phase11/hypercare-7day-playbook.md`)
 - [x] `Status: DONE` Production sign-off package: architecture/runtime/security/perf/UAT evidence + ownership handoff complete (completed baseline on 2026-02-17 with phase11 evidence pack under `docs/phase11/*`)
 
 ---

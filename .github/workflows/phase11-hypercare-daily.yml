@@ -1,0 +1,77 @@
+name: phase11-hypercare-daily
+run-name: phase11-hypercare-daily-${{ github.event_name }}
+
+on:
+  schedule:
+    - cron: "0 20 * * *" # daily 03:00 Asia/Bangkok
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  collect-daily-hypercare:
+    runs-on: ubuntu-latest
+    environment: staging
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Collect daily hypercare snapshot
+        env:
+          API_BASE_URL: ${{ secrets.STAGING_API_URL }}
+          WEB_BASE_URL: ${{ secrets.STAGING_WEB_URL }}
+          ALLOW_INSECURE_TLS: "true"
+          OUT_DIR: artifacts/phase11/hypercare
+        run: bash scripts/phase11/collect-daily-hypercare.sh
+
+      - name: Upload hypercare artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: phase11-hypercare-daily
+          path: artifacts/phase11/hypercare
+          retention-days: 30
+
+      - name: Comment tracker issue
+        if: always()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const path = require('path');
+
+            const issueTitle = 'Phase11 Window Gate Tracker';
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+
+            const issues = await github.paginate(github.rest.issues.listForRepo, {
+              owner, repo, state: 'open', per_page: 100
+            });
+            const tracker = issues.find((it) => it.title === issueTitle);
+
+            const dir = path.join(process.env.GITHUB_WORKSPACE, 'artifacts/phase11/hypercare');
+            let latest = 'hypercare artifact generated';
+            if (fs.existsSync(dir)) {
+              const files = fs.readdirSync(dir).filter((f) => f.endsWith('.md')).sort();
+              if (files.length > 0) {
+                latest = fs.readFileSync(path.join(dir, files[files.length - 1]), 'utf8');
+              }
+            }
+
+            const body = [
+              'Daily hypercare snapshot created.',
+              '',
+              '```md',
+              latest.slice(0, 4000),
+              '```',
+              '',
+              `Run: ${context.serverUrl}/${owner}/${repo}/actions/runs/${context.runId}`
+            ].join('\n');
+
+            if (tracker) {
+              await github.rest.issues.createComment({
+                owner, repo, issue_number: tracker.number, body
+              });
+            }
