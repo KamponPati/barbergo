@@ -495,7 +495,7 @@ Default for Phase 11:
 
 ### 11B) API, Data, and Domain Correctness Gate
 
-- [ ] `Status: TODO` Freeze API contract v1.1 (customer/partner/admin/mobile) + backward compatibility matrix + changelog
+- [x] `Status: DONE` Freeze API contract v1.1 (customer/partner/admin/mobile) + backward compatibility matrix + changelog (completed on 2026-02-17 with `docs/api/openapi-v1.yaml`, `docs/api/openapi-v1.1-changelog.md`, `docs/api/backward-compatibility-matrix-v1.1.md`)
 - [ ] `Status: TODO` Data integrity gate: booking/payment/wallet/reconciliation correctness on production-like dataset
 - [ ] `Status: TODO` Idempotency + concurrency gate: verify no duplicate booking/payment under retry/race conditions
 - [ ] `Status: TODO` Event and audit completeness gate: critical business actions traceable end-to-end by `request_id`

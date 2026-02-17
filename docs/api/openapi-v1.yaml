@@ -1,13 +1,104 @@
 openapi: 3.1.0
 info:
   title: BarberGo API
-  version: 1.0.0-rc2
-  description: Contract-first API skeleton for Phase 1 freeze candidate.
+  version: 1.1.0
+  description: Contract-first API (v1.1 freeze) including profile/settings persistence endpoints.
 servers:
   - url: /api/v1
 security:
   - bearerAuth: []
 paths:
+  /auth/login:
+    post:
+      summary: Login and issue access token
+      tags: [Auth]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [user_id, role]
+              properties:
+                user_id:
+                  type: string
+                role:
+                  type: string
+                  enum: [customer, partner, admin]
+      responses:
+        '200':
+          description: Access token issued
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [access_token, expires_in_seconds]
+                properties:
+                  access_token:
+                    type: string
+                  expires_in_seconds:
+                    type: number
+
+  /auth/me:
+    get:
+      summary: Get current authenticated principal
+      tags: [Auth]
+      responses:
+        '200':
+          description: Current user principal
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [user_id, role]
+                properties:
+                  user_id:
+                    type: string
+                  role:
+                    type: string
+
+  /auth/me/profile:
+    get:
+      summary: Get current user profile
+      tags: [Auth]
+      responses:
+        '200':
+          description: Current user profile
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserProfileResponse'
+
+  /auth/me/settings:
+    get:
+      summary: Get current user settings
+      tags: [Auth]
+      responses:
+        '200':
+          description: User settings
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserSettingsResponse'
+    put:
+      summary: Update current user settings
+      tags: [Auth]
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateUserSettingsRequest'
+      responses:
+        '200':
+          description: Updated user settings
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserSettingsResponse'
+
   /customer/shops/nearby:
     get:
       summary: Get nearby shops
@@ -445,3 +536,51 @@ components:
           type: string
         request_id:
           type: string
+
+    UserProfileResponse:
+      type: object
+      required: [user_id, role, display_name, status, locale, time_zone]
+      properties:
+        user_id:
+          type: string
+        role:
+          type: string
+          enum: [customer, partner, admin]
+        display_name:
+          type: string
+        status:
+          type: string
+          enum: [active, disabled]
+        locale:
+          type: string
+        time_zone:
+          type: string
+
+    UserSettingsResponse:
+      type: object
+      required: [locale, time_zone, email_alerts, push_alerts, compact_mode]
+      properties:
+        locale:
+          type: string
+        time_zone:
+          type: string
+        email_alerts:
+          type: boolean
+        push_alerts:
+          type: boolean
+        compact_mode:
+          type: boolean
+
+    UpdateUserSettingsRequest:
+      type: object
+      properties:
+        locale:
+          type: string
+        time_zone:
+          type: string
+        email_alerts:
+          type: boolean
+        push_alerts:
+          type: boolean
+        compact_mode:
+          type: boolean
