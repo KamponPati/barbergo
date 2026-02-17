@@ -11,24 +11,26 @@ export function LoginPage(): JSX.Element {
 
   async function login(role: UserRole): Promise<void> {
     await loginAs(role);
-    navigate(role === "admin" ? "/admin" : role === "partner" ? "/partner" : "/customer");
+    navigate("/app/home");
   }
 
   return (
-    <section className="panel">
-      <header className="panel-header">
+    <section className="login-shell">
+      <article className="login-card">
+        <p className="eyebrow">BarberGo</p>
         <h2>{label("เข้าสู่ระบบ", "Login")}</h2>
         <p className="section-subtitle">
-          {label("เลือกบทบาทเพื่อทดสอบสิทธิ์การเข้าถึงด้วย RBAC", "Choose a role to test flow permissions with RBAC guards.")}
+          {label(
+            "เลือกบทบาทเพื่อเข้าสู่หน้าหลักของแอปและใช้งานฟังก์ชันตามสิทธิ์",
+            "Choose a role to enter the app and access role-based features."
+          )}
         </p>
-      </header>
-      <div className="panel-body">
-        <div className="row">
-          <UiButton onClick={() => void login("customer")}>{label("เข้าระบบลูกค้า", "Login as Customer")}</UiButton>
-          <UiButton onClick={() => void login("partner")}>{label("เข้าระบบพาร์ทเนอร์", "Login as Partner")}</UiButton>
-          <UiButton onClick={() => void login("admin")}>{label("เข้าระบบแอดมิน", "Login as Admin")}</UiButton>
+        <div className="login-actions">
+          <UiButton onClick={() => void login("customer")}>{label("เข้าสู่ระบบลูกค้า", "Continue as Customer")}</UiButton>
+          <UiButton onClick={() => void login("partner")}>{label("เข้าสู่ระบบพาร์ทเนอร์", "Continue as Partner")}</UiButton>
+          <UiButton onClick={() => void login("admin")}>{label("เข้าสู่ระบบแอดมิน", "Continue as Admin")}</UiButton>
         </div>
-      </div>
+      </article>
     </section>
   );
 }
