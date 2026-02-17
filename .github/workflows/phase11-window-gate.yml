@@ -21,8 +21,6 @@ jobs:
           PHASE11_GO_LIVE_DATE: ${{ vars.PHASE11_GO_LIVE_DATE }}
         with:
           script: |
-            const core = require('@actions/core');
-
             const goLiveRaw = process.env.PHASE11_GO_LIVE_DATE;
             if (!goLiveRaw) {
               core.setFailed('Missing repo variable PHASE11_GO_LIVE_DATE (YYYY-MM-DD)');
