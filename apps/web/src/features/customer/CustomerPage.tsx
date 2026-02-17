@@ -36,6 +36,7 @@ export function CustomerPage(): JSX.Element {
 
   const selectedShop = shops.find((shop) => shop.id === selectedShopId) ?? null;
   const selectedService = selectedShop?.services.find((service) => service.id === selectedServiceId) ?? null;
+  const quoteTotal = quote?.total ? formatCurrency(Number(quote.total)) : "-";
 
   const filteredShops = useMemo(() => {
     if (!searchText.trim()) return shops;
@@ -167,84 +168,123 @@ export function CustomerPage(): JSX.Element {
     >
       {toast ? <Toast message={toast} onClose={() => setToast(null)} /> : null}
 
-      <div className="stats-grid">
-        <StatCard label={label("ร้านที่กรอง", "Filtered Shops")} value={filteredShops.length} />
-        <StatCard label={label("สล็อต", "Slots")} value={slots.length} />
-        <StatCard label={label("ประวัติ", "History")} value={history.length} />
+      <section className="customer-hero">
+        <div>
+          <p className="eyebrow">{label("ประสบการณ์การจอง", "Booking Experience")}</p>
+          <h3>{label("จองตัดผมได้เร็วขึ้นใน 4 ขั้นตอน", "Book your haircut in 4 quick steps")}</h3>
+          <p className="section-subtitle">
+            {label(
+              "1) ค้นหาร้าน 2) ดูช่วงเวลา 3) ขอราคา 4) ยืนยันการจอง",
+              "1) Find shop 2) Check slots 3) Get quote 4) Confirm booking"
+            )}
+          </p>
+          <div className="chip-row">
+            <UiBadge tone={quote ? "success" : "warning"}>{quote ? "Quote Ready" : "Quote Pending"}</UiBadge>
+            <UiBadge tone={slots.length > 0 ? "success" : "warning"}>
+              {slots.length > 0 ? "Slots Available" : "No Slots"}
+            </UiBadge>
+          </div>
+        </div>
+        <aside className="customer-price-card">
+          <p>{label("ยอดจองล่าสุด", "Current Quote")}</p>
+          <h4>{quoteTotal}</h4>
+          <p>{label("บริการ", "Service")}: {selectedService?.name ?? "-"}</p>
+          <p>{label("ช่วงเวลา", "Slot")}: {selectedSlot ? formatDateTime(selectedSlot) : "-"}</p>
+        </aside>
+      </section>
+
+      <div className="stats-grid customer-stats">
+        <StatCard label={label("ร้านที่เจอ", "Filtered Shops")} value={filteredShops.length} />
+        <StatCard label={label("เวลาว่าง", "Available Slots")} value={slots.length} />
+        <StatCard label={label("ประวัติการจอง", "Booking History")} value={history.length} />
         <StatCard label={label("บริการที่เลือก", "Selected Service")} value={selectedService?.name ?? "-"} />
       </div>
 
-      <div className="form-grid">
-        <Field label={label("ค้นหาร้าน", "Search shop")}>
-          <Input value={searchText} onChange={setSearchText} placeholder={label("ค้นหาจากชื่อร้าน", "Search by shop name")} />
-        </Field>
-        <Field label={label("ร้าน", "Shop")}>
-          <Select
-            value={selectedShopId}
-            onChange={(nextShopId) => {
-              setSelectedShopId(nextShopId);
-              const nextShop = shops.find((shop) => shop.id === nextShopId) ?? null;
-              syncShopDefaults(nextShop);
-              setSlots([]);
-              setSelectedSlot("");
-            }}
-            options={
-              filteredShops.length > 0
-                ? filteredShops.map((shop) => ({
-                    value: shop.id,
-                    label: `${shop.name} (${shop.rating})`
-                  }))
-                : [{ value: "", label: label("ไม่พบร้าน", "No shops found") }]
-            }
-          />
-        </Field>
-        <Field label={label("สาขา", "Branch")}>
-          <Select
-            value={selectedBranchId}
-            onChange={setSelectedBranchId}
-            disabled={!selectedShop}
-            options={
-              selectedShop?.branches?.length
-                ? selectedShop.branches.map((branch) => ({
-                    value: branch.id,
-                    label: branch.name
-                  }))
-                : [{ value: selectedBranchId || "branch_1", label: selectedBranchId || "branch_1" }]
-            }
-          />
-        </Field>
-        <Field label={label("บริการ", "Service")}>
-          <Select
-            value={selectedServiceId}
-            onChange={setSelectedServiceId}
-            disabled={!selectedShop}
-            options={
-              selectedShop?.services?.length
-                ? selectedShop.services.map((service) => ({
-                    value: service.id,
-                    label: `${service.name} (${formatCurrency(service.price)})`
-                  }))
-                : [{ value: "", label: label("ไม่มีบริการ", "No services") }]
-            }
-          />
-        </Field>
-      </div>
+      <section className="customer-workspace">
+        <article className="customer-form-card">
+          <h3>{label("ค้นหาและเลือกบริการ", "Find and Select Service")}</h3>
+          <div className="form-grid">
+            <Field label={label("ค้นหาร้าน", "Search shop")}>
+              <Input value={searchText} onChange={setSearchText} placeholder={label("ค้นหาจากชื่อร้าน", "Search by shop name")} />
+            </Field>
+            <Field label={label("ร้าน", "Shop")}>
+              <Select
+                value={selectedShopId}
+                onChange={(nextShopId) => {
+                  setSelectedShopId(nextShopId);
+                  const nextShop = shops.find((shop) => shop.id === nextShopId) ?? null;
+                  syncShopDefaults(nextShop);
+                  setSlots([]);
+                  setSelectedSlot("");
+                }}
+                options={
+                  filteredShops.length > 0
+                    ? filteredShops.map((shop) => ({
+                        value: shop.id,
+                        label: `${shop.name} (${shop.rating})`
+                      }))
+                    : [{ value: "", label: label("ไม่พบร้าน", "No shops found") }]
+                }
+              />
+            </Field>
+            <Field label={label("สาขา", "Branch")}>
+              <Select
+                value={selectedBranchId}
+                onChange={setSelectedBranchId}
+                disabled={!selectedShop}
+                options={
+                  selectedShop?.branches?.length
+                    ? selectedShop.branches.map((branch) => ({
+                        value: branch.id,
+                        label: branch.name
+                      }))
+                    : [{ value: selectedBranchId || "branch_1", label: selectedBranchId || "branch_1" }]
+                }
+              />
+            </Field>
+            <Field label={label("บริการ", "Service")}>
+              <Select
+                value={selectedServiceId}
+                onChange={setSelectedServiceId}
+                disabled={!selectedShop}
+                options={
+                  selectedShop?.services?.length
+                    ? selectedShop.services.map((service) => ({
+                        value: service.id,
+                        label: `${service.name} (${formatCurrency(service.price)})`
+                      }))
+                    : [{ value: "", label: label("ไม่มีบริการ", "No services") }]
+                }
+              />
+            </Field>
+          </div>
+          <div className="row">
+            <UiButton onClick={loadShops}>{label("โหลดร้าน", "Load Shops")}</UiButton>
+            <UiButton onClick={loadAvailability} disabled={!selectedShopId || !selectedServiceId}>
+              {label("โหลดเวลาว่าง", "Load Availability")}
+            </UiButton>
+            <UiButton onClick={loadQuote} disabled={!selectedShopId || !selectedServiceId}>
+              {label("ขอราคา", "Quote")}
+            </UiButton>
+            <UiButton onClick={() => setCheckoutModalOpen(true)} disabled={!selectedShopId || !selectedServiceId}>
+              {label("ชำระเงิน", "Checkout")}
+            </UiButton>
+            <UiButton variant="secondary" onClick={loadHistory}>
+              {label("โหลดประวัติ", "Load History")}
+            </UiButton>
+          </div>
+        </article>
 
-      <div className="row">
-        <UiButton onClick={loadShops}>{label("โหลดร้าน", "Load Shops")}</UiButton>
-        <UiButton onClick={loadAvailability} disabled={!selectedShopId || !selectedServiceId}>
-          {label("โหลดเวลาว่าง", "Load Availability")}
-        </UiButton>
-        <UiButton onClick={loadQuote} disabled={!selectedShopId || !selectedServiceId}>
-          {label("ขอราคา", "Quote")}
-        </UiButton>
-        <UiButton onClick={() => setCheckoutModalOpen(true)} disabled={!selectedShopId || !selectedServiceId}>
-          {label("ชำระเงิน", "Checkout")}
-        </UiButton>
-        <UiButton variant="secondary" onClick={loadHistory}>
-          {label("โหลดประวัติ", "Load History")}
-        </UiButton>
-      </div>
+        <aside className="customer-side-card">
+          <h3>{label("สรุปการจอง", "Booking Summary")}</h3>
+          <p>{label("ร้าน", "Shop")}: <strong>{selectedShop?.name ?? "-"}</strong></p>
+          <p>{label("สาขา", "Branch")}: <strong>{selectedBranchId || "-"}</strong></p>
+          <p>{label("บริการ", "Service")}: <strong>{selectedService?.name ?? "-"}</strong></p>
+          <p>{label("ราคา", "Quote Total")}: <strong>{quoteTotal}</strong></p>
+          <p>{label("เวลานัดหมาย", "Selected Slot")}: <strong>{selectedSlot ? formatDateTime(selectedSlot) : "-"}</strong></p>
+        </aside>
+      </section>
+
       <p className="helper-note">
         {label(
           "ลำดับที่แนะนำ: โหลดร้าน -> โหลดเวลาว่าง -> ขอราคา -> ชำระเงิน -> โหลดประวัติ",
@@ -266,10 +306,6 @@ export function CustomerPage(): JSX.Element {
       {loading && activeTab !== "debug" ? <SkeletonRows count={4} /> : null}
       {error ? <ErrorBanner message={error} /> : null}
       <StatusLine value={status} />
-      <div className="row">
-        <UiBadge tone={quote ? "success" : "neutral"}>{quote ? "Quote Ready" : "Quote Pending"}</UiBadge>
-        <UiBadge tone={slots.length > 0 ? "success" : "warning"}>{slots.length > 0 ? "Slots Available" : "No Slots"}</UiBadge>
-      </div>
 
       {!loading && !error && shops.length === 0 ? (
         <EmptyHint message={label("ยังไม่มีข้อมูลร้าน กดโหลดร้านเพื่อเริ่มต้น", "No shops loaded yet. Click Load Shops.")} />
@@ -290,7 +326,7 @@ export function CustomerPage(): JSX.Element {
             />
           </Field>
           <Field label={label("ราคาปัจจุบัน", "Current quote")}>
-            <Input value={quote?.total ? formatCurrency(Number(quote.total)) : "-"} onChange={() => {}} readOnly />
+            <Input value={quoteTotal} onChange={() => {}} readOnly />
           </Field>
         </div>
       ) : null}

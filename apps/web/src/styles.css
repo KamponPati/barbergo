@@ -960,6 +960,69 @@ code {
   margin: 6px 0;
 }
 
+.customer-hero {
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background: linear-gradient(130deg, #ffffff, #f2fbf8);
+  padding: 14px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 280px;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.customer-hero h3 {
+  margin: 0;
+  font-size: 24px;
+}
+
+.customer-price-card {
+  border: 1px solid #bce6dd;
+  border-radius: var(--radius-sm);
+  padding: 12px;
+  background: #ffffff;
+}
+
+.customer-price-card p {
+  margin: 0 0 8px;
+  color: var(--muted);
+}
+
+.customer-price-card h4 {
+  margin: 0 0 8px;
+  font-size: 28px;
+  color: var(--brand-strong);
+}
+
+.customer-workspace {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 280px;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.customer-form-card,
+.customer-side-card {
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: #fff;
+  padding: 12px;
+}
+
+.customer-form-card h3,
+.customer-side-card h3 {
+  margin: 0 0 10px;
+}
+
+.customer-side-card p {
+  margin: 0 0 8px;
+  color: var(--muted);
+}
+
+.customer-stats .stat-card {
+  background: linear-gradient(160deg, #ffffff, #f8f8f5);
+}
+
 .app-section-grid {
   display: grid;
   gap: 12px;
@@ -1072,6 +1135,11 @@ code {
   .support-grid,
   .app-section-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .customer-hero,
+  .customer-workspace {
+    grid-template-columns: minmax(0, 1fr);
   }
 
   .drawer {
