@@ -523,7 +523,7 @@ Default for Phase 11:
 - [ ] `Status: TODO` Release pipeline hardening: protected branch, required checks, manual approval gates, artifact signing/versioning
 - [ ] `Status: TODO` Self-hosted runner hardening: least privilege sudoers, runner isolation, auto-update, audit logging
 - [ ] `Status: TODO` Blue/green or canary rollout playbook: promote, verify, rollback within target time
-- [ ] `Status: TODO` Nightly smoke + weekly full e2e schedule with report retention and failure escalation
+- [x] `Status: DONE` Nightly smoke + weekly full e2e schedule with report retention and failure escalation (completed on 2026-02-17 with `.github/workflows/ops-scheduled-validation.yml` + `scripts/staging/full-e2e-regression.sh` + artifact retention + incident issue automation)
 
 ### 11F) UAT, Go-Live, and Post-Go-Live Control
 
