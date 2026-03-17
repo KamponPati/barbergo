@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-FILE="/home/yee/app/infra/docker/docker-compose.observability.yml"
+FILE="/home/yee/app3/barbergo/infra/docker/docker-compose.observability.yml"
 
 # Ensure stale named containers from previous compose project names do not block startup.
 for c in barbergo-prometheus barbergo-loki barbergo-grafana barbergo-promtail barbergo-alertmanager; do

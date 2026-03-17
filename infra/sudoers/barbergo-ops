@@ -4,18 +4,18 @@
 #   sudo visudo -cf /etc/sudoers.d/barbergo-ops
 #
 # Verify:
-#   sudo -n /usr/bin/bash /home/yee/app/scripts/ops/install-systemd-units.sh
-#   sudo -n /usr/bin/bash /home/yee/app/scripts/backup/run-backup.sh
-#   sudo -n /usr/bin/bash /home/yee/app/scripts/backup/verify-restore.sh
+#   sudo -n /usr/bin/bash /home/yee/app3/barbergo/scripts/ops/install-systemd-units.sh
+#   sudo -n /usr/bin/bash /home/yee/app3/barbergo/scripts/backup/run-backup.sh
+#   sudo -n /usr/bin/bash /home/yee/app3/barbergo/scripts/backup/verify-restore.sh
 
 Cmnd_Alias BARBERGO_OPS = \
-  /usr/bin/bash /home/yee/app/scripts/ops/bootstrap-env-files.sh, \
-  /usr/bin/bash /home/yee/app/scripts/ops/check-env-parity.sh, \
-  /usr/bin/bash /home/yee/app/scripts/ops/install-systemd-units.sh, \
-  /usr/bin/bash /home/yee/app/scripts/ops/observability-up.sh, \
-  /usr/bin/bash /home/yee/app/scripts/ops/observability-down.sh, \
-  /usr/bin/bash /home/yee/app/scripts/backup/run-backup.sh, \
-  /usr/bin/bash /home/yee/app/scripts/backup/verify-restore.sh, \
+  /usr/bin/bash /home/yee/app3/barbergo/scripts/ops/bootstrap-env-files.sh, \
+  /usr/bin/bash /home/yee/app3/barbergo/scripts/ops/check-env-parity.sh, \
+  /usr/bin/bash /home/yee/app3/barbergo/scripts/ops/install-systemd-units.sh, \
+  /usr/bin/bash /home/yee/app3/barbergo/scripts/ops/observability-up.sh, \
+  /usr/bin/bash /home/yee/app3/barbergo/scripts/ops/observability-down.sh, \
+  /usr/bin/bash /home/yee/app3/barbergo/scripts/backup/run-backup.sh, \
+  /usr/bin/bash /home/yee/app3/barbergo/scripts/backup/verify-restore.sh, \
   /bin/systemctl enable --now backup-barbergo.timer, \
   /bin/systemctl start backup-barbergo.service, \
   /bin/systemctl status backup-barbergo.timer, \

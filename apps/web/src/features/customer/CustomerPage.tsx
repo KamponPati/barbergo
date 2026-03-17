@@ -2,13 +2,20 @@ import { useEffect, useMemo, useState } from "react";
 import {
   AlarmClockCheck,
   BadgeCheck,
+  CalendarDays,
   CarTaxiFront,
+  CheckCircle2,
+  Clock,
   Crown,
   Heart,
+  Home,
   MapPinned,
+  Navigation,
   PhoneCall,
+  Scissors,
   ShieldAlert,
   Star,
+  Truck,
   Wallet
 } from "lucide-react";
 import { checkoutBooking, getAvailability, getCustomerHistory, getNearbyShops, quoteBooking } from "../../lib/api";
@@ -97,6 +104,21 @@ const DELIVERY_BARBERS: DeliveryBarber[] = [
   }
 ];
 
+const TRACKING_STEPS: { state: TrackingState; label: string }[] = [
+  { state: "on_the_way", label: "On the Way" },
+  { state: "arrived", label: "Arrived" },
+  { state: "in_progress", label: "In Progress" },
+  { state: "completed", label: "Done" }
+];
+
+const NAV_ITEMS: { key: CustomerView; icon: JSX.Element; label: string }[] = [
+  { key: "home", icon: <Home size={18} />, label: "Home" },
+  { key: "delivery", icon: <Truck size={18} />, label: "Delivery" },
+  { key: "bookings", icon: <CalendarDays size={18} />, label: "Bookings" },
+  { key: "tracking", icon: <Navigation size={18} />, label: "Tracking" },
+  { key: "rewards", icon: <Crown size={18} />, label: "Rewards" }
+];
+
 function shopReliability(shopId: string): number {
   if (shopId === "shop_1") return 96;
   if (shopId === "shop_2") return 92;
@@ -149,6 +171,8 @@ export function CustomerPage(): JSX.Element {
   const quoteTotal = quote?.total ? formatCurrency(quote.total) : "-";
   const points = history.length * 20 + 140;
   const tier = points >= 500 ? "Gold" : "Silver";
+  const nextTierPoints = tier === "Gold" ? 1000 : 500;
+  const pointsProgressPct = Math.min(100, Math.round((points / nextTierPoints) * 100));
 
   const discoveryShops = useMemo(() => {
     const source = shops.map((shop) => ({ ...shop, reliability: shopReliability(shop.id), wait_min: shopLiveWait(shop.id) }));
@@ -192,12 +216,7 @@ export function CustomerPage(): JSX.Element {
         const shouldProgress = nextProgress >= 70 && prev.state === "arrived";
         const shouldComplete = nextProgress >= 96 && prev.state === "in_progress";
         const nextTrackingState = shouldAdvance || shouldProgress || shouldComplete ? nextState(prev.state) : prev.state;
-        return {
-          ...prev,
-          progress_pct: nextProgress,
-          eta_min: nextEta,
-          state: nextTrackingState
-        };
+        return { ...prev, progress_pct: nextProgress, eta_min: nextEta, state: nextTrackingState };
       });
     }, 1600);
     return () => window.clearInterval(timer);
@@ -262,20 +281,12 @@ export function CustomerPage(): JSX.Element {
       async () => {
         const quoteRes = await quoteBooking(token, selectedShopId, selectedServiceId);
         setQuote(quoteRes);
-
         const slotAt = selectedSlot || slots[0];
         if (!slotAt) {
           setStatus("No slot available right now. Please retry.");
           return;
         }
-
-        const checkoutRes = await checkoutBooking({
-          token,
-          shopId: selectedShopId,
-          serviceId: selectedServiceId,
-          slot: slotAt
-        });
-
+        const checkoutRes = await checkoutBooking({ token, shopId: selectedShopId, serviceId: selectedServiceId, slot: slotAt });
         setTracking({
           booking_id: checkoutRes.booking.id,
           barber_name: selectedBarber?.name ?? "Akkarin P.",
@@ -283,7 +294,6 @@ export function CustomerPage(): JSX.Element {
           eta_min: selectedBarber?.eta_min ?? 18,
           state: "on_the_way"
         });
-
         await loadHistory();
         setStatus(`Checkout completed: ${checkoutRes.booking.id}`);
       },
@@ -305,9 +315,7 @@ export function CustomerPage(): JSX.Element {
   }
 
   function routeFor(booking: { action: string }): void {
-    if (booking.action.includes("Track")) {
-      setCurrentView("tracking");
-    }
+    if (booking.action.includes("Track")) setCurrentView("tracking");
     setStatus("Opened contextual booking action");
   }
 
@@ -320,48 +328,46 @@ export function CustomerPage(): JSX.Element {
       )}
     >
       <main className="customer-v2">
-        <section className="customer-v2-head">
-          <div>
-            <p className="customer-kicker">Dual Mode Customer App</p>
+
+        {/* ── Header bar ── */}
+        <header className="customer-v2-head">
+          <div className="customer-v2-head-left">
+            <span className="customer-kicker">
+              <Scissors size={11} style={{ display: "inline", verticalAlign: "middle" }} /> Dual Mode Customer App
+            </span>
             <h3>In-Shop + Delivery</h3>
           </div>
-          <div className="row">
-            <UiButton onClick={() => void loadShops()} variant="secondary">
-              Reload Shops
-            </UiButton>
-            <UiButton onClick={() => void loadHistory()} variant="secondary">
-              Load History
-            </UiButton>
+          <div className="customer-v2-head-actions">
+            <UiButton onClick={() => void loadShops()} variant="secondary">Reload Shops</UiButton>
+            <UiButton onClick={() => void loadHistory()} variant="secondary">Load History</UiButton>
           </div>
-        </section>
+        </header>
 
         {loading ? <LoadingBadge text="Customer app syncing..." /> : null}
         {error ? <ErrorBanner message={error} /> : null}
         <StatusLine value={status} />
 
+        {/* ── Tab navigation ── */}
         <nav className="customer-v2-nav" aria-label="Customer views">
-          <button type="button" className={currentView === "home" ? "is-active" : ""} onClick={() => setCurrentView("home")}>
-            Home
-          </button>
-          <button type="button" className={currentView === "delivery" ? "is-active" : ""} onClick={() => setCurrentView("delivery")}>
-            Delivery
-          </button>
-          <button type="button" className={currentView === "bookings" ? "is-active" : ""} onClick={() => setCurrentView("bookings")}>
-            Bookings
-          </button>
-          <button type="button" className={currentView === "tracking" ? "is-active" : ""} onClick={() => setCurrentView("tracking")}>
-            Tracking
-          </button>
-          <button type="button" className={currentView === "rewards" ? "is-active" : ""} onClick={() => setCurrentView("rewards")}>
-            Rewards
-          </button>
+          {NAV_ITEMS.map(({ key, icon, label: navLabel }) => (
+            <button
+              key={key}
+              type="button"
+              className={currentView === key ? "is-active" : ""}
+              onClick={() => setCurrentView(key)}
+            >
+              {icon}
+              <span>{navLabel}</span>
+            </button>
+          ))}
         </nav>
 
+        {/* ── Home: Lookbook + Shop discovery ── */}
         {currentView === "home" ? (
           <>
             <section className="customer-lookbook">
               <div className="customer-card-head">
-                <h3>Lookbook Search</h3>
+                <h3>{label("สไตล์ทรงผม", "Lookbook")}</h3>
                 <button
                   type="button"
                   className={asapOnly ? "customer-asap-btn is-active" : "customer-asap-btn"}
@@ -381,7 +387,14 @@ export function CustomerPage(): JSX.Element {
                       setStatus(`Lookbook style selected: ${style.name}`);
                     }}
                   >
-                    <img src={style.image} alt={style.name} />
+                    <div className="customer-style-img-wrap">
+                      <img src={style.image} alt={style.name} />
+                      {selectedStyle === style.id ? (
+                        <div className="customer-style-check">
+                          <CheckCircle2 size={20} />
+                        </div>
+                      ) : null}
+                    </div>
                     <span>{style.name}</span>
                   </button>
                 ))}
@@ -393,19 +406,29 @@ export function CustomerPage(): JSX.Element {
                 const reliability = shopReliability(shop.id);
                 const waitMin = shopLiveWait(shop.id);
                 const isFast = waitMin <= 15;
+                const isSelected = selectedShopId === shop.id;
                 return (
-                  <article key={shop.id} className="customer-shop-card">
+                  <article key={shop.id} className={`customer-shop-card ${isSelected ? "is-selected" : ""}`}>
                     <div className="customer-card-head">
-                      <h4>{shop.name}</h4>
-                      <UiBadge tone={isFast ? "success" : "warning"}>{isFast ? "Ready Soon" : "Queue"}</UiBadge>
+                      <div>
+                        <div className="customer-shop-name-row">
+                          <Scissors size={13} />
+                          <h4>{shop.name}</h4>
+                        </div>
+                        <div className="customer-shop-meta">
+                          <Star size={11} />
+                          <span>{shop.rating}</span>
+                          <span className="customer-meta-dot">·</span>
+                          <span>Reliability {reliability}%</span>
+                        </div>
+                      </div>
+                      <UiBadge tone={isFast ? "success" : "warning"}>{isFast ? "Ready" : "Queue"}</UiBadge>
                     </div>
-                    <p>
-                      <Star size={14} /> Rating {shop.rating} | Reliability {reliability}%
-                    </p>
-                    <p>
-                      <MapPinned size={14} /> Live Queue {waitMin} min | Next slot {slots?.[0] ? formatDateTime(slots[0]) : "-"}
-                    </p>
-                    <div className="row">
+                    <div className="customer-shop-info-row">
+                      <span><Clock size={12} /> {waitMin} min wait</span>
+                      <span><CalendarDays size={12} /> {slots?.[0] ? formatDateTime(slots[0]) : "No slot yet"}</span>
+                    </div>
+                    <div className="customer-shop-actions">
                       <UiButton
                         variant="secondary"
                         onClick={() => {
@@ -413,9 +436,9 @@ export function CustomerPage(): JSX.Element {
                           setStatus(`Selected shop ${shop.name}`);
                         }}
                       >
-                        Select Shop
+                        {isSelected ? "Selected ✓" : "Select Shop"}
                       </UiButton>
-                      <UiButton onClick={() => void loadAvailability()}>Load Availability</UiButton>
+                      <UiButton onClick={() => void loadAvailability()}>Check Slots</UiButton>
                     </div>
                   </article>
                 );
@@ -428,31 +451,42 @@ export function CustomerPage(): JSX.Element {
           </>
         ) : null}
 
+        {/* ── Delivery: Barber list + detail ── */}
         {currentView === "delivery" ? (
           <>
             <section className="customer-delivery-grid">
               {DELIVERY_BARBERS.map((barber) => (
-                <article key={barber.id} className="customer-barber-card">
-                  <img src={barber.portrait} alt={barber.name} className="customer-barber-portrait" />
-                  <div className="customer-card-head">
-                    <h4>{barber.name}</h4>
-                    <UiBadge tone={barber.ready ? "success" : "warning"}>{barber.ready ? "Ready to Travel" : "Busy"}</UiBadge>
+                <article key={barber.id} className={`customer-barber-card ${selectedBarberId === barber.id ? "is-selected" : ""}`}>
+                  <div className="customer-barber-portrait-wrap">
+                    <img src={barber.portrait} alt={barber.name} className="customer-barber-portrait" />
+                    <UiBadge tone={barber.ready ? "success" : "warning"}>
+                      {barber.ready ? "Ready" : "Busy"}
+                    </UiBadge>
                   </div>
-                  <p>{barber.specialty} | {barber.years} yrs</p>
-                  <p>
-                    <BadgeCheck size={14} /> {barber.verified ? "Verified" : "Unverified"} | ETA {barber.eta_min} min
-                  </p>
-                  <div className="row">
+                  <div className="customer-barber-info">
+                    <div className="customer-card-head">
+                      <h4>{barber.name}</h4>
+                      <span className="customer-barber-rating">
+                        <Star size={12} /> {barber.rating}
+                      </span>
+                    </div>
+                    <p className="customer-barber-specialty">{barber.specialty} · {barber.years} yrs exp</p>
+                    <div className="customer-barber-meta">
+                      <span><BadgeCheck size={12} /> {barber.verified ? "Verified" : "Unverified"}</span>
+                      <span><Clock size={12} /> ETA {barber.eta_min} min</span>
+                    </div>
+                  </div>
+                  <div className="customer-shop-actions">
                     <UiButton
+                      variant="secondary"
                       onClick={() => {
                         setSelectedBarberId(barber.id);
                         setStatus(`Selected barber ${barber.name}`);
                       }}
                     >
-                      View Detail
+                      View Profile
                     </UiButton>
                     <UiButton
-                      variant="secondary"
                       onClick={() => {
                         setCurrentView("tracking");
                         setTracking({
@@ -464,7 +498,7 @@ export function CustomerPage(): JSX.Element {
                         });
                       }}
                     >
-                      Track
+                      Book Now
                     </UiButton>
                   </div>
                 </article>
@@ -475,9 +509,9 @@ export function CustomerPage(): JSX.Element {
               <section className="customer-barber-detail">
                 <div className="customer-card-head">
                   <h3>{selectedBarber.name}</h3>
-                  <UiBadge tone="success">Profile Detail</UiBadge>
+                  <UiBadge tone="success">Profile</UiBadge>
                 </div>
-                <p>{selectedBarber.bio}</p>
+                <p className="customer-barber-bio">{selectedBarber.bio}</p>
                 <div className="customer-portfolio-grid">
                   {selectedBarber.portfolio.map((photo) => (
                     <img key={photo} src={photo} alt="portfolio" />
@@ -485,9 +519,7 @@ export function CustomerPage(): JSX.Element {
                 </div>
                 <div className="customer-equipment">
                   {selectedBarber.equipment.map((item) => (
-                    <UiBadge key={item} tone="neutral">
-                      {item}
-                    </UiBadge>
+                    <UiBadge key={item} tone="neutral">{item}</UiBadge>
                   ))}
                 </div>
               </section>
@@ -495,12 +527,32 @@ export function CustomerPage(): JSX.Element {
           </>
         ) : null}
 
+        {/* ── Bookings hub ── */}
         {currentView === "bookings" ? (
           <section className="customer-bookings-hub">
             <div className="customer-card-head">
-              <h3>Bookings Hub</h3>
+              <h3>{label("การจอง", "Bookings Hub")}</h3>
               <UiButton onClick={() => void quoteAndCheckout()}>Quote + Checkout</UiButton>
             </div>
+
+            <div className="customer-summary-grid">
+              <article className="customer-summary-card">
+                <div className="customer-summary-icon"><Scissors size={16} /></div>
+                <p>{label("ร้านที่เลือก", "Selected Shop")}</p>
+                <h4>{selectedShop?.name ?? "—"}</h4>
+              </article>
+              <article className="customer-summary-card">
+                <div className="customer-summary-icon"><Wallet size={16} /></div>
+                <p>{label("ราคาประเมิน", "Quote")}</p>
+                <h4>{quoteTotal}</h4>
+              </article>
+              <article className="customer-summary-card">
+                <div className="customer-summary-icon"><CalendarDays size={16} /></div>
+                <p>{label("สล็อตถัดไป", "Next Slot")}</p>
+                <h4>{selectedSlot ? formatDateTime(selectedSlot) : "—"}</h4>
+              </article>
+            </div>
+
             <div className="customer-booking-actions">
               <UiButton variant="secondary" onClick={() => void loadAvailability()} disabled={!selectedShopId || !selectedServiceId}>
                 Load Slots
@@ -509,20 +561,7 @@ export function CustomerPage(): JSX.Element {
                 Refresh History
               </UiButton>
             </div>
-            <div className="customer-summary-grid">
-              <article className="customer-summary-card">
-                <p>Selected Shop</p>
-                <h4>{selectedShop?.name ?? "-"}</h4>
-              </article>
-              <article className="customer-summary-card">
-                <p>Quote</p>
-                <h4>{quoteTotal}</h4>
-              </article>
-              <article className="customer-summary-card">
-                <p>Next Slot</p>
-                <h4>{selectedSlot ? formatDateTime(selectedSlot) : "-"}</h4>
-              </article>
-            </div>
+
             <DataTable
               caption="Upcoming bookings"
               columns={[
@@ -555,61 +594,132 @@ export function CustomerPage(): JSX.Element {
           </section>
         ) : null}
 
+        {/* ── Live Tracking ── */}
         {currentView === "tracking" ? (
           <section className="customer-tracking">
             <div className="customer-card-head">
-              <h3>Live Tracking</h3>
-              <UiBadge tone={tracking.state === "completed" ? "success" : "warning"}>{tracking.state}</UiBadge>
+              <div>
+                <h3>{label("ติดตามสด", "Live Tracking")}</h3>
+                <p className="customer-tracking-barber-name">{tracking.barber_name}</p>
+              </div>
+              <UiBadge tone={tracking.state === "completed" ? "success" : "warning"}>
+                {tracking.state.replace("_", " ")}
+              </UiBadge>
             </div>
-            <article className="tracking-map-sim">
-              <div className="tracking-route" style={{ width: `${tracking.progress_pct}%` }} />
-              <p>
-                Barber: {tracking.barber_name} | ETA {tracking.eta_min} min | Progress {tracking.progress_pct}%
-              </p>
-            </article>
-            <div className="row">
-              <UiButton variant="secondary">
-                <PhoneCall size={14} /> Call
-              </UiButton>
-              <UiButton variant="secondary">
-                <CarTaxiFront size={14} /> Message
-              </UiButton>
-              <UiButton variant="secondary">
-                <ShieldAlert size={14} /> SOS
-              </UiButton>
+
+            {/* Step indicator */}
+            <div className="customer-tracking-steps">
+              {TRACKING_STEPS.map(({ state: stepState, label: stepLabel }, i) => {
+                const currentIdx = TRACKING_STEPS.findIndex((s) => s.state === tracking.state);
+                const stepIdx = i;
+                const isDone = stepIdx < currentIdx;
+                const isActive = stepState === tracking.state;
+                return (
+                  <div
+                    key={stepState}
+                    className={`customer-tracking-step ${isDone ? "is-done" : ""} ${isActive ? "is-active" : ""}`}
+                  >
+                    {i < TRACKING_STEPS.length - 1 ? <div className={`customer-step-line ${isDone ? "is-done" : ""}`} /> : null}
+                    <div className="customer-step-dot">
+                      {isDone ? <CheckCircle2 size={14} /> : <span>{i + 1}</span>}
+                    </div>
+                    <span className="customer-step-label">{stepLabel}</span>
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Progress bar */}
+            <div className="customer-tracking-progress-wrap">
+              <div className="customer-tracking-progress-bar" style={{ width: `${tracking.progress_pct}%` }} />
+            </div>
+            <p className="customer-tracking-eta">
+              <MapPinned size={14} />
+              {tracking.state === "completed"
+                ? "Service completed!"
+                : `ETA ${tracking.eta_min} min · ${tracking.progress_pct}% complete`}
+            </p>
+
+            {/* Action buttons */}
+            <div className="customer-tracking-actions">
+              <button type="button" className="customer-action-btn">
+                <PhoneCall size={18} />
+                <span>Call</span>
+              </button>
+              <button type="button" className="customer-action-btn">
+                <CarTaxiFront size={18} />
+                <span>Message</span>
+              </button>
+              <button type="button" className="customer-action-btn customer-action-btn-danger">
+                <ShieldAlert size={18} />
+                <span>SOS</span>
+              </button>
             </div>
           </section>
         ) : null}
 
+        {/* ── Rewards ── */}
         {currentView === "rewards" ? (
           <section className="customer-rewards">
+            {/* Tier hero */}
+            <div className="customer-rewards-hero">
+              <div className={`customer-tier-badge ${tier === "Gold" ? "is-gold" : "is-silver"}`}>
+                <Crown size={26} />
+                <span>{tier}</span>
+              </div>
+              <div className="customer-rewards-info">
+                <p className="customer-points-label">BarberGo Points</p>
+                <h3 className="customer-points-value">{points.toLocaleString()}</h3>
+                <p className="customer-points-next">{(nextTierPoints - points).toLocaleString()} pts to next tier</p>
+              </div>
+            </div>
+
+            {/* Points progress bar */}
+            <div className="customer-points-bar-wrap">
+              <div className="customer-points-bar" style={{ width: `${pointsProgressPct}%` }} />
+            </div>
+            <p className="customer-points-progress-label">{pointsProgressPct}% to {tier === "Gold" ? "Platinum" : "Gold"}</p>
+
+            {/* Perk cards */}
+            <div className="customer-rewards-perks">
+              <div className="customer-perk-card">
+                <Wallet size={22} />
+                <p>Saved Cards</p>
+                <span>3 cards</span>
+              </div>
+              <div className="customer-perk-card">
+                <Crown size={22} />
+                <p>Loyalty Perks</p>
+                <span>5 active</span>
+              </div>
+              <div className="customer-perk-card">
+                <Heart size={22} />
+                <p>Favourites</p>
+                <span>2 barbers</span>
+              </div>
+            </div>
+
+            {/* Wallet summary */}
             <div className="customer-summary-grid">
               <article className="customer-summary-card">
-                <p>BarberGo Points</p>
-                <h4>{points}</h4>
-              </article>
-              <article className="customer-summary-card">
-                <p>Membership Tier</p>
-                <h4>{tier}</h4>
-              </article>
-              <article className="customer-summary-card">
-                <p>Wallet Balance</p>
+                <div className="customer-summary-icon"><Wallet size={16} /></div>
+                <p>Wallet</p>
                 <h4>{formatCurrency(1240)}</h4>
               </article>
-            </div>
-            <div className="row">
-              <UiBadge tone="neutral">
-                <Wallet size={14} /> Saved Cards
-              </UiBadge>
-              <UiBadge tone="neutral">
-                <Crown size={14} /> Loyalty Perks
-              </UiBadge>
-              <UiBadge tone="neutral">
-                <Heart size={14} /> Favorite Barbers
-              </UiBadge>
+              <article className="customer-summary-card">
+                <div className="customer-summary-icon"><CalendarDays size={16} /></div>
+                <p>Total Bookings</p>
+                <h4>{history.length}</h4>
+              </article>
+              <article className="customer-summary-card">
+                <div className="customer-summary-icon"><Star size={16} /></div>
+                <p>Tier</p>
+                <h4>{tier}</h4>
+              </article>
             </div>
           </section>
         ) : null}
+
       </main>
     </PageSection>
   );

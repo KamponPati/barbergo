@@ -712,3 +712,397 @@ Default for Milestone:
 - [x] `Status: DONE` Phase 9 Signed (completed on 2026-02-16)
 - [x] `Status: DONE` Phase 10 Signed (completed on 2026-02-16)
 - [ ] `Status: BLOCKED` Phase 11 Signed (blocked on 2026-02-17: pending 7-day SLO window + 7-day hypercare completion; tracked by `phase11-window-gate` workflow)
+
+---
+
+## Phase 13 - Customer Mobile App (React Native + Expo)
+
+อัปเดต: 2026-02-18
+เป้าหมาย: สร้าง Customer Mobile App แบบ native ด้วย React Native + Expo ให้ครบ end-to-end flow ตาม Product Requirement v3.1
+
+Default for Phase 13:
+- `Owner: Codex | Priority: P1 | Sprint: S13 | Dependency: DEP-03/DEP-04 | DoD: Implementation | Deliverable: working screen + passing build | Blocker: None`
+
+---
+
+### 13A) Dependencies & Project Setup
+
+งาน: ติดตั้ง library ที่จำเป็นและตั้งค่า project ให้พร้อม
+
+- [x] `Status: DONE` ติดตั้ง React Navigation (`@react-navigation/native`, `@react-navigation/bottom-tabs`, `@react-navigation/native-stack`) พร้อม peer deps
+  `Owner: Codex | Priority: P0 | Due: 2026-02-20 | Dependency: DEP-04 | DoD: import ได้ไม่ error, build ผ่าน | Deliverable: apps/mobile/package.json updated | Blocker: None`
+
+- [x] `Status: DONE` ติดตั้ง `expo-location` สำหรับ GPS (ค้นหาร้านใกล้เคียง)
+  `Owner: Codex | Priority: P0 | Due: 2026-02-20 | Dependency: DEP-04 | DoD: request permission + get coords ได้ | Deliverable: apps/mobile/package.json | Blocker: None`
+
+- [x] `Status: DONE` ติดตั้ง `expo-secure-store` สำหรับเก็บ JWT token อย่างปลอดภัย (แทน AsyncStorage)
+  `Owner: Codex | Priority: P0 | Due: 2026-02-20 | Dependency: DEP-04 | DoD: save/read token ได้ | Deliverable: apps/mobile/src/lib/storage.ts | Blocker: None`
+
+- [x] `Status: DONE` ติดตั้ง `zustand` สำหรับ global state (auth, cart, tracking)
+  `Owner: Codex | Priority: P0 | Due: 2026-02-20 | Dependency: DEP-04 | DoD: store ทำงานได้ | Deliverable: apps/mobile/src/store/ | Blocker: None`
+
+- [x] `Status: DONE` ตั้งค่า `app.json` เพิ่ม `expo-location` ใน plugins และ `NSLocationWhenInUseUsageDescription` สำหรับ iOS
+  `Owner: Codex | Priority: P0 | Due: 2026-02-20 | Dependency: DEP-04 | DoD: config ถูกต้อง, build warning-free | Deliverable: apps/mobile/app.json | Blocker: None`
+
+- [x] `Status: DONE` ตั้งค่า `.env` สำหรับ mobile (`EXPO_PUBLIC_API_BASE_URL`) และเพิ่มใน `.env.example`
+  `Owner: Codex | Priority: P0 | Due: 2026-02-20 | Dependency: DEP-00 | DoD: API_BASE_URL ใช้งานได้ทั้ง dev/staging | Deliverable: apps/mobile/.env.example | Blocker: None`
+
+---
+
+### 13B) Design System & Theme
+
+งาน: สร้าง design token และ shared components ให้ consistent ตลอด app
+
+- [x] `Status: DONE` อัปเดต `theme.ts` ให้ตรงกับ Customer UI สีน้ำเงิน (`#2563eb`, `#1d4ed8`, `#9333ea`) พร้อม typography scale และ spacing
+  `Owner: Codex | Priority: P0 | Due: 2026-02-21 | Dependency: 13A | DoD: ใช้ token ได้ทุก screen | Deliverable: apps/mobile/src/theme.ts | Blocker: None`
+
+- [x] `Status: DONE` สร้าง shared components: `Button`, `Badge`, `Card`, `ShopCard`, `Skeleton`, `EmptyState`, `ErrorBanner`
+  `Owner: Codex | Priority: P0 | Due: 2026-02-22 | Dependency: 13B.1 | DoD: render ได้ทุก variant, รองรับ dark mode พื้นฐาน | Deliverable: apps/mobile/src/components/ | Blocker: None`
+
+- [x] `Status: DONE` สร้าง `BottomTabBar` component แบบ custom ให้ตรงกับ Customer tab (Home/Delivery/Bookings/Tracking/Rewards)
+  `Owner: Codex | Priority: P0 | Due: 2026-02-22 | Dependency: 13B.1 | DoD: active state ชัดเจน, accessible | Deliverable: apps/mobile/src/components/BottomTabBar.tsx | Blocker: None`
+
+---
+
+### 13C) Navigation & Auth
+
+งาน: ตั้งค่า navigation stack และ auth flow
+
+- [x] `Status: DONE` สร้าง Root Navigator ด้วย React Navigation: Stack (Login → Main) + Bottom Tabs (Home/Delivery/Bookings/Tracking/Rewards)
+  `Owner: Codex | Priority: P0 | Due: 2026-02-23 | Dependency: 13A, 13B | DoD: navigate ระหว่าง screen ได้ครบ | Deliverable: apps/mobile/src/navigation/ | Blocker: None`
+
+- [x] `Status: DONE` สร้าง `LoginScreen` พร้อม role selector (Customer/Partner) และ login ผ่าน API `/auth/login`
+  `Owner: Codex | Priority: P0 | Due: 2026-02-23 | Dependency: 13C.1 | DoD: login สำเร็จ token เก็บใน SecureStore, redirect ไป Main | Deliverable: apps/mobile/src/screens/LoginScreen.tsx | Blocker: None`
+
+- [x] `Status: DONE` สร้าง auth store (Zustand) เก็บ `token`, `role`, `userId` พร้อม `login()` / `logout()` actions
+  `Owner: Codex | Priority: P0 | Due: 2026-02-23 | Dependency: 13A | DoD: persist ข้าม session ได้ด้วย SecureStore | Deliverable: apps/mobile/src/store/authStore.ts | Blocker: None`
+
+- [x] `Status: DONE` ทำ auth guard: ถ้าไม่มี token ให้ redirect ไป LoginScreen อัตโนมัติ
+  `Owner: Codex | Priority: P0 | Due: 2026-02-23 | Dependency: 13C.1, 13C.2 | DoD: protected routes ทำงานถูกต้อง | Deliverable: apps/mobile/src/navigation/ | Blocker: None`
+
+---
+
+### 13D) Home Screen — Discovery & Lookbook
+
+งาน: หน้าแรก ค้นหาร้านใกล้เคียง + Lookbook style picker
+
+- [x] `Status: DONE` สร้าง `HomeScreen` พร้อม Lookbook horizontal scroll (รูปสไตล์ทรงผม 4 แบบ) แบบ snap scroll
+  `Owner: Codex | Priority: P0 | Due: 2026-02-25 | Dependency: 13C, 13B | DoD: scroll ได้ smooth, select style ได้ | Deliverable: apps/mobile/src/screens/HomeScreen.tsx | Blocker: None`
+
+- [x] `Status: DONE` ขอ Location permission และเรียก `GET /discovery/nearby` ด้วย GPS coords
+  `Owner: Codex | Priority: P0 | Due: 2026-02-25 | Dependency: 13D.1 | DoD: แสดงร้านตาม GPS, graceful fallback ถ้า deny permission | Deliverable: HomeScreen + api.ts | Blocker: None`
+
+- [x] `Status: DONE` สร้าง `ShopCard` แสดง: ชื่อร้าน, rating, ระยะทาง, wait time, ASAP badge — พร้อม press ไป ShopDetailScreen
+  `Owner: Codex | Priority: P1 | Due: 2026-02-25 | Dependency: 13D.2 | DoD: ข้อมูลครบ, press ได้ | Deliverable: apps/mobile/src/components/ShopCard.tsx | Blocker: None`
+
+- [x] `Status: DONE` ทำ ASAP filter toggle กรองร้านที่ wait ≤ 15 นาที
+  `Owner: Codex | Priority: P1 | Due: 2026-02-25 | Dependency: 13D.3 | DoD: filter ทำงานถูกต้อง | Deliverable: HomeScreen | Blocker: None`
+
+- [x] `Status: DONE` ทำ pull-to-refresh สำหรับ shop list
+  `Owner: Codex | Priority: P2 | Due: 2026-02-26 | Dependency: 13D.2 | DoD: refresh แสดง indicator และ reload data | Deliverable: HomeScreen | Blocker: None`
+
+---
+
+### 13E) Shop Detail Screen
+
+งาน: หน้ารายละเอียดร้าน — บริการ, พนักงาน, รีวิว
+
+- [x] `Status: DONE` สร้าง `ShopDetailScreen` เรียก `GET /discovery/shops/:shopId` แสดง: ชื่อร้าน, rating, บริการ, สาขา, slot
+  `Owner: Codex | Priority: P0 | Due: 2026-02-26 | Dependency: 13D | DoD: ข้อมูลครบ, UX ชัดเจน | Deliverable: apps/mobile/src/screens/ShopDetailScreen.tsx | Blocker: None`
+
+- [x] `Status: DONE` แสดง service list พร้อม ราคา และ select ไป BookingFlowScreen ได้
+  `Owner: Codex | Priority: P0 | Due: 2026-02-26 | Dependency: 13E.1 | DoD: select service แล้ว pass ไป BookingScreen ได้ | Deliverable: ShopDetailScreen | Blocker: None`
+
+- [x] `Status: DONE` แสดง staff list พร้อม rating, specialty และ select staff ได้ (optional)
+  `Owner: Codex | Priority: P1 | Due: 2026-02-27 | Dependency: 13E.1 | DoD: select staff ได้ หรือ "Any staff" | Deliverable: ShopDetailScreen | Blocker: None`
+
+---
+
+### 13F) Booking Flow
+
+งาน: flow จอง — เลือก slot → quote → checkout → confirmation
+
+- [x] `Status: DONE` สร้าง `BookingFlowScreen` เรียก `GET /discovery/shops/:id/availability` แสดง date picker + time slot grid เลือกได้
+  `Owner: Codex | Priority: P0 | Due: 2026-02-27 | Dependency: 13E | DoD: slots load ได้, select ได้ | Deliverable: apps/mobile/src/screens/BookingFlowScreen.tsx | Blocker: None`
+
+- [x] `Status: DONE` ทำ quote summary: เรียก `POST /customer/bookings/quote` แสดง subtotal, total พร้อม service/shop/slot ที่เลือก
+  `Owner: Codex | Priority: P0 | Due: 2026-02-27 | Dependency: 13F.1 | DoD: ราคาถูกต้อง, แสดงก่อน confirm | Deliverable: BookingFlowScreen | Blocker: None`
+
+- [x] `Status: DONE` ทำ checkout: เรียก `POST /customer/bookings/checkout` พร้อม Idempotency-Key, handle error gracefully
+  `Owner: Codex | Priority: P0 | Due: 2026-02-28 | Dependency: 13F.2 | DoD: booking สำเร็จ → navigate ไป Bookings, error → แสดง banner | Deliverable: BookingFlowScreen | Blocker: None`
+
+- [x] `Status: DONE` สร้าง Confirm bottom sheet แสดง booking summary หลัง select slot พร้อมปุ่ม "ยืนยันจอง" / "เลือกเวลาอื่น"
+  `Owner: Codex | Priority: P1 | Due: 2026-02-28 | Dependency: 13F.3 | DoD: bottom sheet ขึ้นมา, navigate ได้ | Deliverable: BookingFlowScreen (Modal) | Blocker: None`
+
+---
+
+### 13G) Delivery Screen
+
+งาน: ค้นหาช่างที่รับงาน delivery (บริการถึงบ้าน)
+
+- [x] `Status: DONE` สร้าง `DeliveryScreen` แสดงรายชื่อช่างพร้อม: portrait emoji, specialty, ETA, rating, status (Ready/Busy)
+  `Owner: Codex | Priority: P1 | Due: 2026-03-01 | Dependency: 13C, 13B | DoD: render ได้ครบ, select ช่างได้ | Deliverable: apps/mobile/src/screens/DeliveryScreen.tsx | Blocker: None`
+
+- [x] `Status: DONE` ทำ barber profile bottom sheet: แสดง bio, equipment list, ETA เมื่อ press card
+  `Owner: Codex | Priority: P1 | Due: 2026-03-01 | Dependency: 13G.1 | DoD: bottom sheet แสดงข้อมูลครบ | Deliverable: DeliveryScreen | Blocker: None`
+
+- [x] `Status: DONE` ทำ "จองเลย" เชื่อมไป BookingFlowScreen พร้อม barber context
+  `Owner: Codex | Priority: P1 | Due: 2026-03-02 | Dependency: 13G.1, 13F | DoD: navigate พร้อม barber context | Deliverable: DeliveryScreen | Blocker: None`
+
+---
+
+### 13H) Live Tracking Screen
+
+งาน: ติดตามสถานะช่างแบบ real-time
+
+- [x] `Status: DONE` สร้าง `TrackingScreen` แสดง 4-step progress (Confirmed → On the Way → In Progress → Done) พร้อม animated progress bar
+  `Owner: Codex | Priority: P0 | Due: 2026-03-02 | Dependency: 13F | DoD: step update, animate ได้ | Deliverable: apps/mobile/src/screens/TrackingScreen.tsx | Blocker: None`
+
+- [x] `Status: DONE` เชื่อม WebSocket (`socket.io-client`) รับ event `booking_confirmed`, `service_started`, `service_completed` อัปเดต state
+  `Owner: Codex | Priority: P0 | Due: 2026-03-03 | Dependency: 13H.1 | DoD: state เปลี่ยนเมื่อ event มา, reconnect อัตโนมัติ | Deliverable: apps/mobile/src/lib/socket.ts | Blocker: None`
+
+- [x] `Status: DONE` ทำ action buttons: Call, Message, SOS (ปุ่ม SOS เปิด native phone dialer)
+  `Owner: Codex | Priority: P1 | Due: 2026-03-03 | Dependency: 13H.1 | DoD: Call/SOS เปิด dialer ได้, Message เปิด chat stub | Deliverable: TrackingScreen | Blocker: None`
+
+- [x] `Status: DONE` ทำ post-service flow: หลัง `completed` → ReviewSheet star rating + `POST /customer/bookings/:id/post-service`
+  `Owner: Codex | Priority: P0 | Due: 2026-03-04 | Dependency: 13H.1 | DoD: submit rating ได้, UX ชัดเจน | Deliverable: TrackingScreen + ReviewSheet | Blocker: None`
+
+---
+
+### 13I) Bookings Screen — History & Upcoming
+
+งาน: ประวัติการจองและ upcoming bookings
+
+- [x] `Status: DONE` สร้าง `BookingsScreen` เรียก `GET /customer/bookings/cust_1` แสดง 2 tabs: Upcoming / History
+  `Owner: Codex | Priority: P0 | Due: 2026-03-04 | Dependency: 13C | DoD: list load ได้, tab switch ได้ | Deliverable: apps/mobile/src/screens/BookingsScreen.tsx | Blocker: None`
+
+- [x] `Status: DONE` ทำ booking card แสดง: booking ID, slot time, status badge, amount
+  `Owner: Codex | Priority: P0 | Due: 2026-03-05 | Dependency: 13I.1 | DoD: status ถูกต้อง | Deliverable: BookingsScreen | Blocker: None`
+
+- [x] `Status: DONE` ทำ cancel booking: กด cancel → reason picker → `POST /customer/bookings/:id/cancel` พร้อม cancellation policy note
+  `Owner: Codex | Priority: P1 | Due: 2026-03-05 | Dependency: 13I.1 | DoD: cancel สำเร็จ list refresh | Deliverable: BookingsScreen | Blocker: None`
+
+- [x] `Status: DONE` ทำ dispute flow: กด "Dispute" บน completed booking → form เหตุผล → `POST /disputes`
+  `Owner: Codex | Priority: P1 | Due: 2026-03-06 | Dependency: 13I.1 | DoD: submit ได้, confirmation แสดง | Deliverable: BookingsScreen (DisputeSheet inline) | Blocker: None`
+
+---
+
+### 13J) Rewards Screen
+
+งาน: แสดง loyalty points, tier, wallet
+
+- [x] `Status: DONE` สร้าง `RewardsScreen` แสดง: tier badge, points, animated progress bar ไปยัง tier ถัดไป
+  `Owner: Codex | Priority: P1 | Due: 2026-03-06 | Dependency: 13C, 13B | DoD: render ถูกต้อง, animate progress bar | Deliverable: apps/mobile/src/screens/RewardsScreen.tsx | Blocker: None`
+
+- [x] `Status: DONE` แสดง wallet balance stub และ saved cards placeholder
+  `Owner: Codex | Priority: P1 | Due: 2026-03-07 | Dependency: 13J.1 | DoD: แสดง balance, placeholder cards | Deliverable: RewardsScreen | Blocker: None`
+
+- [x] `Status: DONE` แสดง favourite barbers list (stub จาก mock data)
+  `Owner: Codex | Priority: P2 | Due: 2026-03-07 | Dependency: 13J.1 | DoD: แสดง list | Deliverable: RewardsScreen | Blocker: None`
+
+---
+
+### 13K) Push Notifications
+
+งาน: รับ push notification สำหรับ booking events
+
+- [x] `Status: DONE` ลงทะเบียน device token ผ่าน `expo-notifications` และส่ง register ไปยัง `POST /platform/devices/register`
+  `Owner: Codex | Priority: P0 | Due: 2026-03-08 | Dependency: 13C | DoD: token register สำเร็จหลัง login | Deliverable: apps/mobile/src/lib/notifications.ts | Blocker: None`
+
+- [x] `Status: DONE` handle push notification เมื่อ app อยู่ foreground: `subscribeToForegroundNotifications` → Alert.alert พร้อมปุ่มนำทาง
+  `Owner: Codex | Priority: P0 | Due: 2026-03-08 | Dependency: 13K.1 | DoD: notification แสดงถูกต้อง | Deliverable: notifications.ts | Blocker: None`
+
+- [x] `Status: DONE` handle push notification เมื่อ app อยู่ background / killed: `subscribeToNotificationResponse` → navigate ไป Customer app
+  `Owner: Codex | Priority: P0 | Due: 2026-03-09 | Dependency: 13K.1 | DoD: deep link ทำงานได้ | Deliverable: notifications.ts + App.tsx | Blocker: None`
+
+---
+
+### 13L) QA, Testing & Accessibility
+
+งาน: ทดสอบความถูกต้องและ accessibility ก่อน build production
+
+- [ ] `Status: TODO` ทดสอบ E2E flow ครบบน Expo Go: Login → Discovery → ShopDetail → Booking → Tracking → Review
+  `Owner: Codex | Priority: P0 | Due: 2026-03-10 | Dependency: 13A..13K | DoD: flow ผ่านได้ไม่ crash | Deliverable: test report | Blocker: None`
+
+- [ ] `Status: TODO` ทำ accessibility pass: minimum touch target 44px, contrast ratio ผ่าน WCAG AA, screen reader label ครบ
+  `Owner: Codex | Priority: P0 | Due: 2026-03-10 | Dependency: 13A..13J | DoD: audit ผ่านทุก screen หลัก | Deliverable: accessibility audit note | Blocker: None`
+
+- [ ] `Status: TODO` ทดสอบ offline/poor network: แสดง error state ที่เข้าใจได้ ไม่ crash
+  `Owner: Codex | Priority: P1 | Due: 2026-03-11 | Dependency: 13L.1 | DoD: error banner แสดง retry ได้ | Deliverable: test report | Blocker: None`
+
+- [ ] `Status: TODO` ทดสอบบน iOS Simulator และ Android Emulator ทั้ง 2 platform
+  `Owner: Codex | Priority: P0 | Due: 2026-03-11 | Dependency: 13L.1 | DoD: ไม่มี crash, layout ถูกต้องทั้ง 2 platform | Deliverable: test screenshots | Blocker: None`
+
+- [ ] `Status: TODO` Performance pass: FlatList ใช้ `keyExtractor` + `getItemLayout` ถูกต้อง, image มี cache header
+  `Owner: Codex | Priority: P1 | Due: 2026-03-12 | Dependency: 13L.4 | DoD: scroll 60fps บน mid-range device | Deliverable: Profiler report | Blocker: None`
+
+---
+
+### 13M) EAS Build & Store Preparation
+
+งาน: build production binary พร้อมขึ้น App Store / Play Store
+
+- [x] `Status: DONE` ตั้งค่า `eas.json` build profiles: `development`, `preview`, `production` ให้ครบ
+  `Owner: Codex | Priority: P0 | Due: 2026-03-13 | Dependency: 13L | DoD: build แต่ละ profile ผ่านใน EAS | Deliverable: apps/mobile/eas.json | Blocker: None`
+
+- [ ] `Status: TODO` สร้าง App Icons ครบ resolution (iOS 1024×1024, Android adaptive icon) และ Splash Screen
+  `Owner: Codex | Priority: P0 | Due: 2026-03-13 | Dependency: DEP-00 | DoD: icon แสดงถูกต้อง บน simulator/device | Deliverable: apps/mobile/assets/ | Blocker: None`
+
+- [x] `Status: DONE` ตั้งค่า bundle identifier (`com.barbergo.app`) สำหรับ iOS และ `applicationId` สำหรับ Android ใน `app.json`
+  `Owner: Codex | Priority: P0 | Due: 2026-03-13 | Dependency: DEP-00 | DoD: config ถูกต้องสำหรับ store submission | Deliverable: apps/mobile/app.json | Blocker: None`
+
+- [ ] `Status: TODO` run `eas build --platform all --profile preview` ได้ artifact `.ipa` และ `.apk`
+  `Owner: Codex | Priority: P0 | Due: 2026-03-14 | Dependency: 13M.1..13M.3 | DoD: build สำเร็จ ไม่มี error, install บน device ได้ | Deliverable: EAS build link | Blocker: None`
+
+- [ ] `Status: TODO` เตรียม App Store Connect metadata: app name, description, screenshots (6.5", 5.5"), keywords, age rating
+  `Owner: Codex | Priority: P1 | Due: 2026-03-15 | Dependency: 13M.4 | DoD: metadata ครบ submit review ได้ | Deliverable: store listing draft | Blocker: None`
+
+- [ ] `Status: TODO` เตรียม Google Play Console metadata: store listing, content rating, target API level 35+
+  `Owner: Codex | Priority: P1 | Due: 2026-03-15 | Dependency: 13M.4 | DoD: metadata ครบ submit review ได้ | Deliverable: store listing draft | Blocker: None`
+
+- [ ] `Status: TODO` Sign-off Phase 13 Mobile App (Product + Engineering + QA)
+  `Owner: Codex | Priority: P0 | Due: 2026-03-17 | Dependency: งาน 13A..13M ครบ | DoD: Sign-off | Deliverable: acceptance note | Blocker: None`
+
+---
+
+## Phase 14 - Partner Mobile App (React Native + Expo)
+
+อัปเดต: 2026-02-18
+เป้าหมาย: สร้าง Partner Mobile App ใน binary เดียวกับ Customer (`apps/mobile`) ให้ partner จัดการร้าน รับงาน และรับเงินได้ครบ end-to-end
+
+หมายเหตุ: Phase 13 (Customer) และ Phase 14 (Partner) แชร์ dependencies ร่วมกัน (13A–13C) — ถ้า 13A–13C เสร็จแล้วให้ข้ามส่วน setup ซ้ำ
+
+Default for Phase 14:
+- `Owner: Codex | Priority: P1 | Sprint: S14 | Dependency: Phase 13A/13B/13C | DoD: Implementation | Deliverable: working screen + passing build | Blocker: Phase 13A complete`
+
+---
+
+### 14A) Partner Navigation & Auth
+
+งาน: แยก navigation flow สำหรับ Partner role หลัง login
+
+- [x] `Status: DONE` เพิ่ม Partner Bottom Tab Navigator: Dashboard / Jobs / Services / Schedule / Wallet
+  `Owner: Codex | Priority: P0 | Due: 2026-03-18 | Dependency: 13C | DoD: navigate ได้ครบ 5 tabs | Deliverable: apps/mobile/src/navigation/PartnerNavigator.tsx | Blocker: None`
+
+- [x] `Status: DONE` ทำ role-based routing: หลัง login ถ้า role=`partner` → PartnerNavigator, ถ้า role=`customer` → CustomerNavigator
+  `Owner: Codex | Priority: P0 | Due: 2026-03-18 | Dependency: 14A.1 | DoD: redirect ถูก role, ไม่ข้ามกัน | Deliverable: apps/mobile/src/navigation/RootNavigator.tsx | Blocker: None`
+
+- [x] `Status: DONE` สร้าง Partner auth store (Zustand): เก็บ `partnerId`, `shopId`, `isOnline` status พร้อม toggle online/offline
+  `Owner: Codex | Priority: P0 | Due: 2026-03-18 | Dependency: 13C | DoD: toggle online ได้ persist ข้าม session | Deliverable: apps/mobile/src/store/partnerStore.ts | Blocker: None`
+
+---
+
+### 14B) Partner Dashboard Screen
+
+งาน: หน้าหลัก partner — KPI metrics, online toggle, KYC status, live alerts
+
+- [x] `Status: DONE` สร้าง `PartnerDashboardScreen` แสดง: online/offline toggle, Today's Revenue, Completed Jobs, Rating, Completion Rate
+  `Owner: Codex | Priority: P0 | Due: 2026-03-19 | Dependency: 14A | DoD: ข้อมูล load จาก API, toggle ได้ | Deliverable: apps/mobile/src/screens/partner/DashboardScreen.tsx | Blocker: None`
+
+- [x] `Status: DONE` แสดง KYC verification banner ถ้า `verification_status !== approved` พร้อม CTA "Complete KYC"
+  `Owner: Codex | Priority: P0 | Due: 2026-03-19 | Dependency: 14B.1 | DoD: banner แสดง/ซ่อนตาม status, กด CTA ไป KYC flow | Deliverable: DashboardScreen | Blocker: None`
+
+- [x] `Status: DONE` แสดง incoming job alert badge บน Jobs tab เมื่อมี new booking request
+  `Owner: Codex | Priority: P1 | Due: 2026-03-20 | Dependency: 14B.1, 14C | DoD: badge count ถูกต้อง, update real-time | Deliverable: PartnerNavigator badge | Blocker: None`
+
+---
+
+### 14C) Jobs Screen — Booking Queue & Operations
+
+งาน: รับและจัดการ booking จาก customer
+
+- [x] `Status: DONE` สร้าง `JobsScreen` เรียก `GET /partner/bookings/incoming/:partnerId` แสดง queue พร้อม: customer name, service, slot, price
+  `Owner: Codex | Priority: P0 | Due: 2026-03-20 | Dependency: 14A | DoD: queue load ได้, pull-to-refresh ได้ | Deliverable: apps/mobile/src/screens/partner/JobsScreen.tsx | Blocker: None`
+
+- [x] `Status: DONE` ทำ job action buttons: Confirm / Reject / Start / Complete ตาม booking state machine
+  `Owner: Codex | Priority: P0 | Due: 2026-03-21 | Dependency: 14C.1 | DoD: transition ถูก state, error toast ถ้า fail | Deliverable: JobsScreen + JobCard.tsx | Blocker: None`
+
+- [x] `Status: DONE` ทำ countdown timer บน active job (in_progress) แสดงเวลาที่เหลือ
+  `Owner: Codex | Priority: P1 | Due: 2026-03-21 | Dependency: 14C.2 | DoD: timer นับถอยหลัง, หยุดเมื่อ complete | Deliverable: JobCard.tsx | Blocker: None`
+
+- [x] `Status: DONE` รับ push notification เมื่อมี booking request ใหม่ → กด notification นำทางไป JobsScreen
+  `Owner: Codex | Priority: P0 | Due: 2026-03-22 | Dependency: 13K, 14C.1 | DoD: notification มาถึง, tap → navigate ได้ | Deliverable: notifications.ts (partner handler) | Blocker: None`
+
+- [x] `Status: DONE` ทำ no-show flow: กดรายงาน no-show บน confirmed booking ที่ลูกค้าไม่มา
+  `Owner: Codex | Priority: P1 | Due: 2026-03-22 | Dependency: 14C.2 | DoD: no-show บันทึกได้, policy fee แสดง | Deliverable: JobsScreen | Blocker: None`
+
+---
+
+### 14D) Services & Staff Management Screen
+
+งาน: จัดการบริการ พนักงาน และสาขา
+
+- [x] `Status: DONE` สร้าง `ServicesScreen` แสดง service list: ชื่อ, ราคา, duration, mode (in-shop/delivery) พร้อม toggle active/inactive
+  `Owner: Codex | Priority: P0 | Due: 2026-03-23 | Dependency: 14A | DoD: list load ได้, toggle ได้ | Deliverable: apps/mobile/src/screens/partner/ServicesScreen.tsx | Blocker: None`
+
+- [x] `Status: DONE` ทำ Add/Edit service form (bottom sheet): ชื่อ, ราคา, duration, mode — submit ไป `POST /partner/services`
+  `Owner: Codex | Priority: P0 | Due: 2026-03-24 | Dependency: 14D.1 | DoD: save สำเร็จ list refresh | Deliverable: ServiceFormSheet.tsx | Blocker: None`
+
+- [x] `Status: DONE` แสดง staff list พร้อม: ชื่อ, skills, สถานะ online/offline และ Add staff form
+  `Owner: Codex | Priority: P1 | Due: 2026-03-24 | Dependency: 14A | DoD: list load ได้, add staff ได้ | Deliverable: ServicesScreen (Staff tab) | Blocker: None`
+
+- [ ] `Status: TODO` แสดง branch list และ branch capacity/hours (read-only MVP — edit ใน phase ถัดไป)
+  `Owner: Codex | Priority: P2 | Due: 2026-03-25 | Dependency: 14D.1 | DoD: แสดงข้อมูลสาขาได้ | Deliverable: ServicesScreen (Branch tab) | Blocker: None`
+
+---
+
+### 14E) Schedule Screen
+
+งาน: จัดการตารางเปิด-ปิดของสาขาและพนักงาน
+
+- [x] `Status: DONE` สร้าง `ScheduleScreen` แสดง 7-day schedule grid พร้อม open/close toggle รายวัน
+  `Owner: Codex | Priority: P1 | Due: 2026-03-25 | Dependency: 14A | DoD: toggle วันได้, save ได้ | Deliverable: apps/mobile/src/screens/partner/ScheduleScreen.tsx | Blocker: None`
+
+- [x] `Status: DONE` แสดง upcoming bookings timeline รายวัน (slot ที่จองแล้ว) เพื่อให้เห็น capacity
+  `Owner: Codex | Priority: P1 | Due: 2026-03-26 | Dependency: 14E.1 | DoD: แสดง slot ที่จองใน calendar view | Deliverable: ScheduleScreen | Blocker: None`
+
+---
+
+### 14F) Wallet & Revenue Screen
+
+งาน: รายได้ การถอนเงิน และ transaction history
+
+- [x] `Status: DONE` สร้าง `WalletScreen` เรียก `GET /partner/wallet/:partnerId` แสดง: available balance, pending balance, total earned
+  `Owner: Codex | Priority: P0 | Due: 2026-03-26 | Dependency: 14A | DoD: balance ถูกต้อง, load ได้ | Deliverable: apps/mobile/src/screens/partner/WalletScreen.tsx | Blocker: None`
+
+- [x] `Status: DONE` ทำ withdrawal flow: กรอก amount → confirm → `POST /partner/wallet/:partnerId/withdraw` พร้อม validation (ไม่เกิน available)
+  `Owner: Codex | Priority: P0 | Due: 2026-03-27 | Dependency: 14F.1 | DoD: withdraw สำเร็จ balance update, error แสดง toast | Deliverable: WalletScreen + WithdrawSheet.tsx | Blocker: None`
+
+- [x] `Status: DONE` แสดง transaction history: job id, service name, gross amount, commission fee, net payout รายการย้อนหลัง
+  `Owner: Codex | Priority: P1 | Due: 2026-03-27 | Dependency: 14F.1 | DoD: list แสดงครบ, scroll ได้ | Deliverable: WalletScreen | Blocker: None`
+
+---
+
+### 14G) Partner Onboarding & KYC Flow
+
+งาน: flow สมัครเป็น partner และส่งเอกสาร KYC
+
+- [x] `Status: DONE` สร้าง `OnboardingScreen` flow แบบ step-by-step: ข้อมูลร้าน → เอกสาร → bank account → submit
+  `Owner: Codex | Priority: P0 | Due: 2026-03-28 | Dependency: 14A | DoD: submit ได้ครบ, status แสดง pending | Deliverable: apps/mobile/src/screens/partner/OnboardingScreen.tsx | Blocker: None`
+
+- [x] `Status: DONE` ทำ document upload: ถ่ายรูป/เลือกจาก gallery ด้วย `expo-image-picker` แล้ว upload ไป MinIO
+  `Owner: Codex | Priority: P0 | Due: 2026-03-28 | Dependency: 14G.1 | DoD: upload สำเร็จ, preview รูปได้ | Deliverable: OnboardingScreen | Blocker: None`
+
+- [x] `Status: DONE` แสดง KYC status screen: pending/approved/rejected พร้อม reason ถ้า rejected และ re-submit ได้
+  `Owner: Codex | Priority: P0 | Due: 2026-03-29 | Dependency: 14G.1 | DoD: status แสดงถูกต้องตาม API | Deliverable: OnboardingScreen | Blocker: None`
+
+---
+
+### 14H) QA, Testing & Sign-off
+
+งาน: ทดสอบ Partner flows ครบก่อน build production
+
+- [ ] `Status: TODO` ทดสอบ E2E Partner flow: Login → Dashboard → รับงาน → Confirm → Start → Complete → Wallet withdraw
+  `Owner: Codex | Priority: P0 | Due: 2026-03-30 | Dependency: 14A..14G | DoD: flow ผ่านไม่ crash ทั้ง iOS และ Android | Deliverable: test report | Blocker: None`
+
+- [ ] `Status: TODO` ทดสอบ push notification สำหรับ Partner: incoming booking, booking cancelled by customer
+  `Owner: Codex | Priority: P0 | Due: 2026-03-30 | Dependency: 13K, 14C.4 | DoD: notification มาถึงและ navigate ถูก screen | Deliverable: test report | Blocker: None`
+
+- [ ] `Status: TODO` ทำ accessibility pass: touch target 44px, contrast, screen reader label ครบทุก Partner screen
+  `Owner: Codex | Priority: P0 | Due: 2026-03-31 | Dependency: 14A..14G | DoD: audit ผ่าน | Deliverable: accessibility note | Blocker: None`
+
+- [ ] `Status: TODO` run `eas build --platform all --profile preview` รวม Customer + Partner ใน binary เดียว
+  `Owner: Codex | Priority: P0 | Due: 2026-04-01 | Dependency: 13M, 14A..14G | DoD: build สำเร็จ install ได้ | Deliverable: EAS build link | Blocker: None`
+
+- [ ] `Status: TODO` Sign-off Phase 14 Partner Mobile App (Product + Engineering + QA + Ops)
+  `Owner: Codex | Priority: P0 | Due: 2026-04-02 | Dependency: งาน 14A..14H ครบ | DoD: Sign-off | Deliverable: acceptance note | Blocker: None`

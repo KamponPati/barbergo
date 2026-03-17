@@ -17,9 +17,9 @@ export function ActionButton({
       accessibilityRole="button"
       accessibilityState={{ disabled: Boolean(disabled) }}
       accessibilityLabel={label}
-      style={({ pressed }) => [appStyles.button, pressed && appStyles.buttonPressed, disabled && appStyles.buttonDisabled]}
+      style={({ pressed }) => [appStyles.btn, appStyles.btnPrimary, pressed && appStyles.btnDisabled, disabled && appStyles.btnDisabled]}
     >
-      <Text style={appStyles.buttonText}>{label}</Text>
+      <Text style={appStyles.btnText}>{label}</Text>
     </Pressable>
   );
 }

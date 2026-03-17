@@ -5,22 +5,22 @@
 #
 # Verify:
 #   sudo -n /usr/bin/docker ps
-#   sudo -n /usr/bin/docker compose -f /home/yee/app/infra/docker/docker-compose.observability.yml up -d
+#   sudo -n /usr/bin/docker compose -f /home/yee/app3/barbergo/infra/docker/docker-compose.observability.yml up -d
 
 Cmnd_Alias BARBERGO_DOCKER = \
   /usr/bin/docker ps, \
-  /usr/bin/docker compose -f /home/yee/app/infra/docker/docker-compose.observability.yml up -d, \
-  /usr/bin/docker compose -f /home/yee/app/infra/docker/docker-compose.observability.yml down, \
-  /usr/bin/docker compose -f /home/yee/app/infra/docker/docker-compose.observability.yml ps, \
-  /usr/bin/docker compose -f /home/yee/app/infra/docker/docker-compose.observability.yml logs *, \
-  /usr/bin/docker compose -f /home/yee/app/infra/docker/docker-compose.observability.yml pull, \
-  /usr/bin/docker compose -f /home/yee/app/infra/docker/docker-compose.observability.yml up -d --pull always, \
-  /usr/bin/docker compose -f /home/yee/app/infra/docker/docker-compose.observability.yml up -d --build, \
-  /usr/bin/docker-compose -f /home/yee/app/infra/docker/docker-compose.observability.yml up -d, \
-  /usr/bin/docker-compose -f /home/yee/app/infra/docker/docker-compose.observability.yml down, \
-  /usr/bin/docker-compose -f /home/yee/app/infra/docker/docker-compose.observability.yml ps, \
-  /usr/bin/docker-compose -f /home/yee/app/infra/docker/docker-compose.observability.yml logs, \
-  /usr/bin/docker-compose -f /home/yee/app/infra/docker/docker-compose.observability.yml logs *, \
-  /usr/bin/docker-compose -f /home/yee/app/infra/docker/docker-compose.observability.yml pull
+  /usr/bin/docker compose -f /home/yee/app3/barbergo/infra/docker/docker-compose.observability.yml up -d, \
+  /usr/bin/docker compose -f /home/yee/app3/barbergo/infra/docker/docker-compose.observability.yml down, \
+  /usr/bin/docker compose -f /home/yee/app3/barbergo/infra/docker/docker-compose.observability.yml ps, \
+  /usr/bin/docker compose -f /home/yee/app3/barbergo/infra/docker/docker-compose.observability.yml logs *, \
+  /usr/bin/docker compose -f /home/yee/app3/barbergo/infra/docker/docker-compose.observability.yml pull, \
+  /usr/bin/docker compose -f /home/yee/app3/barbergo/infra/docker/docker-compose.observability.yml up -d --pull always, \
+  /usr/bin/docker compose -f /home/yee/app3/barbergo/infra/docker/docker-compose.observability.yml up -d --build, \
+  /usr/bin/docker-compose -f /home/yee/app3/barbergo/infra/docker/docker-compose.observability.yml up -d, \
+  /usr/bin/docker-compose -f /home/yee/app3/barbergo/infra/docker/docker-compose.observability.yml down, \
+  /usr/bin/docker-compose -f /home/yee/app3/barbergo/infra/docker/docker-compose.observability.yml ps, \
+  /usr/bin/docker-compose -f /home/yee/app3/barbergo/infra/docker/docker-compose.observability.yml logs, \
+  /usr/bin/docker-compose -f /home/yee/app3/barbergo/infra/docker/docker-compose.observability.yml logs *, \
+  /usr/bin/docker-compose -f /home/yee/app3/barbergo/infra/docker/docker-compose.observability.yml pull
 
 yee ALL=(root) NOPASSWD: BARBERGO_DOCKER

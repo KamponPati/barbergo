@@ -7,7 +7,7 @@ set -euo pipefail
 # Usage:
 #   BARBERGO_ENV_FILE=/path/to/env bash scripts/ops/reset-db-and-seed.sh
 
-ROOT_DIR="/home/yee/app"
+ROOT_DIR="/home/yee/app3/barbergo"
 ENV_FILE="${BARBERGO_ENV_FILE:-$ROOT_DIR/.env}"
 
 if [ ! -f "$ENV_FILE" ]; then

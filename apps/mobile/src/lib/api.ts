@@ -105,6 +105,14 @@ export async function postServiceFeedback(token: string, bookingId: string): Pro
   });
 }
 
+export async function cancelBooking(token: string, bookingId: string, reason: string): Promise<void> {
+  await request(`/customer/bookings/${bookingId}/cancel`, {
+    method: "POST",
+    token,
+    body: { reason },
+  });
+}
+
 export async function createDispute(token: string, bookingId: string): Promise<void> {
   await request("/disputes", {
     method: "POST",
@@ -143,7 +151,10 @@ export async function partnerOnboarding(token: string): Promise<{ partner_id: st
   });
 }
 
-export async function getPartnerOnboardingStatus(token: string, partnerId: string): Promise<unknown> {
+export async function getPartnerOnboardingStatus(
+  token: string,
+  partnerId: string
+): Promise<{ verification_status: "pending" | "approved" | "rejected"; rejection_reason?: string }> {
   return request(`/partner/onboarding/${partnerId}/status`, { token });
 }
 

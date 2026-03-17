@@ -36,7 +36,7 @@ http {
     add_header Referrer-Policy "no-referrer" always;
     add_header Permissions-Policy "geolocation=(), microphone=(), camera=()" always;
 
-    root /home/yee/app/apps/web/dist;
+    root /home/yee/app3/barbergo/apps/web/dist;
     index index.html;
 
     location /api/v1/ {

@@ -1,0 +1,7 @@
+services:
+  web:
+    image: barbergo-web-local:latest
+    container_name: barbergo-web
+    ports:
+      - "5180:80"
+    restart: unless-stopped

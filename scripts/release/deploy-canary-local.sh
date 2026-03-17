@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-ROOT_DIR="/home/yee/app"
+ROOT_DIR="/home/yee/app3/barbergo"
 VERSION_FILE="$ROOT_DIR/VERSION"
 
 cd "$ROOT_DIR"

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-git rev-parse HEAD > /home/yee/app/VERSION
+git rev-parse HEAD > /home/yee/app3/barbergo/VERSION
 bash scripts/release/ensure-ports-free.sh
 sudo -n /bin/systemctl restart barbergo-api
 sudo -n /bin/systemctl restart barbergo-web

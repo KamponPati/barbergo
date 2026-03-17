@@ -6,9 +6,9 @@ After=network.target
 Type=simple
 User=yee
 Group=yee
-WorkingDirectory=/home/yee/app
+WorkingDirectory=/home/yee/app3/barbergo
 EnvironmentFile=-/etc/barbergo/production.env
-EnvironmentFile=-/home/yee/app/.env
+EnvironmentFile=-/home/yee/app3/barbergo/.env
 Environment=NODE_ENV=production
 Environment=PORT=3000
 # Fail fast if critical env is missing.

@@ -1699,18 +1699,28 @@ code {
 .customer-v2-nav button {
   border: 1px solid transparent;
   border-radius: 16px;
-  min-height: 48px;
+  min-height: 56px;
   min-width: 48px;
   background: transparent;
   color: #2563eb;
   font-weight: 700;
+  font-size: 11px;
+  letter-spacing: 0.02em;
   cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 8px 6px;
+  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
 }
 
 .customer-v2-nav button.is-active {
   border-color: #93c5fd;
-  background: #eff6ff;
+  background: linear-gradient(135deg, #eff6ff, #f5f3ff);
   color: #1d4ed8;
+  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.12);
 }
 
 .customer-lookbook,
@@ -1791,11 +1801,33 @@ code {
   cursor: pointer;
 }
 
+.customer-style-img-wrap {
+  position: relative;
+}
+
+.customer-style-check {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  color: #2563eb;
+  background: #fff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+}
+
 .customer-style-chip img {
   width: 100%;
-  height: 96px;
+  height: 108px;
   border-radius: 16px;
   object-fit: cover;
+  transition: transform 0.2s ease;
+}
+
+.customer-style-chip:hover img {
+  transform: scale(1.03);
 }
 
 .customer-style-chip span {
@@ -1807,6 +1839,7 @@ code {
 .customer-style-chip.is-active {
   border-color: #60a5fa;
   background: #eff6ff;
+  box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.3);
 }
 
 .customer-shop-grid,
@@ -1819,20 +1852,42 @@ code {
 .customer-shop-card,
 .customer-barber-card {
   border: 1px solid var(--cust-line);
-  border-radius: 22px;
+  border-radius: 20px;
   background: #fff;
-  padding: 12px;
+  padding: 14px 14px 14px 18px;
   display: grid;
-  gap: 8px;
+  gap: 10px;
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
 
-.customer-shop-card p,
-.customer-barber-card p {
-  margin: 0;
-  color: #1d4ed8;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
+.customer-shop-card::before,
+.customer-barber-card::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  background: linear-gradient(180deg, #2563eb, #9333ea);
+  border-radius: 4px 0 0 4px;
+}
+
+.customer-shop-card:hover,
+.customer-barber-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(37, 99, 235, 0.1);
+}
+
+.customer-shop-card.is-selected {
+  border-color: #60a5fa;
+  background: #f0f9ff;
+}
+
+.customer-barber-card.is-selected {
+  border-color: #60a5fa;
+  background: #f0f9ff;
 }
 
 .customer-barber-portrait {
@@ -1859,6 +1914,417 @@ code {
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
+}
+
+/* ── Shop card sub-elements ── */
+.customer-shop-name-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #1e3a8a;
+}
+
+.customer-shop-name-row h4 {
+  margin: 0;
+  font-size: 15px;
+}
+
+.customer-shop-meta {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 4px;
+  font-size: 12px;
+  color: #3b82f6;
+  font-weight: 600;
+}
+
+.customer-meta-dot {
+  color: #93c5fd;
+}
+
+.customer-shop-info-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #1d4ed8;
+  align-items: center;
+}
+
+.customer-shop-info-row span {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.customer-shop-actions {
+  display: flex;
+  gap: 8px;
+}
+
+/* ── Head layout variants ── */
+.customer-v2-head-left {
+  display: grid;
+  gap: 2px;
+}
+
+.customer-v2-head-left h3 {
+  margin: 0;
+  font-size: 22px;
+}
+
+.customer-v2-head-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+/* ── Barber card sub-elements ── */
+.customer-barber-portrait-wrap {
+  position: relative;
+}
+
+.customer-barber-portrait-wrap .badge {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+}
+
+.customer-barber-info {
+  display: grid;
+  gap: 6px;
+}
+
+.customer-barber-rating {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #1d4ed8;
+}
+
+.customer-barber-specialty {
+  margin: 0;
+  font-size: 13px;
+  color: #3b82f6;
+  font-weight: 600;
+}
+
+.customer-barber-meta {
+  display: flex;
+  gap: 12px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #1d4ed8;
+}
+
+.customer-barber-meta span {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.customer-barber-bio {
+  margin: 0;
+  color: #475569;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+/* ── Bookings summary icon ── */
+.customer-summary-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #eff6ff, #e0e7ff);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #2563eb;
+  margin-bottom: 4px;
+}
+
+/* ── Tracking section ── */
+.customer-tracking-barber-name {
+  margin: 2px 0 0;
+  font-size: 13px;
+  color: #3b82f6;
+  font-weight: 600;
+}
+
+.customer-tracking-steps {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: 16px;
+  background: #f8fbff;
+  border-radius: 16px;
+  border: 1px solid var(--cust-line);
+}
+
+.customer-tracking-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  flex: 1;
+  position: relative;
+  font-size: 11px;
+  font-weight: 700;
+  color: #93c5fd;
+  text-align: center;
+}
+
+.customer-tracking-step.is-active {
+  color: #1d4ed8;
+}
+
+.customer-tracking-step.is-done {
+  color: #16a34a;
+}
+
+.customer-step-dot {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 2px solid #bfdbfe;
+  background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 800;
+  color: #93c5fd;
+  z-index: 1;
+  position: relative;
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.customer-tracking-step.is-active .customer-step-dot {
+  border-color: #2563eb;
+  background: #2563eb;
+  color: #fff;
+  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.15);
+}
+
+.customer-tracking-step.is-done .customer-step-dot {
+  border-color: #16a34a;
+  background: #ecfdf3;
+  color: #16a34a;
+}
+
+.customer-step-line {
+  position: absolute;
+  top: 17px;
+  left: calc(50% + 17px);
+  right: calc(-50% + 17px);
+  height: 2px;
+  background: #bfdbfe;
+  z-index: 0;
+  transition: background 0.3s ease;
+}
+
+.customer-step-line.is-done {
+  background: #86efac;
+}
+
+.customer-step-label {
+  white-space: nowrap;
+}
+
+.customer-tracking-progress-wrap {
+  height: 10px;
+  background: #dbeafe;
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.customer-tracking-progress-bar {
+  height: 100%;
+  background: linear-gradient(90deg, #9333ea, #2563eb);
+  border-radius: 999px;
+  transition: width 0.5s ease;
+}
+
+.customer-tracking-eta {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 700;
+  color: #1d4ed8;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.customer-tracking-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.customer-action-btn {
+  flex: 1;
+  min-height: 52px;
+  border: 1px solid var(--cust-line);
+  border-radius: 14px;
+  background: #f8fbff;
+  color: #1d4ed8;
+  font-weight: 700;
+  font-size: 12px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  transition: background 0.15s ease, transform 0.15s ease;
+}
+
+.customer-action-btn:hover {
+  background: #eff6ff;
+  transform: translateY(-1px);
+}
+
+.customer-action-btn-danger {
+  border-color: #fecaca;
+  background: #fff5f5;
+  color: #dc2626;
+}
+
+.customer-action-btn-danger:hover {
+  background: #fee2e2;
+}
+
+/* ── Rewards section ── */
+.customer-rewards-hero {
+  border: 1px solid var(--cust-line);
+  border-radius: 20px;
+  background: linear-gradient(135deg, #eff6ff, #f5f3ff);
+  padding: 18px;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.customer-tier-badge {
+  width: 76px;
+  height: 76px;
+  border-radius: 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  color: #fff;
+  flex-shrink: 0;
+}
+
+.customer-tier-badge.is-gold {
+  background: linear-gradient(135deg, #fbbf24, #d97706);
+  box-shadow: 0 4px 18px rgba(217, 119, 6, 0.35);
+}
+
+.customer-tier-badge.is-silver {
+  background: linear-gradient(135deg, #94a3b8, #64748b);
+  box-shadow: 0 4px 18px rgba(100, 116, 139, 0.3);
+}
+
+.customer-tier-badge span {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.customer-rewards-info {
+  display: grid;
+  gap: 2px;
+}
+
+.customer-points-label {
+  margin: 0;
+  font-size: 11px;
+  font-weight: 700;
+  color: #3b82f6;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+}
+
+.customer-points-value {
+  margin: 0;
+  font-size: 38px;
+  font-weight: 800;
+  color: #1e3a8a;
+  line-height: 1.1;
+}
+
+.customer-points-next {
+  margin: 0;
+  font-size: 12px;
+  color: #60a5fa;
+  font-weight: 600;
+}
+
+.customer-points-bar-wrap {
+  height: 10px;
+  background: #dbeafe;
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.customer-points-bar {
+  height: 100%;
+  background: linear-gradient(90deg, #2563eb, #9333ea);
+  border-radius: 999px;
+  transition: width 0.6s ease;
+}
+
+.customer-points-progress-label {
+  margin: 0;
+  font-size: 12px;
+  color: #3b82f6;
+  font-weight: 600;
+  text-align: right;
+}
+
+.customer-rewards-perks {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.customer-perk-card {
+  border: 1px solid var(--cust-line);
+  border-radius: 16px;
+  background: #fff;
+  padding: 16px 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  text-align: center;
+  color: #2563eb;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.customer-perk-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(37, 99, 235, 0.1);
+}
+
+.customer-perk-card p {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 700;
+  color: #1d4ed8;
+}
+
+.customer-perk-card span {
+  font-size: 11px;
+  color: #60a5fa;
+  font-weight: 600;
 }
 
 .customer-booking-actions {

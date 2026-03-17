@@ -7,6 +7,6 @@ Wants=docker.service
 Type=oneshot
 User=root
 Group=root
-WorkingDirectory=/home/yee/app
+WorkingDirectory=/home/yee/app3/barbergo
 Environment=OUT_DIR=/var/backups/barbergo
 ExecStart=/usr/bin/env bash -lc 'bash scripts/backup/run-backup.sh'

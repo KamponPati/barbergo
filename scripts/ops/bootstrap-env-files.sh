@@ -4,7 +4,7 @@ set -euo pipefail
 # Bootstrap /etc/barbergo/{staging,production}.env from repo templates if missing.
 # Existing files are never overwritten.
 
-ROOT_DIR="/home/yee/app"
+ROOT_DIR="/home/yee/app3/barbergo"
 TARGET_DIR="/etc/barbergo"
 
 install_if_missing() {

@@ -14,18 +14,46 @@
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.barbergo.app",
+      "buildNumber": "1",
+      "infoPlist": {
+        "NSLocationWhenInUseUsageDescription": "BarberGo ใช้ตำแหน่งของคุณเพื่อค้นหาร้านตัดผมใกล้เคียง",
+        "NSCameraUsageDescription": "BarberGo ต้องการเข้าถึงกล้องเพื่ออัปโหลดเอกสาร KYC",
+        "NSPhotoLibraryUsageDescription": "BarberGo ต้องการเข้าถึงรูปภาพเพื่ออัปโหลดเอกสาร KYC"
+      }
     },
     "android": {
+      "package": "com.barbergo.app",
+      "versionCode": 1,
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
+        "backgroundColor": "#2563eb"
       },
       "edgeToEdgeEnabled": true,
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "permissions": [
+        "ACCESS_FINE_LOCATION",
+        "ACCESS_COARSE_LOCATION",
+        "CAMERA",
+        "READ_EXTERNAL_STORAGE"
+      ]
     },
     "plugins": [
-      "expo-notifications"
+      "expo-notifications",
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "BarberGo ใช้ตำแหน่งของคุณเพื่อค้นหาร้านตัดผมใกล้เคียง"
+        }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "BarberGo ต้องการเข้าถึงรูปภาพเพื่ออัปโหลดเอกสาร KYC",
+          "cameraPermission": "BarberGo ต้องการใช้กล้องเพื่อถ่ายรูปเอกสาร KYC"
+        }
+      ]
     ],
     "web": {
       "favicon": "./assets/favicon.png"
